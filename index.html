@@ -818,7 +818,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 var currentUser = null;
 var SESSION = null;
 var PUBLIC_CFG = null;
-var API_URL = 'PUT_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
+var API_URL = 'https://script.google.com/macros/s/AKfycbx_y6tuua_6K3q6NdinA_NQyyK_-19FhoIP815f-F4BhSMOWJYvMhof78Xb9YqqV7DFeQ/exec';
 var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'findCivilServantMatches', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
 function callApi(fn, args) {
   return fetch(API_URL, {
