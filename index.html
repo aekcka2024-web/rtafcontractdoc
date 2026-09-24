@@ -754,7 +754,7 @@ var currentUser = null;
 var SESSION = null;
 var PUBLIC_CFG = null;
 var API_URL = 'https://script.google.com/macros/s/AKfycbwDpgn2Nd7F1EUR3evp82FlPj8WtaSp7EUE8gm_DrTGdSlOGTGjttV5VpGqKTT_IhktlQ/exec';
-var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'getSubmission', 'uploadDocumentFile', 'setDocumentReview', 'findCivilServantMatches', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
+var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'findCivilServantMatches', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
 function callApi(fn, args) {
   return fetch(API_URL, {
     method: 'POST',
@@ -1825,7 +1825,7 @@ function renderDocTable(containerId, docs, sub) {
     var entry = docEntry(sub, doc.id);
     var tr = document.createElement('tr');
     var locked = entry.reviewStatus === 'pass' || entry.reviewStatus === 'fail';
-    var fileBadge = entry.status === 'uploaded' ? "<button class=\"file-link\" onclick=\"openDocModal('".concat(sub.subId, "','").concat(doc.id, "')\">\uD83D\uDCC4 ").concat(entry.originalFileName, "</button>") : doc.optional ? '<span class="badge pending">ไม่มีเอกสารนี้</span>' : '<span class="badge fail">ยังไม่อัพโหลด</span>';
+    var fileBadge = entry.status === 'uploaded' ? "<button class=\"file-link\" onclick=\"openDocModal('".concat(sub.subId, "','").concat(doc.id, "')\">\uD83D\uDCC4 ").concat(adminFileName(sub, entry), "</button>") : doc.optional ? '<span class="badge pending">ไม่มีเอกสารนี้</span>' : '<span class="badge fail">ยังไม่อัพโหลด</span>';
     var canReview = entry.status === 'uploaded';
     var select = canReview ? "\n      <select onchange=\"setReview('".concat(doc.id, "','").concat(sub.subId, "',this.value)\">\n        <option value=\"pending\" ").concat(entry.reviewStatus === 'pending' ? 'selected' : '', ">\u0E23\u0E2D\u0E15\u0E23\u0E27\u0E08</option>\n        <option value=\"pass\" ").concat(entry.reviewStatus === 'pass' ? 'selected' : '', ">\u0E1C\u0E48\u0E32\u0E19</option>\n        <option value=\"needs-revision\" ").concat(entry.reviewStatus === 'needs-revision' ? 'selected' : '', ">\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02</option>\n        <option value=\"fail\" ").concat(entry.reviewStatus === 'fail' ? 'selected' : '', ">\u0E44\u0E21\u0E48\u0E1C\u0E48\u0E32\u0E19</option>\n      </select>") : '<span class="sub-cell">—</span>';
     var commentBox = canReview ? "\n      <textarea placeholder=\"comment (\u0E16\u0E49\u0E32\u0E21\u0E35) \u2014 \u0E08\u0E33\u0E40\u0E1B\u0E47\u0E19\u0E40\u0E21\u0E37\u0E48\u0E2D\u0E40\u0E25\u0E37\u0E2D\u0E01 '\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02'\" onchange=\"setComment('".concat(doc.id, "','").concat(sub.subId, "',this.value)\">").concat(entry.comment || '', "</textarea>") : '';
@@ -1908,11 +1908,12 @@ function openCompareModal() {
   compareSelection.forEach(function (docId) {
     var meta = findDocMeta(docId);
     var entry = docEntry(sub, docId);
-    var previewHtml = entry.driveFileId ? "<iframe src=\"https://drive.google.com/file/d/".concat(entry.driveFileId, "/preview\" style=\"width:100%;height:100%;border:none;\"></iframe>") : "<div class=\"modal-preview\" style=\"height:100%;margin:0;border:none\"><span class=\"icon\">\uD83D\uDCC4</span><span>\u0E44\u0E21\u0E48\u0E21\u0E35\u0E44\u0E1F\u0E25\u0E4C\u0E41\u0E19\u0E1A</span></div>";
+    var previewHtml = '';
     var pane = document.createElement('div');
     pane.className = 'compare-pane';
-    pane.innerHTML = "\n      <div class=\"compare-pane-header\"><span>".concat(meta.name, "</span><button class=\"ghost\" onclick=\"removeFromCompare('").concat(docId, "')\">\u0E19\u0E33\u0E2D\u0E2D\u0E01</button></div>\n      <div class=\"compare-pane-body\">").concat(previewHtml, "</div>\n      <div class=\"compare-pane-footer\">\n        <select onchange=\"setReview('").concat(docId, "','").concat(sub.subId, "',this.value)\">\n          <option value=\"pending\" ").concat(entry.reviewStatus === 'pending' ? 'selected' : '', ">\u0E23\u0E2D\u0E15\u0E23\u0E27\u0E08</option>\n          <option value=\"pass\" ").concat(entry.reviewStatus === 'pass' ? 'selected' : '', ">\u0E1C\u0E48\u0E32\u0E19</option>\n          <option value=\"needs-revision\" ").concat(entry.reviewStatus === 'needs-revision' ? 'selected' : '', ">\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02</option>\n          <option value=\"fail\" ").concat(entry.reviewStatus === 'fail' ? 'selected' : '', ">\u0E44\u0E21\u0E48\u0E1C\u0E48\u0E32\u0E19</option>\n        </select>\n        <textarea placeholder=\"comment (\u0E16\u0E49\u0E32\u0E21\u0E35) \u2014 \u0E08\u0E33\u0E40\u0E1B\u0E47\u0E19\u0E40\u0E21\u0E37\u0E48\u0E2D\u0E40\u0E25\u0E37\u0E2D\u0E01 '\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02'\" onchange=\"setComment('").concat(docId, "','").concat(sub.subId, "',this.value)\">").concat(entry.comment || '', "</textarea>\n      </div>\n    ");
+    pane.innerHTML = "\n      <div class=\"compare-pane-header\"><span>".concat(meta.name, "</span><button class=\"ghost\" onclick=\"removeFromCompare('").concat(docId, "')\">\u0E19\u0E33\u0E2D\u0E2D\u0E01</button></div>\n      <div class=\"compare-pane-body\" id=\"compare-body-").concat(docId, "\"></div>\n      <div class=\"compare-pane-footer\">\n        <select onchange=\"setReview('").concat(docId, "','").concat(sub.subId, "',this.value)\">\n          <option value=\"pending\" ").concat(entry.reviewStatus === 'pending' ? 'selected' : '', ">\u0E23\u0E2D\u0E15\u0E23\u0E27\u0E08</option>\n          <option value=\"pass\" ").concat(entry.reviewStatus === 'pass' ? 'selected' : '', ">\u0E1C\u0E48\u0E32\u0E19</option>\n          <option value=\"needs-revision\" ").concat(entry.reviewStatus === 'needs-revision' ? 'selected' : '', ">\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02</option>\n          <option value=\"fail\" ").concat(entry.reviewStatus === 'fail' ? 'selected' : '', ">\u0E44\u0E21\u0E48\u0E1C\u0E48\u0E32\u0E19</option>\n        </select>\n        <textarea placeholder=\"comment (\u0E16\u0E49\u0E32\u0E21\u0E35) \u2014 \u0E08\u0E33\u0E40\u0E1B\u0E47\u0E19\u0E40\u0E21\u0E37\u0E48\u0E2D\u0E40\u0E25\u0E37\u0E2D\u0E01 '\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02'\" onchange=\"setComment('").concat(docId, "','").concat(sub.subId, "',this.value)\">").concat(entry.comment || '', "</textarea>\n      </div>\n    ");
     panesContainer.appendChild(pane);
+    loadPdfInto(pane.querySelector('.compare-pane-body'), sub, docId);
   });
   document.getElementById('compare-modal').classList.add('active');
 }
@@ -1933,6 +1934,41 @@ function closeCompareModal() {
     return s.subId === currentSubId;
   });
   if (sub) renderAllDocTables(sub);
+}
+function adminFileName(sub, entry) {
+  return entry.fileNameCode ? sub.subId + '_' + entry.fileNameCode + '.pdf' : entry.originalFileName || '';
+}
+var pdfUrlCache = {};
+function pdfFrameHtml(url) {
+  return '<iframe src="' + url + '" style="width:100%;height:100%;border:none;"></iframe>';
+}
+function loadPdfInto(container, sub, docId) {
+  var entry = docEntry(sub, docId);
+  if (!entry.driveFileId) {
+    container.innerHTML = '<div class="modal-preview" style="height:100%;margin:0;border:none"><span class="icon">📄</span><span>ไม่มีไฟล์แนบ</span></div>';
+    return;
+  }
+  var key = sub.subId + '/' + docId + '/' + (entry.uploadedAt || entry.driveFileId);
+  container.dataset.pdfKey = key;
+  if (pdfUrlCache[key]) {
+    container.innerHTML = pdfFrameHtml(pdfUrlCache[key]);
+    return;
+  }
+  container.innerHTML = '<div class="modal-preview" style="height:100%;margin:0;border:none"><span class="icon">⏳</span><span>กำลังโหลดเอกสาร...</span></div>';
+  gsRun().withSuccessHandler(function (file) {
+    var bin = atob(file.base64);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    var url = URL.createObjectURL(new Blob([bytes], {
+      type: 'application/pdf'
+    }));
+    pdfUrlCache[key] = url;
+    if (container.dataset.pdfKey === key) container.innerHTML = pdfFrameHtml(url);
+  }).withFailureHandler(function (err) {
+    if (container.dataset.pdfKey !== key) return;
+    container.innerHTML = '<div class="modal-preview" style="height:100%;margin:0;border:none"><span class="icon">⚠️</span><span></span></div>';
+    container.querySelector('span:last-child').textContent = 'โหลดเอกสารไม่สำเร็จ: ' + err.message;
+  }).getDocumentFile(SESSION, sub.subId, docId);
 }
 var docModalCurrent = null;
 var ocrMatchResult = null;
@@ -1961,13 +1997,9 @@ function openDocModal(subId, docId) {
   var entry = docEntry(sub, docId);
   var meta = findDocMeta(docId);
   document.getElementById('modal-title').textContent = meta.name;
-  document.getElementById('modal-meta').textContent = "".concat(sub.personal.title, " ").concat(sub.personal.first, " ").concat(sub.personal.last, " \xB7 \u0E44\u0E1F\u0E25\u0E4C: ").concat(entry.originalFileName);
+  document.getElementById('modal-meta').textContent = "".concat(sub.personal.title, " ").concat(sub.personal.first, " ").concat(sub.personal.last, " \xB7 \u0E44\u0E1F\u0E25\u0E4C: ").concat(adminFileName(sub, entry));
   var previewArea = document.getElementById('modal-preview-content');
-  if (entry.driveFileId) {
-    previewArea.innerHTML = "<iframe src=\"https://drive.google.com/file/d/".concat(entry.driveFileId, "/preview\" style=\"width:100%;height:100%;border:none;\"></iframe>");
-  } else {
-    previewArea.innerHTML = "<span class=\"icon\">\uD83D\uDCC4</span><span>\u0E44\u0E21\u0E48\u0E21\u0E35\u0E44\u0E1F\u0E25\u0E4C\u0E41\u0E19\u0E1A</span>";
-  }
+  loadPdfInto(previewArea, sub, docId);
   document.getElementById('modal-review-select').value = entry.reviewStatus;
   document.getElementById('modal-comment-box').value = entry.comment || '';
   var ocrBlock = document.getElementById('doc-modal-ocr-block');
