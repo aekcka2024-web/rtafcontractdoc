@@ -317,6 +317,10 @@
   .ocr-status{font-size:12px;color:var(--steel);}
   .ocr-raw-wrap{margin:0 0 10px;font-size:12px;color:var(--steel);}
   .ocr-raw-wrap pre{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:4px;padding:8px;max-height:140px;overflow:auto;font-family:inherit;margin:6px 0 0;}
+  .loading-overlay{display:none;position:fixed;inset:0;background:rgba(22,35,63,.35);z-index:300;align-items:center;justify-content:center;}
+  .loading-overlay.active{display:flex;}
+  .loading-box{background:#fff;border-radius:8px;padding:22px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;font-size:14px;color:var(--steel);box-shadow:0 6px 24px rgba(0,0,0,.18);}
+  .loading-box .spinner{width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;}
 
 </style>
 </head>
@@ -549,7 +553,7 @@ setTimeout(function () {
     </label>
     <div class="modal-actions">
       <button class="secondary" onclick="closeConsentModal()">ยกเลิก</button>
-      <button class="primary" id="pdpa-confirm-btn" onclick="confirmCreateSubmission()" disabled>ยินยอมและเริ่มกรอกเอกสาร</button>
+      <button class="primary" id="pdpa-confirm-btn" onclick="onPdpaConfirm()" disabled>ยินยอมและเริ่มกรอกเอกสาร</button>
     </div>
   </div>
 </div>
@@ -741,6 +745,9 @@ setTimeout(function () {
 
 </div>
 
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-box"><div class="spinner"></div><div id="loading-text">กำลังโหลดข้อมูล...</div></div>
+</div>
 
 
 <script>
@@ -759,8 +766,8 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 var currentUser = null;
 var SESSION = null;
 var PUBLIC_CFG = null;
-var API_URL = 'https://script.google.com/macros/s/AKfycbwDpgn2Nd7F1EUR3evp82FlPj8WtaSp7EUE8gm_DrTGdSlOGTGjttV5VpGqKTT_IhktlQ/exec';
-var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'findCivilServantMatches', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
+var API_URL = 'PUT_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
+var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'findCivilServantMatches', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
 function callApi(fn, args) {
   return fetch(API_URL, {
     method: 'POST',
@@ -889,6 +896,16 @@ function onBootSuccess(identity) {
 }
 function onBootError(err) {
   __showBootError('เข้าสู่ระบบไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+}
+function showLoading(text) {
+  document.getElementById('loading-text').textContent = text || 'กำลังโหลดข้อมูล...';
+  document.getElementById('loading-overlay').classList.add('active');
+}
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.remove('active');
+}
+function toDate(v) {
+  return new Date(String(v).replace(' ', 'T'));
 }
 function formatContractNumber(sub) {
   if (!sub.contractNumber) return 'ยังไม่มีเลขที่สัญญา';
@@ -1269,6 +1286,10 @@ function renderGuarantorStep() {
   });
 }
 var pendingStepAfterConsent = null;
+var savedPersonalKey = null;
+function personalKey(p) {
+  return JSON.stringify([p.title, p.first, p.last, p.eduType, p.phone, p.workPhone || '']);
+}
 function goStep(n) {
   if (n >= 2) {
     if (!validatePersonal()) {
@@ -1280,8 +1301,25 @@ function goStep(n) {
       openConsentModal();
       return;
     }
+    if (personalKey(state.personal) !== savedPersonalKey) {
+      savePersonalThenGo(n);
+      return;
+    }
   }
   showStep(n);
+}
+function savePersonalThenGo(n) {
+  showLoading('กำลังบันทึกข้อมูลผู้ทำสัญญา...');
+  gsRun().withSuccessHandler(function (res) {
+    hideLoading();
+    savedPersonalKey = personalKey(state.personal);
+    if (res && res.matchReset) state.matchResult = null;
+    showStep(n);
+  }).withFailureHandler(function (err) {
+    hideLoading();
+    showStep(1);
+    alert('บันทึกข้อมูลไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+  }).updateSubmissionPersonal(SESSION, state.subId, state.personal);
 }
 function showStep(n) {
   renderContractNumberLine();
@@ -1407,7 +1445,12 @@ function renderSummary() {
     renderDocSummary("summary-gs".concat(g.n), g.spouseDocs);
   });
 }
+var pdpaMode = 'create';
+function onPdpaConfirm() {
+  if (pdpaMode === 'resubmit') doFinalizeSubmission();else confirmCreateSubmission();
+}
 function openConsentModal() {
+  pdpaMode = 'create';
   document.getElementById('pdpa-title').textContent = 'ความยินยอมในการเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคล';
   document.getElementById('pdpa-body').textContent = 'ข้าพเจ้ารับทราบและยินยอมให้กองทัพอากาศเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคลของข้าพเจ้า รวมถึงเอกสารที่แนบมาพร้อมแบบฟอร์มนี้ เพื่อวัตถุประสงค์ในการพิจารณาการเข้ารับการศึกษา ฝึกอบรม หรือดูงาน และเพื่อการตรวจสอบความถูกต้องของข้อมูลกับหน่วยงานหรือฐานข้อมูลที่เกี่ยวข้อง ทั้งนี้ เป็นไปตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562';
   document.getElementById('pdpa-check-row').style.display = 'flex';
@@ -1433,6 +1476,7 @@ function confirmCreateSubmission() {
     state.createdAt = row.createdAt;
     state.consentedAt = row.consentedAt;
     state.submittedAt = row.submittedAt;
+    savedPersonalKey = personalKey(state.personal);
     document.getElementById('in-id').readOnly = true;
     closeConsentModal();
     showStep(pendingStepAfterConsent || 2);
@@ -1444,7 +1488,17 @@ function confirmCreateSubmission() {
   }).createSubmission(SESSION, state.personal);
 }
 function finalizeSubmission() {
-  if (!confirm('ยืนยันส่งเอกสารให้เจ้าหน้าที่ตรวจสอบหรือไม่?')) return;
+  pdpaMode = 'resubmit';
+  document.getElementById('pdpa-title').textContent = 'ยืนยันการส่งเอกสาร';
+  document.getElementById('pdpa-body').textContent = 'ท่านได้ให้ความยินยอมตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 ไว้แล้วเมื่อ ' + formatThaiDateTime(state.consentedAt) + ' ระบบจะส่งเอกสารให้เจ้าหน้าที่ตรวจสอบ และบันทึกวันเวลาส่งล่าสุดให้อัตโนมัติ';
+  document.getElementById('pdpa-check-row').style.display = 'none';
+  var confirmBtn = document.getElementById('pdpa-confirm-btn');
+  confirmBtn.disabled = false;
+  confirmBtn.textContent = 'ยืนยันส่งเอกสาร';
+  document.getElementById('pdpa-modal').classList.add('active');
+}
+function doFinalizeSubmission() {
+  closeConsentModal();
   var btn = document.getElementById('submit-btn');
   btn.disabled = true;
   btn.innerHTML = '<span class="inline-spinner"></span>กำลังส่ง...';
@@ -1455,10 +1509,7 @@ function finalizeSubmission() {
     });
     document.getElementById('panel-done').classList.add('active');
     document.getElementById('done-contract-number').textContent = "\u0E40\u0E25\u0E02\u0E17\u0E35\u0E48\u0E2A\u0E31\u0E0D\u0E0D\u0E32 ".concat(formatContractNumber(state), " \u2014 \u0E09\u0E1A\u0E31\u0E1A\u0E17\u0E35\u0E48 ").concat(state.personalSeq, " \u0E02\u0E2D\u0E07\u0E17\u0E48\u0E32\u0E19");
-    document.getElementById('submitted-at-label').textContent = 'ส่งล่าสุดเมื่อ: ' + new Date(state.submittedAt).toLocaleString('th-TH', {
-      dateStyle: 'medium',
-      timeStyle: 'short'
-    });
+    document.getElementById('submitted-at-label').textContent = 'ส่งล่าสุดเมื่อ: ' + formatThaiDateTime(state.submittedAt);
   }).withFailureHandler(function (err) {
     btn.disabled = false;
     btn.textContent = 'ส่งเอกสาร';
@@ -1467,7 +1518,9 @@ function finalizeSubmission() {
 }
 var myExistingContracts = [];
 function checkForExistingContracts() {
+  showLoading('กำลังตรวจสอบสัญญาเดิมของท่าน...');
   gsRun().withSuccessHandler(function (rows) {
+    hideLoading();
     myExistingContracts = rows;
     if (rows.length > 0) {
       openContractPicker(rows);
@@ -1475,6 +1528,7 @@ function checkForExistingContracts() {
       showStep(1);
     }
   }).withFailureHandler(function (err) {
+    hideLoading();
     alert('ตรวจสอบสัญญาเดิมไม่สำเร็จ: ' + (err && err.message ? err.message : err));
     showStep(1);
   }).listMySubmissions(SESSION);
@@ -1499,12 +1553,16 @@ function closeContractPicker() {
   document.getElementById('contract-picker-modal').classList.remove('active');
 }
 function resumeContract(contractId) {
+  showLoading('กำลังโหลดข้อมูลสัญญา...');
   gsRun().withSuccessHandler(function (result) {
+    hideLoading();
     state = hydrateSubmission(result);
+    savedPersonalKey = personalKey(state.personal);
     fillFormFromState();
     closeContractPicker();
     showStep(1);
   }).withFailureHandler(function (err) {
+    hideLoading();
     alert('โหลดสัญญาไม่สำเร็จ: ' + (err && err.message ? err.message : err));
   }).getSubmission(SESSION, contractId);
 }
@@ -1603,10 +1661,13 @@ function adaptFlatSubmission(row) {
   };
 }
 function refreshList() {
+  showLoading('กำลังโหลดรายชื่อสัญญา...');
   gsRun().withSuccessHandler(function (rows) {
+    hideLoading();
     SUBMISSIONS = rows.map(adaptFlatSubmission);
     renderList();
   }).withFailureHandler(function (err) {
+    hideLoading();
     alert('โหลดรายชื่อไม่สำเร็จ: ' + (err && err.message ? err.message : err));
   }).listAllSubmissions(SESSION);
 }
@@ -1617,7 +1678,7 @@ function siblingContractsForOfficialId(id) {
 }
 function formatShortDate(iso) {
   if (!iso) return '-';
-  return new Date(iso).toLocaleDateString('th-TH', {
+  return toDate(iso).toLocaleDateString('th-TH', {
     day: 'numeric',
     month: 'short',
     year: '2-digit'
@@ -1625,7 +1686,7 @@ function formatShortDate(iso) {
 }
 function formatThaiDateTime(iso) {
   if (!iso) return '-';
-  return new Date(iso).toLocaleString('th-TH', {
+  return toDate(iso).toLocaleString('th-TH', {
     dateStyle: 'medium',
     timeStyle: 'short'
   });
@@ -1688,7 +1749,9 @@ function showList() {
 }
 function showDetail(subId) {
   currentSubId = subId;
+  showLoading('กำลังโหลดข้อมูลสัญญา...');
   gsRun().withSuccessHandler(function (result) {
+    hideLoading();
     var hydrated = hydrateSubmission(result);
     var idx = SUBMISSIONS.findIndex(function (s) {
       return s.subId === subId;
@@ -1696,6 +1759,7 @@ function showDetail(subId) {
     if (idx === -1) SUBMISSIONS.push(hydrated);else SUBMISSIONS[idx] = hydrated;
     renderDetail(hydrated);
   }).withFailureHandler(function (err) {
+    hideLoading();
     alert('โหลดรายละเอียดสัญญาไม่สำเร็จ: ' + (err && err.message ? err.message : err));
   }).getSubmission(SESSION, subId);
 }
