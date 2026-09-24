@@ -321,6 +321,17 @@
   .loading-overlay.active{display:flex;}
   .loading-box{background:#fff;border-radius:8px;padding:22px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;font-size:14px;color:var(--steel);box-shadow:0 6px 24px rgba(0,0,0,.18);}
   .loading-box .spinner{width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;}
+  .ur-progress{font-size:13px;font-weight:600;color:var(--navy);margin:10px 0 4px;}
+  .ur-certify{font-size:13px;margin:14px 0 0;}
+  .sig-block{width:300px;margin:36px 0 0 auto;text-align:center;font-size:14px;page-break-inside:avoid;break-inside:avoid;}
+  .sig-row{margin-bottom:14px;white-space:nowrap;}
+  .sig-blank{display:inline-block;width:210px;border-bottom:1px dotted var(--text);margin-left:6px;vertical-align:bottom;}
+  .ur-printed{font-size:11px;color:var(--muted);margin-top:18px;}
+  @media print{
+    .steps, .contract-number-line{display:none;}
+    .ur-progress, .ur-certify{font-size:11px;}
+    .sig-block{margin-top:24px;font-size:12px;}
+  }
 
 </style>
 </head>
@@ -510,7 +521,10 @@ setTimeout(function () {
     </div>
     <div class="nav-buttons">
       <button class="secondary" onclick="goStep(3)">ย้อนกลับ</button>
-      <button class="primary" id="submit-btn" onclick="finalizeSubmission()">ส่งเอกสาร</button>
+      <span style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="secondary" onclick="openUserReport()">พิมพ์รายงานสรุป</button>
+        <button class="primary" id="submit-btn" onclick="finalizeSubmission()">ส่งเอกสาร</button>
+      </span>
     </div>
   </div>
 
@@ -523,7 +537,45 @@ setTimeout(function () {
       <p class="hint">เจ้าหน้าที่จะตรวจสอบเอกสารและแจ้งผลกลับทางอีเมลที่ระบุไว้</p>
       <p class="hint" id="submitted-at-label"></p>
       <p class="hint">ยังส่งเอกสารไม่ครบ หรือมีรายการที่ต้องแก้ไข? กลับมาที่หน้านี้อีกครั้งเมื่อพร้อม ระบบจะแสดงสถานะล่าสุดที่เจ้าหน้าที่ตรวจให้แล้ว</p>
-      <button class="secondary" onclick="goStep(2)">กลับไปดูสถานะ/อัพโหลดเพิ่มเติม</button>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="secondary" onclick="goStep(2)">กลับไปดูสถานะ/อัพโหลดเพิ่มเติม</button>
+        <button class="primary" onclick="openUserReport()">พิมพ์รายงานสรุปเพื่อลงนาม</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICANT PRINTABLE SUMMARY -->
+  <div class="panel" id="panel-user-report">
+    <button class="back-link no-print" onclick="closeUserReport()">← กลับ</button>
+    <div class="card">
+      <div class="report-header">
+        <h2>รายงานสรุปการส่งเอกสารประกอบการทำสัญญา</h2>
+        <div class="report-meta">
+          <div class="report-meta-fields">
+            <div><strong>เลขที่สัญญา:</strong> <span id="ur-contract"></span></div>
+            <div><strong>ฉบับที่:</strong> <span id="ur-seq"></span></div>
+            <div><strong>ชื่อผู้ทำสัญญา:</strong> <span id="ur-name"></span></div>
+            <div><strong>เลขประจำตัวข้าราชการ:</strong> <span id="ur-official-id"></span></div>
+            <div><strong>ประเภทการศึกษา:</strong> <span id="ur-edutype"></span></div>
+            <div><strong>ส่งเอกสารล่าสุดเมื่อ:</strong> <span id="ur-submitted"></span></div>
+          </div>
+        </div>
+      </div>
+      <table class="doc-table report-table">
+        <thead><tr><th style="width:24%">หมวดเอกสาร</th><th style="width:54%">รายการ</th><th style="width:22%">สถานะ</th></tr></thead>
+        <tbody id="ur-rows"></tbody>
+      </table>
+      <p class="ur-progress" id="ur-progress"></p>
+      <p class="ur-certify">ข้าพเจ้าขอรับรองว่าเอกสารที่ส่งผ่านระบบเป็นสำเนาที่ถูกต้องตรงกับเอกสารตัวจริง และได้แนบเอกสารตัวจริงมาพร้อมรายงานฉบับนี้</p>
+      <div class="sig-block">
+        <div class="sig-row"><span id="ur-sig-rank"></span><span class="sig-blank"></span></div>
+        <div class="sig-row" id="ur-sig-name"></div>
+        <div class="sig-row">______/______/______</div>
+      </div>
+      <p class="ur-printed">พิมพ์เมื่อ <span id="ur-printed"></span></p>
+      <div class="no-print" style="margin-top:16px;text-align:right">
+        <button class="primary" onclick="window.print()">พิมพ์รายงาน</button>
+      </div>
     </div>
   </div>
 
@@ -766,8 +818,8 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 var currentUser = null;
 var SESSION = null;
 var PUBLIC_CFG = null;
-var API_URL = 'https://script.google.com/macros/s/AKfycbx_y6tuua_6K3q6NdinA_NQyyK_-19FhoIP815f-F4BhSMOWJYvMhof78Xb9YqqV7DFeQ/exec';
-var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'findCivilServantMatches', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
+var API_URL = 'PUT_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
+var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'findCivilServantMatches', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
 function callApi(fn, args) {
   return fetch(API_URL, {
     method: 'POST',
@@ -1175,10 +1227,16 @@ function renderDocList(containerId, docs) {
       cb.type = 'checkbox';
       cb.checked = entry.status === 'skipped';
       cb.onchange = function () {
-        state.documents[doc.id] = cb.checked ? _objectSpread(_objectSpread({}, EMPTY_DOC), {}, {
-          status: 'skipped'
-        }) : _objectSpread({}, EMPTY_DOC);
-        renderDocList(containerId, docs);
+        var wanted = cb.checked;
+        cb.disabled = true;
+        gsRun().withSuccessHandler(function (row) {
+          state.documents[doc.id] = row;
+          renderDocList(containerId, docs);
+        }).withFailureHandler(function (err) {
+          cb.checked = !wanted;
+          cb.disabled = false;
+          alert('บันทึกไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+        }).setDocumentSkipped(SESSION, state.subId, doc.id, wanted);
       };
       skipWrap.appendChild(cb);
       skipWrap.appendChild(document.createTextNode('ไม่มีเอกสารนี้'));
@@ -1583,6 +1641,95 @@ function startNewContractFromPicker() {
   fillFormFromState();
   closeContractPicker();
   showStep(1);
+}
+function escapeHtml(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[c];
+  });
+}
+function openUserReport() {
+  var p = state.personal;
+  document.getElementById('ur-contract').textContent = formatContractNumber(state);
+  document.getElementById('ur-seq').textContent = state.personalSeq || '-';
+  document.getElementById('ur-name').textContent = p.title + ' ' + p.first + ' ' + p.last;
+  document.getElementById('ur-official-id').textContent = p.officialId || '-';
+  document.getElementById('ur-edutype').textContent = EDU_TYPE_LABEL[p.eduType] || '-';
+  document.getElementById('ur-submitted').textContent = state.submittedAt ? formatThaiDateTime(state.submittedAt) : '-';
+  document.getElementById('ur-printed').textContent = new Date().toLocaleString('th-TH', {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+  var groups = [{
+    label: 'เอกสารของผู้ทำสัญญา',
+    docs: DOCS_CONTRACTOR
+  }, {
+    label: 'เอกสารของคู่สมรสผู้ทำสัญญา',
+    docs: DOCS_CONTRACTOR_SPOUSE
+  }];
+  activeGuarantors(p.eduType).forEach(function (g) {
+    groups.push({
+      label: 'ผู้ค้ำประกันคนที่ ' + g.n,
+      docs: g.docs
+    });
+    groups.push({
+      label: 'คู่สมรสผู้ค้ำประกันคนที่ ' + g.n,
+      docs: g.spouseDocs
+    });
+  });
+  var reqTotal = 0,
+    reqSent = 0;
+  var rows = [];
+  groups.forEach(function (grp) {
+    grp.docs.forEach(function (doc, i) {
+      var e = getEntry(doc.id);
+      var sent = e.status === 'uploaded' || e.reviewStatus === 'pass';
+      if (!doc.optional) {
+        reqTotal++;
+        if (sent) reqSent++;
+      }
+      var label, cls;
+      if (e.status === 'skipped') {
+        label = '– ไม่มีเอกสารนี้';
+        cls = 'result-empty';
+      } else if (e.reviewStatus === 'needs-revision') {
+        label = '⚠ ต้องแก้ไข';
+        cls = 'result-revision';
+      } else if (e.reviewStatus === 'fail') {
+        label = '✗ ไม่ผ่าน';
+        cls = 'result-revision';
+      } else if (sent) {
+        label = '✓ ส่งแล้ว';
+        cls = 'result-pass';
+      } else {
+        label = doc.optional ? '– ยังไม่ส่ง (ถ้ามี)' : '✗ ยังไม่ส่ง';
+        cls = doc.optional ? 'result-empty' : 'result-revision';
+      }
+      var groupCell = i === 0 ? '<td class="report-group-cell" rowspan="' + grp.docs.length + '">' + escapeHtml(grp.label) + '</td>' : '';
+      rows.push('<tr>' + groupCell + '<td>' + escapeHtml(doc.name.replace(/\s*\([^)]*\)\s*$/, '')) + '</td><td><span class="' + cls + '">' + label + '</span></td></tr>');
+    });
+  });
+  document.getElementById('ur-rows').innerHTML = rows.join('');
+  document.getElementById('ur-progress').textContent = 'ส่งเอกสารบังคับแล้ว ' + reqSent + ' จาก ' + reqTotal + ' รายการ' + (reqSent < reqTotal ? ' (ยังไม่ครบ)' : ' (ครบถ้วน)');
+  document.getElementById('ur-sig-rank').textContent = p.title || '';
+  document.getElementById('ur-sig-name').textContent = '( ' + p.first + ' ' + p.last + ' )';
+  document.querySelectorAll('#app-user .panel').forEach(function (el) {
+    el.classList.remove('active');
+  });
+  document.getElementById('panel-user-report').classList.add('active');
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+function closeUserReport() {
+  document.getElementById('panel-user-report').classList.remove('active');
+  showStep(4);
 }
 function initUserView() {
   document.getElementById('user-header-sub').textContent = 'เข้าสู่ระบบด้วย ' + currentUser.email;
