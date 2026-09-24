@@ -314,6 +314,9 @@
   .boot-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;}
   #gsi-button{min-height:44px;margin-top:6px;}
   .boot-origin-hint{font-size:11px;color:var(--muted);max-width:460px;text-align:center;word-break:break-all;margin-top:14px;}
+  .ocr-status{font-size:12px;color:var(--steel);}
+  .ocr-raw-wrap{margin:0 0 10px;font-size:12px;color:var(--steel);}
+  .ocr-raw-wrap pre{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:4px;padding:8px;max-height:140px;overflow:auto;font-family:inherit;margin:6px 0 0;}
 
 </style>
 </head>
@@ -685,7 +688,9 @@ setTimeout(function () {
         <div class="ocr-card-type-row">
           <label><input type="radio" name="ocr-card-type" value="civil" checked onchange="updateOcrIdLabel()"> บัตรข้าราชการ</label>
           <label><input type="radio" name="ocr-card-type" value="citizen" onchange="updateOcrIdLabel()"> บัตรประชาชน</label>
-          <button class="secondary" onclick="runDocOcrStub()">สแกน OCR</button>
+          <label>หน้าที่ <input type="number" id="ocr-page" value="1" min="1" style="width:56px;padding:4px 6px;border:1px solid var(--line);border-radius:4px;font-family:inherit"></label>
+          <button class="secondary" id="ocr-scan-btn" onclick="runDocOcr()">สแกน OCR</button>
+          <span class="ocr-status" id="ocr-status"></span>
         </div>
         <div class="ocr-fields-row">
           <div class="field"><label>คำนำหน้า/ยศ</label><input id="ocr-title"></div>
@@ -693,6 +698,7 @@ setTimeout(function () {
           <div class="field"><label>นามสกุล</label><input id="ocr-last"></div>
           <div class="field"><label id="ocr-idnum-label">เลขประจำตัวข้าราชการ</label><input id="ocr-idnum"></div>
         </div>
+        <details id="ocr-raw-wrap" class="ocr-raw-wrap" style="display:none"><summary>ข้อความทั้งหมดที่อ่านได้</summary><pre id="ocr-raw"></pre></details>
         <button class="primary" onclick="runDocOcrMatch()">ตรวจสอบรายชื่อกับระบบ</button>
         <div id="doc-modal-match-result"></div>
       </div>
@@ -753,7 +759,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 var currentUser = null;
 var SESSION = null;
 var PUBLIC_CFG = null;
-var API_URL = 'https://script.google.com/macros/s/AKfycbwDpgn2Nd7F1EUR3evp82FlPj8WtaSp7EUE8gm_DrTGdSlOGTGjttV5VpGqKTT_IhktlQ/exec';
+var API_URL = 'PUT_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
 var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'findCivilServantMatches', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
 function callApi(fn, args) {
   return fetch(API_URL, {
@@ -1939,8 +1945,24 @@ function adminFileName(sub, entry) {
   return entry.fileNameCode ? sub.subId + '_' + entry.fileNameCode + '.pdf' : entry.originalFileName || '';
 }
 var pdfUrlCache = {};
+var pdfBytesCache = {};
 function pdfFrameHtml(url) {
   return '<iframe src="' + url + '" style="width:100%;height:100%;border:none;"></iframe>';
+}
+function pdfKey(sub, docId) {
+  var entry = docEntry(sub, docId);
+  return sub.subId + '/' + docId + '/' + (entry.uploadedAt || entry.driveFileId);
+}
+function getPdfBytes(sub, docId) {
+  var key = pdfKey(sub, docId);
+  if (pdfBytesCache[key]) return Promise.resolve(pdfBytesCache[key]);
+  return callApi('getDocumentFile', [SESSION, sub.subId, docId]).then(function (file) {
+    var bin = atob(file.base64);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    pdfBytesCache[key] = bytes;
+    return bytes;
+  });
 }
 function loadPdfInto(container, sub, docId) {
   var entry = docEntry(sub, docId);
@@ -1948,27 +1970,24 @@ function loadPdfInto(container, sub, docId) {
     container.innerHTML = '<div class="modal-preview" style="height:100%;margin:0;border:none"><span class="icon">📄</span><span>ไม่มีไฟล์แนบ</span></div>';
     return;
   }
-  var key = sub.subId + '/' + docId + '/' + (entry.uploadedAt || entry.driveFileId);
+  var key = pdfKey(sub, docId);
   container.dataset.pdfKey = key;
   if (pdfUrlCache[key]) {
     container.innerHTML = pdfFrameHtml(pdfUrlCache[key]);
     return;
   }
   container.innerHTML = '<div class="modal-preview" style="height:100%;margin:0;border:none"><span class="icon">⏳</span><span>กำลังโหลดเอกสาร...</span></div>';
-  gsRun().withSuccessHandler(function (file) {
-    var bin = atob(file.base64);
-    var bytes = new Uint8Array(bin.length);
-    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  getPdfBytes(sub, docId).then(function (bytes) {
     var url = URL.createObjectURL(new Blob([bytes], {
       type: 'application/pdf'
     }));
     pdfUrlCache[key] = url;
     if (container.dataset.pdfKey === key) container.innerHTML = pdfFrameHtml(url);
-  }).withFailureHandler(function (err) {
+  }, function (err) {
     if (container.dataset.pdfKey !== key) return;
     container.innerHTML = '<div class="modal-preview" style="height:100%;margin:0;border:none"><span class="icon">⚠️</span><span></span></div>';
     container.querySelector('span:last-child').textContent = 'โหลดเอกสารไม่สำเร็จ: ' + err.message;
-  }).getDocumentFile(SESSION, sub.subId, docId);
+  });
 }
 var docModalCurrent = null;
 var ocrMatchResult = null;
@@ -2008,6 +2027,11 @@ function openDocModal(subId, docId) {
   if (isIdCard) {
     document.querySelector('input[name="ocr-card-type"][value="civil"]').checked = true;
     updateOcrIdLabel();
+    document.getElementById('ocr-page').value = 1;
+    setOcrStatus('');
+    document.getElementById('ocr-raw').textContent = '';
+    document.getElementById('ocr-raw-wrap').style.display = 'none';
+    document.getElementById('ocr-scan-btn').disabled = false;
     document.getElementById('doc-modal-match-result').innerHTML = '';
     var gNum = guarantorNumberFromIdDocId(docId);
     var confirmed = gNum && sub.guarantorInfo && sub.guarantorInfo[gNum];
@@ -2050,21 +2074,209 @@ function updateOcrIdLabel() {
   var cardType = document.querySelector('input[name="ocr-card-type"]:checked').value;
   document.getElementById('ocr-idnum-label').textContent = cardType === 'civil' ? 'เลขประจำตัวข้าราชการ' : 'เลขบัตรประชาชน (13 หลัก)';
 }
-function runDocOcrStub() {
-  var cardType = document.querySelector('input[name="ocr-card-type"]:checked').value;
-  if (cardType === 'civil') {
-    document.getElementById('ocr-title').value = 'นาวาอากาศตรี';
-    document.getElementById('ocr-first').value = 'ประสิทธิ์';
-    document.getElementById('ocr-last').value = 'แก้วมณี';
-    document.getElementById('ocr-idnum').value = '1234500033';
-  } else {
-    document.getElementById('ocr-title').value = 'นาย';
-    document.getElementById('ocr-first').value = 'สมหมาย';
-    document.getElementById('ocr-last').value = 'ใจดี';
-    document.getElementById('ocr-idnum').value = '1234567890123';
+var PDFJS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+var PDFJS_WORKER_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+var TESSERACT_URL = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+var scriptLoads = {};
+function loadScriptOnce(src, globalName) {
+  if (window[globalName]) return Promise.resolve();
+  if (!scriptLoads[src]) {
+    scriptLoads[src] = new Promise(function (resolve, reject) {
+      var el = document.createElement('script');
+      el.src = src;
+      el.onload = function () {
+        resolve();
+      };
+      el.onerror = function () {
+        delete scriptLoads[src];
+        reject(new Error('โหลดไลบรารีไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต'));
+      };
+      document.head.appendChild(el);
+    });
   }
-  ocrMatchResult = null;
-  document.getElementById('doc-modal-match-result').innerHTML = '';
+  return scriptLoads[src];
+}
+function renderPdfPageToCanvas(bytes, pageNum) {
+  return loadScriptOnce(PDFJS_URL, 'pdfjsLib').then(function () {
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+    return window.pdfjsLib.getDocument({
+      data: bytes.slice()
+    }).promise;
+  }).then(function (pdf) {
+    if (pageNum > pdf.numPages) throw new Error('เอกสารนี้มีเพียง ' + pdf.numPages + ' หน้า');
+    return pdf.getPage(pageNum);
+  }).then(function (page) {
+    var base = page.getViewport({
+      scale: 1
+    });
+    var scale = Math.min(4, Math.max(1.5, 2400 / base.width));
+    var viewport = page.getViewport({
+      scale: scale
+    });
+    var canvas = document.createElement('canvas');
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+    return page.render({
+      canvasContext: canvas.getContext('2d'),
+      viewport: viewport
+    }).promise.then(function () {
+      return canvas;
+    });
+  });
+}
+var ocrWorkerPromise = null;
+function getOcrWorker() {
+  if (!ocrWorkerPromise) {
+    ocrWorkerPromise = loadScriptOnce(TESSERACT_URL, 'Tesseract').then(function () {
+      return window.Tesseract.createWorker(['tha', 'eng'], 1, {
+        logger: function logger(m) {
+          if (m.status === 'recognizing text') setOcrStatus('กำลังอ่านข้อความ... ' + Math.round((m.progress || 0) * 100) + '%');else if (m.status) setOcrStatus('กำลังเตรียมระบบ OCR (ครั้งแรกอาจใช้เวลาสักครู่)...');
+        }
+      });
+    });
+    ocrWorkerPromise.then(null, function () {
+      ocrWorkerPromise = null;
+    });
+  }
+  return ocrWorkerPromise;
+}
+function setOcrStatus(text) {
+  document.getElementById('ocr-status').textContent = text;
+}
+var RANK_FULL_TO_ABBR = [['พันจ่าอากาศเอก', 'พ.อ.อ.'], ['พันจ่าอากาศโท', 'พ.อ.ท.'], ['พันจ่าอากาศตรี', 'พ.อ.ต.'], ['พลอากาศเอก', 'พล.อ.อ.'], ['พลอากาศโท', 'พล.อ.ท.'], ['พลอากาศตรี', 'พล.อ.ต.'], ['นาวาอากาศเอก', 'น.อ.'], ['นาวาอากาศโท', 'น.ท.'], ['นาวาอากาศตรี', 'น.ต.'], ['เรืออากาศเอก', 'ร.อ.'], ['เรืออากาศโท', 'ร.ท.'], ['เรืออากาศตรี', 'ร.ต.'], ['จ่าอากาศเอก', 'จ.อ.อ.'], ['จ่าอากาศโท', 'จ.อ.ท.'], ['จ่าอากาศตรี', 'จ.อ.ต.']];
+var RANK_ABBRS = ['พล.อ.อ.', 'พล.อ.ท.', 'พล.อ.ต.', 'พ.อ.อ.', 'พ.อ.ท.', 'พ.อ.ต.', 'จ.อ.อ.', 'จ.อ.ท.', 'จ.อ.ต.', 'น.อ.', 'น.ท.', 'น.ต.', 'ร.อ.', 'ร.ท.', 'ร.ต.'];
+var CIVIL_TITLES = ['นางสาว', 'นาง', 'นาย'];
+function escapeRe(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+function looseRe(word) {
+  return word.split('').map(escapeRe).join('[ \\t]*');
+}
+function buildTitlePatterns() {
+  var list = [];
+  RANK_FULL_TO_ABBR.forEach(function (p) {
+    list.push({
+      re: looseRe(p[0]),
+      out: p[1],
+      sep: '[ \\t]*'
+    });
+  });
+  RANK_ABBRS.forEach(function (a) {
+    list.push({
+      re: a.split('.').filter(Boolean).map(escapeRe).join('[ \\t]*\\.[ \\t]*') + '\\.',
+      out: a,
+      sep: '[ \\t]*'
+    });
+  });
+  return list;
+}
+var MIL_TITLE_PATTERNS = buildTitlePatterns();
+var CIVIL_TITLE_PATTERNS = CIVIL_TITLES.map(function (t) {
+  return {
+    re: looseRe(t),
+    out: t,
+    sep: '[ \\t]+'
+  };
+});
+function findTitledName(lines, patterns) {
+  for (var li = 0; li < lines.length; li++) {
+    for (var pi = 0; pi < patterns.length; pi++) {
+      var re = new RegExp("(^|[^\\u0E00-\\u0E7F])(" + patterns[pi].re + ')([ \\t]*หญิง)?' + patterns[pi].sep + "([\\u0E01-\\u0E4E]{2,})[ \\t]+([\\u0E01-\\u0E4E]{2,})");
+      var m = re.exec(lines[li]);
+      if (m) {
+        var female = !!m[3];
+        if (/อากาศ|หญิง/.test(m[4])) continue;
+        return {
+          title: patterns[pi].out + (female && patterns[pi].out.indexOf('.') > -1 ? 'หญิง' : ''),
+          first: m[4],
+          last: m[5]
+        };
+      }
+    }
+  }
+  return null;
+}
+function parseIdCardText(raw) {
+  var text = String(raw || '').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/[๐-๙]/g, function (d) {
+    return String('๐๑๒๓๔๕๖๗๘๙'.indexOf(d));
+  });
+  var lines = text.split(/\r?\n/).map(function (l) {
+    return l.replace(/\s+/g, ' ').trim();
+  }).filter(Boolean);
+  var name = findTitledName(lines, MIL_TITLE_PATTERNS) || findTitledName(lines, CIVIL_TITLE_PATTERNS);
+  var runs = [];
+  text.replace(/\d[\d \-]{6,24}\d/g, function (m) {
+    runs.push(m.replace(/\D/g, ''));
+    return m;
+  });
+  var civil = runs.filter(function (d) {
+    return d.length === 10;
+  });
+  var citizen = runs.filter(function (d) {
+    return d.length === 13;
+  });
+  var idNum = '',
+    idType = null;
+  var kwCivil = text.search(/ประจำตัวข้าราชการ/);
+  var kwCitizen = text.search(/ประจำตัวประชาชน|Identification/i);
+  if (citizen.length && (kwCitizen > -1 || !civil.length)) {
+    idNum = citizen[0];
+    idType = 'citizen';
+  } else if (civil.length) {
+    idNum = civil[0];
+    idType = 'civil';
+  }
+  if (kwCivil > -1 && civil.length) {
+    idNum = civil[0];
+    idType = 'civil';
+  }
+  return {
+    title: name ? name.title : '',
+    first: name ? name.first : '',
+    last: name ? name.last : '',
+    idNum: idNum,
+    idType: idType,
+    found: !!(name || idNum)
+  };
+}
+function runDocOcr() {
+  if (!docModalCurrent) return;
+  var sub = SUBMISSIONS.find(function (s) {
+    return s.subId === docModalCurrent.subId;
+  });
+  var docId = docModalCurrent.docId;
+  var pageNum = Math.max(1, parseInt(document.getElementById('ocr-page').value, 10) || 1);
+  var btn = document.getElementById('ocr-scan-btn');
+  btn.disabled = true;
+  setOcrStatus('กำลังเตรียมเอกสาร...');
+  getPdfBytes(sub, docId).then(function (bytes) {
+    return renderPdfPageToCanvas(bytes, pageNum);
+  }).then(function (canvas) {
+    return getOcrWorker().then(function (worker) {
+      return worker.recognize(canvas);
+    });
+  }).then(function (result) {
+    if (!docModalCurrent || docModalCurrent.docId !== docId) return;
+    var text = result && result.data && result.data.text || '';
+    var parsed = parseIdCardText(text);
+    document.getElementById('ocr-title').value = parsed.title;
+    document.getElementById('ocr-first').value = parsed.first;
+    document.getElementById('ocr-last').value = parsed.last;
+    document.getElementById('ocr-idnum').value = parsed.idNum;
+    if (parsed.idType) {
+      document.querySelector('input[name="ocr-card-type"][value="' + parsed.idType + '"]').checked = true;
+      updateOcrIdLabel();
+    }
+    document.getElementById('ocr-raw').textContent = text;
+    document.getElementById('ocr-raw-wrap').style.display = '';
+    ocrMatchResult = null;
+    document.getElementById('doc-modal-match-result').innerHTML = '';
+    setOcrStatus(parsed.found ? 'อ่านเสร็จแล้ว — กรุณาตรวจทานก่อนกด "ตรวจสอบรายชื่อกับระบบ" (OCR ภาษาไทยอาจอ่านผิดบางตัวอักษร)' : 'อ่านข้อความได้ แต่ไม่พบชื่อหรือเลขประจำตัวที่ชัดเจน กรุณากรอกเอง (ดูข้อความที่อ่านได้ด้านล่าง)');
+  }).then(null, function (err) {
+    setOcrStatus('สแกนไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+  }).then(function () {
+    btn.disabled = false;
+  });
 }
 function runDocOcrMatch() {
   var cardType = document.querySelector('input[name="ocr-card-type"]:checked').value;
