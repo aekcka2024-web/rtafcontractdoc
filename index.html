@@ -585,11 +585,11 @@ setTimeout(function () {
 <div class="modal-overlay" id="contract-picker-modal">
   <div class="modal-box">
     <h3>พบสัญญาเดิมของท่าน</h3>
-    <p>บัญชี Google ของท่านเคยยื่นสัญญาไว้แล้ว ท่านสามารถทำสัญญาฉบับเดิมต่อ หรือเริ่มทำสัญญาฉบับใหม่สำหรับภารกิจอื่น</p>
+    <p>บัญชี Google ของท่านเคยยื่นสัญญาไว้แล้ว กด <strong>"ดำเนินการต่อ"</strong> เพื่อดูสถานะและส่งเอกสารของสัญญาเดิม
+      หรือกด "เริ่มทำสัญญาฉบับใหม่" เฉพาะกรณีทำสัญญาสำหรับภารกิจ/หลักสูตรใหม่เท่านั้น</p>
     <ul class="contract-list" id="contract-picker-list"></ul>
-    <div class="modal-actions" style="justify-content:space-between">
-      <button class="secondary" onclick="closeContractPicker()">ปิด (ทำฉบับปัจจุบันต่อ)</button>
-      <button class="primary" onclick="startNewContractFromPicker()">+ เริ่มทำสัญญาฉบับใหม่</button>
+    <div class="modal-actions" style="justify-content:flex-end">
+      <button class="secondary" onclick="startNewContractFromPicker()">+ เริ่มทำสัญญาฉบับใหม่</button>
     </div>
   </div>
 </div>
@@ -802,6 +802,9 @@ setTimeout(function () {
 </div>
 
 
+<!-- ตั้งค่าเฉพาะเครื่อง/โปรเจกต์ — อยู่คนละไฟล์ตั้งใจ จะได้ไม่ต้องแก้ทุกครั้งที่ index.html มีอัปเดตใหม่ -->
+<script src="config.js"></script>
+
 <script>
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
@@ -818,7 +821,6 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 var currentUser = null;
 var SESSION = null;
 var PUBLIC_CFG = null;
-var API_URL = 'https://script.google.com/macros/s/AKfycbx_y6tuua_6K3q6NdinA_NQyyK_-19FhoIP815f-F4BhSMOWJYvMhof78Xb9YqqV7DFeQ/exec';
 var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'findCivilServantMatches', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
 function callApi(fn, args) {
   return fetch(API_URL, {
@@ -870,8 +872,8 @@ function setBootStatus(text, showSpinner) {
   document.querySelector('#boot-gate .spinner').style.display = showSpinner ? '' : 'none';
 }
 function boot() {
-  if (API_URL.indexOf('PUT_YOUR') === 0) {
-    __showBootError('ยังไม่ได้ตั้งค่า API_URL ในไฟล์ index.html (ลิงก์ /exec ของ Apps Script)');
+  if (typeof API_URL === 'undefined' || !API_URL || API_URL.indexOf('PUT_YOUR') === 0) {
+    __showBootError('ไม่พบ API_URL ที่ตั้งค่าไว้ — ตรวจสอบว่าไฟล์ config.js อยู่ในโฟลเดอร์เดียวกับ index.html บน GitHub และมีบรรทัด const API_URL = ... ที่ถูกต้อง');
     return;
   }
   gsRun().withSuccessHandler(function (cfg) {
@@ -1602,7 +1604,7 @@ function openContractPicker(contracts) {
     li.innerHTML = "\n        <div class=\"cinfo\">\n          <strong>\u0E40\u0E25\u0E02\u0E17\u0E35\u0E48\u0E2A\u0E31\u0E0D\u0E0D\u0E32 ".concat(formatContractNumber({
       contractNumber: rec.contractNumber,
       contractYear: rec.contractYear
-    }), " \u2014 \u0E09\u0E1A\u0E31\u0E1A\u0E17\u0E35\u0E48 ").concat(rec.personalSeq, "</strong>\n          <span>\u0E1B\u0E23\u0E30\u0E40\u0E20\u0E17: ").concat(EDU_TYPE_LABEL[rec.eduType] || '-', " \xB7 \u0E2A\u0E48\u0E07\u0E25\u0E48\u0E32\u0E2A\u0E38\u0E14: ").concat(rec.submittedAt ? new Date(rec.submittedAt).toLocaleDateString('th-TH') : '-', " \xB7 ").concat(statusText, "</span>\n        </div>\n        <button class=\"secondary\" onclick='resumeContract(").concat(JSON.stringify(rec.subId), ")'>\u0E14\u0E33\u0E40\u0E19\u0E34\u0E19\u0E01\u0E32\u0E23\u0E15\u0E48\u0E2D</button>\n      ");
+    }), " \u2014 \u0E09\u0E1A\u0E31\u0E1A\u0E17\u0E35\u0E48 ").concat(rec.personalSeq, "</strong>\n          <span>\u0E1B\u0E23\u0E30\u0E40\u0E20\u0E17: ").concat(EDU_TYPE_LABEL[rec.eduType] || '-', " \xB7 \u0E2A\u0E48\u0E07\u0E25\u0E48\u0E32\u0E2A\u0E38\u0E14: ").concat(rec.submittedAt ? new Date(rec.submittedAt).toLocaleDateString('th-TH') : '-', " \xB7 ").concat(statusText, "</span>\n        </div>\n        <button class=\"primary\" onclick='resumeContract(").concat(JSON.stringify(rec.subId), ")'>\u0E14\u0E33\u0E40\u0E19\u0E34\u0E19\u0E01\u0E32\u0E23\u0E15\u0E48\u0E2D</button>\n      ");
     list.appendChild(li);
   });
   document.getElementById('contract-picker-modal').classList.add('active');
@@ -1625,6 +1627,7 @@ function resumeContract(contractId) {
   }).getSubmission(SESSION, contractId);
 }
 function startNewContractFromPicker() {
+  if (!confirm('ยืนยันเริ่มทำสัญญาฉบับใหม่? (สำหรับภารกิจ/หลักสูตรใหม่เท่านั้น ถ้าต้องการส่งเอกสารของสัญญาเดิม ให้กด "ยกเลิก" แล้วเลือก "ดำเนินการต่อ")')) return;
   var latest = myExistingContracts.slice().sort(function (a, b) {
     return new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0);
   })[0];
