@@ -309,6 +309,38 @@
     display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;
     border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:-2px;margin-right:6px;
   }
+
+  .boot-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+  #gsi-button{min-height:44px;margin-top:6px;}
+  .boot-origin-hint{font-size:11px;color:var(--muted);max-width:460px;text-align:center;word-break:break-all;margin-top:14px;}
+  .ocr-status{font-size:12px;color:var(--steel);}
+  .ocr-raw-wrap{margin:0 0 10px;font-size:12px;color:var(--steel);}
+  .ocr-raw-wrap pre{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:4px;padding:8px;max-height:140px;overflow:auto;font-family:inherit;margin:6px 0 0;}
+  .loading-overlay{display:none;position:fixed;inset:0;background:rgba(22,35,63,.35);z-index:300;align-items:center;justify-content:center;}
+  .loading-overlay.active{display:flex;}
+  .loading-box{background:#fff;border-radius:8px;padding:22px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;font-size:14px;color:var(--steel);box-shadow:0 6px 24px rgba(0,0,0,.18);}
+  .loading-box .spinner{width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;}
+  .ur-progress{font-size:13px;font-weight:600;color:var(--navy);margin:10px 0 4px;}
+  .ur-certify{font-size:13px;margin:14px 0 0;}
+  .sig-block{width:300px;margin:36px 0 0 auto;text-align:center;font-size:14px;page-break-inside:avoid;break-inside:avoid;}
+  .sig-row{margin-bottom:14px;white-space:nowrap;}
+  .sig-blank{display:inline-block;width:210px;border-bottom:1px dotted var(--text);margin-left:6px;vertical-align:bottom;}
+  .ur-printed{font-size:11px;color:var(--muted);margin-top:18px;}
+  @media print{
+    .steps, .contract-number-line{display:none;}
+    .ur-progress, .ur-certify{font-size:11px;}
+    .sig-block{margin-top:24px;font-size:12px;}
+  }
+  .hris-card{padding:14px 18px;}
+  .hris-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+  .hris-status{font-size:13px;color:var(--steel);background:var(--ok-bg);border:1px solid var(--line);border-radius:6px;padding:9px 12px;}
+  .hris-status.hris-warn{background:#FFF6E5;border-color:#E8C57A;color:#7A5712;}
+  .hris-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .hris-map-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px;}
+  .hris-map-field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--steel);}
+  .hris-map-field select{font-family:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:4px;}
+  .doc-row-waived{opacity:.6;}
+  @media print{ .hris-card{display:none;} }
 </style>
 </head>
 <body>
@@ -600,6 +632,11 @@ setTimeout(function () {
 
   <!-- LIST VIEW -->
   <div class="panel active" id="panel-list">
+    <div class="card hris-card">
+      <div class="hris-title">ข้อมูลสำหรับตรวจสอบรายชื่อ (HRIS)</div>
+      <div id="hris-bar"></div>
+      <input type="file" id="hris-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="onHrisFileChosen(this)">
+    </div>
     <div class="card">
       <div class="list-header">
         <div>
@@ -633,6 +670,7 @@ setTimeout(function () {
         <button class="primary" id="btn-match" onclick="runMatch()">ตรวจสอบรายชื่อกับระบบ</button>
       </div>
       <div id="match-result"></div>
+      <div id="marital-warnings"></div>
       <div id="sibling-contracts"></div>
     </div>
 
@@ -733,6 +771,11 @@ setTimeout(function () {
         <details id="ocr-raw-wrap" class="ocr-raw-wrap" style="display:none"><summary>ข้อความทั้งหมดที่อ่านได้</summary><pre id="ocr-raw"></pre></details>
         <button class="primary" onclick="runDocOcrMatch()">ตรวจสอบรายชื่อกับระบบ</button>
         <div id="doc-modal-match-result"></div>
+        <div id="ocr-save-row" style="display:none;margin-top:10px;align-items:center;gap:10px">
+          <button class="primary" id="ocr-save-btn" onclick="saveOcrGuarantorInfo()">บันทึกข้อมูลผู้ค้ำประกัน</button>
+          <span id="ocr-save-status" class="ocr-status"></span>
+        </div>
+        <p class="field-note" id="ocr-spouse-note" style="display:none;margin-top:10px">ข้อมูลคู่สมรสของผู้ค้ำประกันไม่ต้องบันทึกแยก — เมื่อตั้งผลตรวจเอกสารนี้เป็น "ผ่าน" ด้านล่าง ถือว่าตรวจสอบแล้วเสร็จสมบูรณ์</p>
       </div>
       <div class="doc-modal-review">
         <div class="doc-modal-review-row">
@@ -797,7 +840,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 var currentUser = null;
 var SESSION = null;
 var PUBLIC_CFG = null;
-var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'findCivilServantMatches', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
+var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
 function callApi(fn, args) {
   return fetch(API_URL, {
     method: 'POST',
@@ -1042,6 +1085,28 @@ function guarantorCountForEduType(eduType) {
 function activeGuarantors(eduType) {
   return GUARANTORS.slice(0, guarantorCountForEduType(eduType));
 }
+function spouseConsentIdFor(docId) {
+  if (/^cs[1-4]$/.test(docId)) return 'cs1';
+  var m = /^gs([1-3])_[1-4]$/.exec(docId);
+  return m ? 'gs' + m[1] + '_1' : null;
+}
+function isSpouseConsentId(docId) {
+  return docId === 'cs1' || /^gs[1-3]_1$/.test(docId);
+}
+function noSpouseDeclared(getEntryFn, docId) {
+  var c = spouseConsentIdFor(docId);
+  return !!c && getEntryFn(c).status === 'skipped';
+}
+function isWaivedDoc(getEntryFn, docId) {
+  return noSpouseDeclared(getEntryFn, docId) && !isSpouseConsentId(docId);
+}
+function isRequiredDoc(getEntryFn, doc) {
+  return !doc.optional && !isWaivedDoc(getEntryFn, doc.id);
+}
+function isDocSatisfied(getEntryFn, doc) {
+  var e = getEntryFn(doc.id);
+  return e.status === 'uploaded' || e.reviewStatus === 'pass' || isSpouseConsentId(doc.id) && e.status === 'skipped';
+}
 function allGuarantorDocs() {
   return activeGuarantors(state.personal.eduType).flatMap(function (g) {
     return [].concat(_toConsumableArray(g.docs), _toConsumableArray(g.spouseDocs));
@@ -1182,6 +1247,13 @@ function renderDocList(containerId, docs) {
     var locked = isLocked(entry);
     var row = document.createElement('div');
     row.className = 'doc-row' + (locked ? ' doc-row-locked' : '');
+    if (isWaivedDoc(getEntry, doc.id)) {
+      row.className += ' doc-row-waived';
+      row.innerHTML = '<div class="doc-name"></div><div class="doc-file"><span class="badge skipped">ไม่ต้องส่ง (ไม่มีคู่สมรส)</span></div>';
+      row.querySelector('.doc-name').textContent = doc.name;
+      container.appendChild(row);
+      return;
+    }
     var nameEl = document.createElement('div');
     nameEl.className = 'doc-name';
     nameEl.textContent = doc.name + (doc.optional ? ' ' : '');
@@ -1198,7 +1270,8 @@ function renderDocList(containerId, docs) {
       nameEl.appendChild(note);
     }
     row.appendChild(nameEl);
-    if (doc.optional && !locked) {
+    var spouseConsent = isSpouseConsentId(doc.id);
+    if ((doc.optional || spouseConsent) && !locked) {
       var skipWrap = document.createElement('label');
       skipWrap.className = 'doc-skip';
       var cb = document.createElement('input');
@@ -1217,7 +1290,7 @@ function renderDocList(containerId, docs) {
         }).setDocumentSkipped(SESSION, state.subId, doc.id, wanted);
       };
       skipWrap.appendChild(cb);
-      skipWrap.appendChild(document.createTextNode('ไม่มีเอกสารนี้'));
+      skipWrap.appendChild(document.createTextNode(spouseConsent ? 'ไม่มีคู่สมรส (ไม่ต้องแนบเอกสารคู่สมรส)' : 'ไม่มีเอกสารนี้'));
       row.appendChild(skipWrap);
     }
     var fileWrap = document.createElement('div');
@@ -1254,7 +1327,7 @@ function renderDocList(containerId, docs) {
       badge.textContent = (entry.originalFileName || 'อัพโหลดแล้ว') + ' (รอตรวจ)';
     } else if (entry.status === 'skipped') {
       badge.className = 'badge skipped';
-      badge.textContent = 'ไม่มีเอกสารนี้';
+      badge.textContent = spouseConsent ? 'แจ้งว่าไม่มีคู่สมรส' : 'ไม่มีเอกสารนี้';
     } else {
       badge.className = 'badge pending';
       badge.textContent = 'ยังไม่อัพโหลด';
@@ -1438,7 +1511,7 @@ function renderDocSummary(listId, docs) {
     var s = getEntry(d.id);
     var li = document.createElement('li');
     var label;
-    if (s.reviewStatus === 'pass') label = '<span style="color:var(--ok)">🔒 ตรวจถูกต้องแล้ว</span>';else if (s.reviewStatus === 'fail') label = '<span style="color:var(--warn);font-weight:600">🔒 ไม่ผ่าน</span>';else if (s.reviewStatus === 'needs-revision') label = '<span style="color:var(--warn);font-weight:600">⚠ ต้องแก้ไข</span>';else if (s.status === 'uploaded') label = '✓ อัพโหลดแล้ว (รอตรวจ)';else if (s.status === 'skipped') label = '– ไม่มีเอกสารนี้';else label = d.optional ? '– ยังไม่อัพโหลด (ถ้ามี)' : '✗ ยังไม่อัพโหลด';
+    if (s.reviewStatus === 'pass') label = '<span style="color:var(--ok)">🔒 ตรวจถูกต้องแล้ว</span>';else if (s.reviewStatus === 'fail') label = '<span style="color:var(--warn);font-weight:600">🔒 ไม่ผ่าน</span>';else if (s.reviewStatus === 'needs-revision') label = '<span style="color:var(--warn);font-weight:600">⚠ ต้องแก้ไข</span>';else if (isWaivedDoc(getEntry, d.id)) label = '– ไม่ต้องส่ง (ไม่มีคู่สมรส)';else if (s.status === 'uploaded') label = '✓ อัพโหลดแล้ว (รอตรวจ)';else if (s.status === 'skipped') label = isSpouseConsentId(d.id) ? '– แจ้งว่าไม่มีคู่สมรส' : '– ไม่มีเอกสารนี้';else label = d.optional ? '– ยังไม่อัพโหลด (ถ้ามี)' : '✗ ยังไม่อัพโหลด';
     li.innerHTML = "<span>".concat(d.name, "</span><span>").concat(label, "</span>");
     list.appendChild(li);
   });
@@ -1447,11 +1520,10 @@ function renderSummary() {
   var p = state.personal;
   document.getElementById('summary-personal').innerHTML = "\n    <li><span>\u0E40\u0E25\u0E02\u0E17\u0E35\u0E48\u0E2A\u0E31\u0E0D\u0E0D\u0E32</span><strong>".concat(formatContractNumber(state), "</strong></li>\n    <li><span>\u0E0A\u0E37\u0E48\u0E2D-\u0E2A\u0E01\u0E38\u0E25</span><strong>").concat(p.title, " ").concat(p.first, " ").concat(p.last, "</strong></li>\n    <li><span>\u0E40\u0E25\u0E02\u0E1B\u0E23\u0E30\u0E08\u0E33\u0E15\u0E31\u0E27\u0E02\u0E49\u0E32\u0E23\u0E32\u0E0A\u0E01\u0E32\u0E23</span><strong>").concat(p.officialId, "</strong></li>\n    <li><span>\u0E1B\u0E23\u0E30\u0E40\u0E20\u0E17\u0E01\u0E32\u0E23\u0E28\u0E36\u0E01\u0E29\u0E32</span><strong>").concat(EDU_TYPE_LABEL[p.eduType] || '-', "</strong></li>\n    <li><span>\u0E40\u0E1A\u0E2D\u0E23\u0E4C\u0E42\u0E17\u0E23\u0E28\u0E31\u0E1E\u0E17\u0E4C</span><strong>").concat(p.phone, "</strong></li>\n    <li><span>\u0E40\u0E1A\u0E2D\u0E23\u0E4C\u0E42\u0E17\u0E23\u0E17\u0E35\u0E48\u0E17\u0E33\u0E07\u0E32\u0E19</span><strong>").concat(p.workPhone || '-', "</strong></li>\n    <li><span>\u0E2D\u0E35\u0E40\u0E21\u0E25</span><strong>").concat(p.email, "</strong></li>\n  ");
   var allRequired = allDocsFlat().filter(function (d) {
-    return !d.optional;
+    return isRequiredDoc(getEntry, d);
   });
   var requiredOk = allRequired.filter(function (d) {
-    var s = getEntry(d.id);
-    return s.status === 'uploaded' || s.reviewStatus === 'pass';
+    return isDocSatisfied(getEntry, d);
   });
   var pct = Math.round(requiredOk.length / allRequired.length * 100);
   document.getElementById('summary-progress-bar').style.width = pct + '%';
@@ -1667,13 +1739,19 @@ function openUserReport() {
   groups.forEach(function (grp) {
     grp.docs.forEach(function (doc, i) {
       var e = getEntry(doc.id);
-      var sent = e.status === 'uploaded' || e.reviewStatus === 'pass';
-      if (!doc.optional) {
+      var sent = isDocSatisfied(getEntry, doc);
+      if (isRequiredDoc(getEntry, doc)) {
         reqTotal++;
         if (sent) reqSent++;
       }
       var label, cls;
-      if (e.status === 'skipped') {
+      if (isWaivedDoc(getEntry, doc.id)) {
+        label = '– ไม่ต้องส่ง (ไม่มีคู่สมรส)';
+        cls = 'result-empty';
+      } else if (e.status === 'skipped' && isSpouseConsentId(doc.id)) {
+        label = '– แจ้งว่าไม่มีคู่สมรส';
+        cls = 'result-empty';
+      } else if (e.status === 'skipped') {
         label = '– ไม่มีเอกสารนี้';
         cls = 'result-empty';
       } else if (e.reviewStatus === 'needs-revision') {
@@ -1818,8 +1896,11 @@ function formatThaiDateTime(iso) {
   });
 }
 function overallDocProgress(sub) {
+  var g = function g(id) {
+    return docEntry(sub, id);
+  };
   var required = docsForSub(sub).filter(function (d) {
-    return !d.optional;
+    return isRequiredDoc(g, d);
   });
   var hydrated = Object.keys(sub.documents || {}).length > 0;
   if (!hydrated) return {
@@ -1827,7 +1908,7 @@ function overallDocProgress(sub) {
     total: required.length
   };
   var done = required.filter(function (d) {
-    return docEntry(sub, d.id).status === 'uploaded' || docEntry(sub, d.id).reviewStatus === 'pass';
+    return isDocSatisfied(g, d);
   }).length;
   return {
     done: done,
@@ -1898,6 +1979,7 @@ function renderDetail(sub) {
   updateCompareBar();
   renderMatchResult(sub);
   renderAllDocTables(sub);
+  renderMaritalWarnings(sub);
   renderStampArea(sub);
   document.getElementById('panel-list').classList.remove('active');
   document.getElementById('panel-detail').classList.add('active');
@@ -1930,11 +2012,8 @@ function runMatch() {
   var sub = SUBMISSIONS.find(function (s) {
     return s.subId === currentSubId;
   });
-  gsRun().withSuccessHandler(function (matches) {
-    finalizeMatch(sub, matches);
-  }).withFailureHandler(function (err) {
-    alert('ตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err));
-  }).findCivilServantMatches(SESSION, sub.personal.officialId, sub.personal.first, sub.personal.last);
+  if (!requireHris()) return;
+  finalizeMatch(sub, hrisFind(sub.personal.officialId, sub.personal.first, sub.personal.last));
 }
 function finalizeMatch(sub, matches) {
   var matchResult;
@@ -1949,6 +2028,7 @@ function finalizeMatch(sub, matches) {
   };
   sub.matchResult = matchResult;
   renderMatchResult(sub);
+  renderMaritalWarnings(sub);
   gsRun().withFailureHandler(function (err) {
     alert('บันทึกผลตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err));
   }).setMatchResult(SESSION, sub.subId, matchResult.type, matchResult.record || null);
@@ -1963,25 +2043,40 @@ function selectCandidate(index) {
     record: record
   };
   renderMatchResult(sub);
+  renderMaritalWarnings(sub);
   gsRun().withFailureHandler(function (err) {
     alert('บันทึกผลตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err));
   }).setMatchResult(SESSION, sub.subId, 'matched', record);
 }
+function personDetailHtml(r) {
+  var lines = [];
+  if (r.unit || r.position) lines.push('สังกัด: ' + escapeHtml(r.unit || '-') + ' · ตำแหน่ง: ' + escapeHtml(r.position || '-'));
+  if (r.marital) lines.push('สถานภาพ (HRIS): ' + escapeHtml(r.marital));
+  if (r.eduDom || r.eduAbr) {
+    if (r.eduDom) lines.push('การศึกษาในประเทศ: ' + escapeHtml(r.eduDom) + hrisYearRange(r.eduDomStart, r.eduDomEnd));
+    if (r.eduAbr) lines.push('การศึกษาต่างประเทศ: ' + escapeHtml(r.eduAbr) + hrisYearRange(r.eduAbrStart, r.eduAbrEnd) + (r.eduAbrEnd ? ' — สำเร็จเมื่อ ' + escapeHtml(hrisThaiDate(r.eduAbrEnd)) : ''));
+  } else if (r.education && r.education.length) {
+    lines.push('ประวัติการศึกษา: ' + escapeHtml(r.education.join(', ')));
+  }
+  return lines.map(function (l) {
+    return '<div>' + l + '</div>';
+  }).join('');
+}
 function matchResultHtml(matchResult, selectCallback) {
   if (!matchResult) {
-    return "<p class=\"hint\" style=\"margin-top:14px\">\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49\u0E15\u0E23\u0E27\u0E08\u0E2A\u0E2D\u0E1A\u0E0A\u0E37\u0E48\u0E2D\u0E01\u0E31\u0E1A\u0E10\u0E32\u0E19\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E02\u0E49\u0E32\u0E23\u0E32\u0E0A\u0E01\u0E32\u0E23</p>";
+    return '<p class="hint" style="margin-top:14px">ยังไม่ได้ตรวจสอบชื่อกับฐานข้อมูลข้าราชการ</p>';
   }
   if (matchResult.type === 'notfound') {
-    return "<div class=\"match-box status-notfound\"><h3>\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E0A\u0E37\u0E48\u0E2D\u0E19\u0E35\u0E49\u0E43\u0E19\u0E10\u0E32\u0E19\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25</h3>\n      <p class=\"match-detail\">\u0E15\u0E23\u0E27\u0E08\u0E2A\u0E2D\u0E1A\u0E27\u0E48\u0E32\u0E40\u0E25\u0E02\u0E1B\u0E23\u0E30\u0E08\u0E33\u0E15\u0E31\u0E27/\u0E0A\u0E37\u0E48\u0E2D-\u0E2A\u0E01\u0E38\u0E25\u0E17\u0E35\u0E48\u0E01\u0E23\u0E2D\u0E01\u0E16\u0E39\u0E01\u0E15\u0E49\u0E2D\u0E07\u0E2B\u0E23\u0E37\u0E2D\u0E44\u0E21\u0E48 \u0E2B\u0E23\u0E37\u0E2D\u0E10\u0E32\u0E19\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49\u0E19\u0E33\u0E40\u0E02\u0E49\u0E32\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E02\u0E2D\u0E07\u0E1A\u0E38\u0E04\u0E04\u0E25\u0E19\u0E35\u0E49</p></div>";
+    return '<div class="match-box status-notfound"><h3>ไม่พบชื่อนี้ในข้อมูล HRIS</h3>' + '<p class="match-detail">ตรวจสอบว่าเลขประจำตัว/ชื่อ-สกุลถูกต้องหรือไม่ หรือไฟล์ HRIS ที่นำเข้ายังไม่มีข้อมูลของบุคคลนี้</p></div>';
   }
   if (matchResult.type === 'multi') {
     var rows = matchResult.candidates.map(function (c, i) {
-      return "\n      <div class=\"candidate\">\n        <div class=\"info\"><strong>".concat(c.title, " ").concat(c.first, " ").concat(c.last, "</strong>\n          \u0E40\u0E25\u0E02\u0E1B\u0E23\u0E30\u0E08\u0E33\u0E15\u0E31\u0E27 ").concat(c.officialId, " \xB7 ").concat(c.unit, " \xB7 ").concat(c.position, "\n          <div class=\"edu-history\">").concat(c.education.join(', '), "</div></div>\n        <button class=\"secondary\" onclick=\"").concat(selectCallback.replace('INDEX', i), "\">\u0E40\u0E25\u0E37\u0E2D\u0E01\u0E04\u0E19\u0E19\u0E35\u0E49</button>\n      </div>");
+      return '<div class="candidate"><div class="info"><strong>' + escapeHtml(c.title + ' ' + c.first + ' ' + c.last) + '</strong> ' + 'เลขประจำตัว ' + escapeHtml(c.officialId || '-') + '<div class="edu-history">' + personDetailHtml(c) + '</div></div>' + '<button class="secondary" onclick="' + selectCallback.replace('INDEX', i) + '">เลือกคนนี้</button></div>';
     }).join('');
-    return "<div class=\"match-box status-multi\"><h3>\u0E1E\u0E1A\u0E0A\u0E37\u0E48\u0E2D-\u0E2A\u0E01\u0E38\u0E25\u0E15\u0E23\u0E07\u0E01\u0E31\u0E19\u0E2B\u0E25\u0E32\u0E22\u0E23\u0E32\u0E22\u0E01\u0E32\u0E23 \u0E01\u0E23\u0E38\u0E13\u0E32\u0E40\u0E25\u0E37\u0E2D\u0E01\u0E04\u0E19\u0E17\u0E35\u0E48\u0E16\u0E39\u0E01\u0E15\u0E49\u0E2D\u0E07</h3>".concat(rows, "</div>");
+    return '<div class="match-box status-multi"><h3>พบชื่อ-สกุลตรงกันหลายรายการ กรุณาเลือกคนที่ถูกต้อง</h3>' + rows + '</div>';
   }
-  var r = matchResult.record;
-  return "<div class=\"match-box status-matched\"><h3>\u0E0A\u0E37\u0E48\u0E2D\u0E15\u0E23\u0E07\u0E01\u0E31\u0E1A\u0E10\u0E32\u0E19\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25</h3>\n    <div class=\"match-detail\">\n      <div><strong>".concat(r.title, " ").concat(r.first, " ").concat(r.last, "</strong> \u2014 \u0E40\u0E25\u0E02\u0E1B\u0E23\u0E30\u0E08\u0E33\u0E15\u0E31\u0E27 ").concat(r.officialId, "</div>\n      <div>\u0E2A\u0E31\u0E07\u0E01\u0E31\u0E14: ").concat(r.unit, " \xB7 \u0E15\u0E33\u0E41\u0E2B\u0E19\u0E48\u0E07: ").concat(r.position, "</div>\n      <div>\u0E1B\u0E23\u0E30\u0E27\u0E31\u0E15\u0E34\u0E01\u0E32\u0E23\u0E28\u0E36\u0E01\u0E29\u0E32: ").concat(r.education.join(', '), "</div>\n    </div></div>");
+  var r = enrichFromHris(matchResult.record);
+  return '<div class="match-box status-matched"><h3>ชื่อตรงกับฐานข้อมูล HRIS</h3><div class="match-detail">' + '<div><strong>' + escapeHtml(r.title + ' ' + r.first + ' ' + r.last) + '</strong> — เลขประจำตัว ' + escapeHtml(r.officialId || '-') + '</div>' + personDetailHtml(r) + '</div></div>';
 }
 function renderMatchResult(sub) {
   document.getElementById('match-result').innerHTML = matchResultHtml(sub.matchResult, 'selectCandidate(INDEX)');
@@ -2021,8 +2116,13 @@ function renderDocTable(containerId, docs, sub) {
     var entry = docEntry(sub, doc.id);
     var tr = document.createElement('tr');
     var locked = entry.reviewStatus === 'pass' || entry.reviewStatus === 'fail';
-    var fileBadge = entry.status === 'uploaded' ? "<button class=\"file-link\" onclick=\"openDocModal('".concat(sub.subId, "','").concat(doc.id, "')\">\uD83D\uDCC4 ").concat(adminFileName(sub, entry), "</button>") : doc.optional ? '<span class="badge pending">ไม่มีเอกสารนี้</span>' : '<span class="badge fail">ยังไม่อัพโหลด</span>';
-    var canReview = entry.status === 'uploaded';
+    var g = function g(id) {
+      return docEntry(sub, id);
+    };
+    var waived = isWaivedDoc(g, doc.id);
+    var declaredNoSpouse = isSpouseConsentId(doc.id) && entry.status === 'skipped';
+    var fileBadge = waived ? '<span class="badge skipped">ไม่ต้องส่ง (ไม่มีคู่สมรส)</span>' : declaredNoSpouse ? '<span class="badge revision">ผู้ยื่นแจ้ง: ไม่มีคู่สมรส</span>' : entry.status === 'uploaded' ? "<button class=\"file-link\" onclick=\"openDocModal('".concat(sub.subId, "','").concat(doc.id, "')\">\uD83D\uDCC4 ").concat(adminFileName(sub, entry), "</button>") : doc.optional ? '<span class="badge pending">ไม่มีเอกสารนี้</span>' : '<span class="badge fail">ยังไม่อัพโหลด</span>';
+    var canReview = entry.status === 'uploaded' || declaredNoSpouse;
     var select = canReview ? "\n      <select onchange=\"setReview('".concat(doc.id, "','").concat(sub.subId, "',this.value)\">\n        <option value=\"pending\" ").concat(entry.reviewStatus === 'pending' ? 'selected' : '', ">\u0E23\u0E2D\u0E15\u0E23\u0E27\u0E08</option>\n        <option value=\"pass\" ").concat(entry.reviewStatus === 'pass' ? 'selected' : '', ">\u0E1C\u0E48\u0E32\u0E19</option>\n        <option value=\"needs-revision\" ").concat(entry.reviewStatus === 'needs-revision' ? 'selected' : '', ">\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02</option>\n        <option value=\"fail\" ").concat(entry.reviewStatus === 'fail' ? 'selected' : '', ">\u0E44\u0E21\u0E48\u0E1C\u0E48\u0E32\u0E19</option>\n      </select>") : '<span class="sub-cell">—</span>';
     var commentBox = canReview ? "\n      <textarea placeholder=\"comment (\u0E16\u0E49\u0E32\u0E21\u0E35) \u2014 \u0E08\u0E33\u0E40\u0E1B\u0E47\u0E19\u0E40\u0E21\u0E37\u0E48\u0E2D\u0E40\u0E25\u0E37\u0E2D\u0E01 '\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02'\" onchange=\"setComment('".concat(doc.id, "','").concat(sub.subId, "',this.value)\">").concat(entry.comment || '', "</textarea>") : '';
     var compareCell = entry.status === 'uploaded' ? "<input type=\"checkbox\" ".concat(compareSelection.includes(doc.id) ? 'checked' : '', " onchange=\"toggleCompare('").concat(doc.id, "', this)\">") : '';
@@ -2223,7 +2323,12 @@ function openDocModal(subId, docId) {
     document.getElementById('ocr-raw-wrap').style.display = 'none';
     document.getElementById('ocr-scan-btn').disabled = false;
     document.getElementById('doc-modal-match-result').innerHTML = '';
+    document.getElementById('ocr-save-status').textContent = '';
     var gNum = guarantorNumberFromIdDocId(docId);
+    var saveRow = document.getElementById('ocr-save-row');
+    var spouseNote = document.getElementById('ocr-spouse-note');
+    saveRow.style.display = gNum ? 'flex' : 'none';
+    spouseNote.style.display = gNum ? 'none' : 'block';
     var confirmed = gNum && sub.guarantorInfo && sub.guarantorInfo[gNum];
     if (confirmed) {
       document.getElementById('ocr-title').value = confirmed.title;
@@ -2235,11 +2340,17 @@ function openDocModal(subId, docId) {
         record: confirmed
       };
       document.getElementById('doc-modal-match-result').innerHTML = matchResultHtml(ocrMatchResult, 'selectOcrCandidate(INDEX)');
+      document.getElementById('ocr-save-btn').disabled = false;
+      document.getElementById('ocr-save-btn').textContent = 'บันทึกซ้ำ / อัปเดตข้อมูล';
     } else {
       document.getElementById('ocr-title').value = '';
       document.getElementById('ocr-first').value = '';
       document.getElementById('ocr-last').value = '';
       document.getElementById('ocr-idnum').value = '';
+      if (gNum) {
+        document.getElementById('ocr-save-btn').disabled = true;
+        document.getElementById('ocr-save-btn').textContent = 'บันทึกข้อมูลผู้ค้ำประกัน';
+      }
     }
   }
   document.getElementById('doc-modal').classList.add('active');
@@ -2474,21 +2585,19 @@ function runDocOcrMatch() {
   var first = document.getElementById('ocr-first').value.trim();
   var last = document.getElementById('ocr-last').value.trim();
   var officialId = cardType === 'civil' ? idNum : '';
-  gsRun().withSuccessHandler(function (matches) {
-    var result;
-    if (matches.length === 0) result = {
-      type: 'notfound'
-    };else if (matches.length === 1) result = {
-      type: 'matched',
-      record: matches[0]
-    };else result = {
-      type: 'multi',
-      candidates: matches
-    };
-    applyOcrMatchResult(result);
-  }).withFailureHandler(function (err) {
-    alert('ตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err));
-  }).findCivilServantMatches(SESSION, officialId, first, last);
+  if (!requireHris()) return;
+  var matches = hrisFind(officialId, first, last);
+  var result;
+  if (matches.length === 0) result = {
+    type: 'notfound'
+  };else if (matches.length === 1) result = {
+    type: 'matched',
+    record: matches[0]
+  };else result = {
+    type: 'multi',
+    candidates: matches
+  };
+  applyOcrMatchResult(result);
 }
 function selectOcrCandidate(index) {
   applyOcrMatchResult({
@@ -2499,23 +2608,46 @@ function selectOcrCandidate(index) {
 function applyOcrMatchResult(result) {
   ocrMatchResult = result;
   document.getElementById('doc-modal-match-result').innerHTML = matchResultHtml(result, 'selectOcrCandidate(INDEX)');
-  if (result.type !== 'matched' || !docModalCurrent) return;
+  document.getElementById('ocr-save-status').textContent = '';
+  var gNum = docModalCurrent ? guarantorNumberFromIdDocId(docModalCurrent.docId) : null;
+  var saveBtn = document.getElementById('ocr-save-btn');
+  if (gNum) {
+    saveBtn.disabled = result.type !== 'matched';
+    saveBtn.textContent = 'บันทึกข้อมูลผู้ค้ำประกัน';
+  }
+}
+function saveOcrGuarantorInfo() {
+  if (!docModalCurrent || !ocrMatchResult || ocrMatchResult.type !== 'matched') return;
+  var gNum = guarantorNumberFromIdDocId(docModalCurrent.docId);
+  if (!gNum) return;
   var sub = SUBMISSIONS.find(function (s) {
     return s.subId === docModalCurrent.subId;
   });
-  var gNum = guarantorNumberFromIdDocId(docModalCurrent.docId);
-  if (gNum) {
+  var record = ocrMatchResult.record;
+  var btn = document.getElementById('ocr-save-btn');
+  var status = document.getElementById('ocr-save-status');
+  btn.disabled = true;
+  status.textContent = 'กำลังบันทึก...';
+  gsRun().withSuccessHandler(function () {
     sub.guarantorInfo = sub.guarantorInfo || {};
-    sub.guarantorInfo[gNum] = _objectSpread({}, result.record);
+    sub.guarantorInfo[gNum] = _objectSpread({}, record);
     renderAllDocTables(sub);
-    gsRun().withFailureHandler(function (err) {
-      alert('บันทึกข้อมูลผู้ค้ำไม่สำเร็จ: ' + (err && err.message ? err.message : err));
-    }).saveGuarantorInfo(SESSION, sub.subId, gNum, result.record);
-  }
+    renderMaritalWarnings(sub);
+    status.textContent = '✓ บันทึกข้อมูลผู้ค้ำประกันแล้ว';
+    btn.disabled = false;
+    btn.textContent = 'บันทึกซ้ำ / อัปเดตข้อมูล';
+  }).withFailureHandler(function (err) {
+    btn.disabled = false;
+    status.textContent = '';
+    alert('บันทึกข้อมูลผู้ค้ำไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+  }).saveGuarantorInfo(SESSION, sub.subId, gNum, record);
 }
 function renderStampArea(sub) {
+  var g = function g(id) {
+    return docEntry(sub, id);
+  };
   var required = docsForSub(sub).filter(function (d) {
-    return !d.optional;
+    return isRequiredDoc(g, d);
   });
   var allPass = required.every(function (d) {
     return docEntry(sub, d.id).reviewStatus === 'pass';
@@ -2598,7 +2730,15 @@ function openReport(subId) {
       var resultText,
         resultClass,
         isFlagged = false;
-      if (entry.status === 'skipped') {
+      if (isWaivedDoc(function (id) {
+        return docEntry(sub, id);
+      }, doc.id)) {
+        resultText = '– ไม่ต้องส่ง (ไม่มีคู่สมรส)';
+        resultClass = 'result-empty';
+      } else if (entry.status === 'skipped' && isSpouseConsentId(doc.id)) {
+        resultText = 'ไม่มีคู่สมรส · ' + (REPORT_RESULT_LABEL[entry.reviewStatus] || REPORT_RESULT_LABEL.pending);
+        resultClass = entry.reviewStatus === 'pass' ? 'result-pass' : 'result-pending';
+      } else if (entry.status === 'skipped') {
         resultText = '– ไม่มี';
         resultClass = 'result-empty';
       } else if (entry.status !== 'uploaded') {
@@ -2639,9 +2779,486 @@ function closeReport() {
   document.getElementById('panel-detail').classList.add('active');
   updateCompareBar();
 }
+var XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+var HRIS_DB_NAME = 'rtaf-contract';
+var HRIS_STORE = 'hris';
+var HRIS_KEY = 'current';
+var HRIS_STALE_DAYS = 90;
+var HRIS = null;
+var pendingHrisImport = null;
+function idbOpen() {
+  return new Promise(function (resolve, reject) {
+    if (!window.indexedDB) {
+      reject(new Error('เบราว์เซอร์นี้ไม่รองรับการเก็บข้อมูลในเครื่อง'));
+      return;
+    }
+    var rq = indexedDB.open(HRIS_DB_NAME, 1);
+    rq.onupgradeneeded = function () {
+      rq.result.createObjectStore(HRIS_STORE);
+    };
+    rq.onsuccess = function () {
+      resolve(rq.result);
+    };
+    rq.onerror = function () {
+      reject(rq.error);
+    };
+  });
+}
+function idbRequest(mode, fn) {
+  return idbOpen().then(function (db) {
+    return new Promise(function (resolve, reject) {
+      var tx = db.transaction(HRIS_STORE, mode);
+      var rq = fn(tx.objectStore(HRIS_STORE));
+      tx.oncomplete = function () {
+        resolve(rq.result);
+      };
+      tx.onerror = function () {
+        reject(tx.error);
+      };
+    });
+  });
+}
+function idbGet(key) {
+  return idbRequest('readonly', function (st) {
+    return st.get(key);
+  });
+}
+function idbPut(key, val) {
+  return idbRequest('readwrite', function (st) {
+    return st.put(val, key);
+  });
+}
+function idbDelete(key) {
+  return idbRequest('readwrite', function (st) {
+    return st.delete(key);
+  });
+}
+function pad2(n) {
+  return (n < 10 ? '0' : '') + n;
+}
+function hrisClean(v) {
+  if (v === null || v === undefined) return '';
+  if (v instanceof Date) return isNaN(v.getTime()) ? '' : v.getFullYear() + '-' + pad2(v.getMonth() + 1) + '-' + pad2(v.getDate());
+  var s = String(v).replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\s+/g, ' ').trim();
+  if (/^[-–—_.\s]*$/.test(s) || s === 'ไม่มี' || /^n\/?a$/i.test(s)) return '';
+  return s;
+}
+function hrisThaiDigits(s) {
+  return s.replace(/[๐-๙]/g, function (d) {
+    return String('๐๑๒๓๔๕๖๗๘๙'.indexOf(d));
+  });
+}
+function normOfficialId(v) {
+  var s = hrisThaiDigits(hrisClean(v)).replace(/\D/g, '');
+  if (s && s.length < 10) s = ('0000000000' + s).slice(-10);
+  return s.length === 10 ? s : '';
+}
+function hrisNameKey(first, last) {
+  return (hrisClean(first) + '|' + hrisClean(last)).replace(/\s+/g, '');
+}
+function hrisToDate(v) {
+  var s = hrisClean(v);
+  var m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s);
+  if (m) {
+    var y = +m[1];
+    if (y > 2400) y -= 543;
+    return new Date(y, +m[2] - 1, +m[3]);
+  }
+  var t = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);
+  if (t) {
+    var _y = +t[3];
+    if (_y > 2400) _y -= 543;
+    return new Date(_y, +t[2] - 1, +t[1]);
+  }
+  return null;
+}
+function hrisThaiDate(v) {
+  var d = hrisToDate(v);
+  return d ? d.toLocaleDateString('th-TH', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }) : hrisClean(v);
+}
+function hrisYearRange(start, end) {
+  var a = hrisToDate(start),
+    b = hrisToDate(end);
+  if (a && b) return ' (' + (a.getFullYear() + 543) + '-' + (b.getFullYear() + 543) + ')';
+  if (b) return ' (จบ ' + (b.getFullYear() + 543) + ')';
+  return '';
+}
+var HRIS_FIELDS = [{
+  key: 'eduDomStart',
+  re: /เริ่ม.*ในประเทศ/
+}, {
+  key: 'eduDomEnd',
+  re: /(สำเร็จ|จบ).*ในประเทศ/
+}, {
+  key: 'eduAbrStart',
+  re: /เริ่ม.*ต่างประเทศ/
+}, {
+  key: 'eduAbrEnd',
+  re: /(สำเร็จ|จบ).*ต่างประเทศ/
+}, {
+  key: 'extractedAt',
+  re: /ดึงข้อมูล|วันที่ข้อมูล/
+}, {
+  key: 'eduDom',
+  re: /(ศึกษา|วุฒิ).*ในประเทศ/
+}, {
+  key: 'eduAbr',
+  re: /(ศึกษา|วุฒิ).*ต่างประเทศ/
+}, {
+  key: 'officialId',
+  re: /เลขประจำตัว(?!ประชาชน)|^official/i
+}, {
+  key: 'serviceAge',
+  re: /อายุราชการ/
+}, {
+  key: 'age',
+  re: /^อายุ$|^อายุ\s*\(/
+}, {
+  key: 'marital',
+  re: /โสด|สมรส|สถานภาพ/
+}, {
+  key: 'title',
+  re: /^ยศ|คำนำหน้า/
+}, {
+  key: 'last',
+  re: /^(นาม)?สกุล|^last/i
+}, {
+  key: 'first',
+  re: /^ชื่อ(จริง)?$|^first/i
+}, {
+  key: 'position',
+  re: /^ตำแหน่ง/
+}, {
+  key: 'unit',
+  re: /^สังกัด|^หน่วย/
+}];
+var HRIS_REQUIRED = [{
+  key: 'officialId',
+  label: 'เลขประจำตัว 10 หลัก'
+}, {
+  key: 'first',
+  label: 'ชื่อ'
+}, {
+  key: 'last',
+  label: 'สกุล'
+}];
+function mapHrisHeaders(headerRow) {
+  var map = {},
+    used = {};
+  HRIS_FIELDS.forEach(function (f) {
+    for (var i = 0; i < headerRow.length; i++) {
+      if (used[i]) continue;
+      var h = hrisClean(headerRow[i]);
+      if (h && f.re.test(h)) {
+        map[f.key] = i;
+        used[i] = true;
+        break;
+      }
+    }
+  });
+  return map;
+}
+function hasRequiredMapping(map) {
+  return HRIS_REQUIRED.every(function (f) {
+    return map[f.key] !== undefined;
+  });
+}
+function detectHrisHeader(rows) {
+  var limit = Math.min(10, rows.length);
+  var best = 0,
+    bestCount = -1;
+  for (var i = 0; i < limit; i++) {
+    var map = mapHrisHeaders(rows[i] || []);
+    if (hasRequiredMapping(map)) return {
+      ok: true,
+      headerIdx: i,
+      map: map
+    };
+    var filled = (rows[i] || []).filter(function (c) {
+      return hrisClean(c) !== '';
+    }).length;
+    if (filled > bestCount) {
+      bestCount = filled;
+      best = i;
+    }
+  }
+  return {
+    ok: false,
+    headerIdx: best,
+    map: mapHrisHeaders(rows[best] || [])
+  };
+}
+function openHrisPicker() {
+  document.getElementById('hris-file').click();
+}
+function onHrisFileChosen(input) {
+  var file = input.files && input.files[0];
+  input.value = '';
+  if (file) hrisImportFile(file);
+}
+function hrisImportFile(file) {
+  showLoading('กำลังอ่านไฟล์ HRIS...');
+  loadScriptOnce(XLSX_URL, 'XLSX').then(function () {
+    return file.arrayBuffer();
+  }).then(function (buf) {
+    var wb = window.XLSX.read(buf, {
+      type: 'array',
+      cellDates: true
+    });
+    var chosen = null;
+    wb.SheetNames.forEach(function (name) {
+      if (chosen) return;
+      var rows = window.XLSX.utils.sheet_to_json(wb.Sheets[name], {
+        header: 1,
+        raw: true,
+        defval: ''
+      });
+      var det = detectHrisHeader(rows);
+      if (det.ok) chosen = {
+        rows: rows,
+        det: det
+      };
+    });
+    if (!chosen) {
+      var rows = window.XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+        header: 1,
+        raw: true,
+        defval: ''
+      });
+      chosen = {
+        rows: rows,
+        det: detectHrisHeader(rows)
+      };
+    }
+    hideLoading();
+    if (!chosen.det.ok) {
+      showHrisMapping(chosen.rows, chosen.det, file.name);
+      return;
+    }
+    hrisFinishImport(chosen.rows, chosen.det.headerIdx, chosen.det.map, file.name);
+  }).catch(function (err) {
+    hideLoading();
+    alert('อ่านไฟล์ HRIS ไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+  });
+}
+function hrisFinishImport(rows, headerIdx, map, fileName) {
+  var get = function get(row, key) {
+    return map[key] === undefined ? '' : row[map[key]];
+  };
+  var records = [];
+  var skipped = 0,
+    noId = 0,
+    latest = null;
+  for (var i = headerIdx + 1; i < rows.length; i++) {
+    var row = rows[i] || [];
+    if (!row.some(function (c) {
+      return hrisClean(c) !== '';
+    })) continue;
+    var rec = {
+      officialId: normOfficialId(get(row, 'officialId')),
+      title: hrisClean(get(row, 'title')),
+      first: hrisClean(get(row, 'first')),
+      last: hrisClean(get(row, 'last')),
+      position: hrisClean(get(row, 'position')),
+      unit: hrisClean(get(row, 'unit')),
+      marital: hrisClean(get(row, 'marital')),
+      age: hrisClean(get(row, 'age')),
+      serviceAge: hrisClean(get(row, 'serviceAge')),
+      eduDom: hrisClean(get(row, 'eduDom')),
+      eduDomStart: hrisClean(get(row, 'eduDomStart')),
+      eduDomEnd: hrisClean(get(row, 'eduDomEnd')),
+      eduAbr: hrisClean(get(row, 'eduAbr')),
+      eduAbrStart: hrisClean(get(row, 'eduAbrStart')),
+      eduAbrEnd: hrisClean(get(row, 'eduAbrEnd'))
+    };
+    if (!rec.officialId && !(rec.first && rec.last)) {
+      skipped++;
+      continue;
+    }
+    if (!rec.officialId) noId++;
+    var ex = hrisToDate(get(row, 'extractedAt'));
+    if (ex && (!latest || ex > latest)) latest = ex;
+    records.push(rec);
+  }
+  if (!records.length) {
+    alert('ไม่พบข้อมูลที่ใช้ได้ในไฟล์นี้ — ตรวจสอบว่าเลือกไฟล์ HRIS ถูกต้อง');
+    return;
+  }
+  var meta = {
+    fileName: fileName,
+    count: records.length,
+    skipped: skipped,
+    noId: noId,
+    extractedAt: latest ? latest.getFullYear() + '-' + pad2(latest.getMonth() + 1) + '-' + pad2(latest.getDate()) : '',
+    importedAt: new Date().toISOString()
+  };
+  var data = {
+    records: records,
+    meta: meta
+  };
+  HRIS = buildHrisIndex(data);
+  pendingHrisImport = null;
+  renderHrisBar();
+  var summary = 'นำเข้าข้อมูล HRIS แล้ว ' + records.length.toLocaleString() + ' รายการ' + (skipped ? ' (ข้าม ' + skipped + ' แถวที่ไม่มีทั้งเลขประจำตัวและชื่อ-สกุล)' : '') + (noId ? ' — มี ' + noId + ' รายการที่ไม่มีเลขประจำตัว ตรวจได้ด้วยชื่อ-สกุลเท่านั้น' : '');
+  idbPut(HRIS_KEY, data).then(function () {
+    alert(summary);
+  }).catch(function () {
+    alert(summary + '\n\nหมายเหตุ: บันทึกไว้ในเครื่องไม่สำเร็จ ข้อมูลใช้ได้จนกว่าจะปิดหน้านี้');
+  });
+}
+function buildHrisIndex(data) {
+  var byId = new Map(),
+    byName = new Map();
+  var push = function push(m, k, r) {
+    if (!m.has(k)) m.set(k, []);
+    m.get(k).push(r);
+  };
+  data.records.forEach(function (r) {
+    if (r.officialId) push(byId, r.officialId, r);
+    if (r.first && r.last) push(byName, hrisNameKey(r.first, r.last), r);
+  });
+  return {
+    records: data.records,
+    meta: data.meta,
+    byId: byId,
+    byName: byName
+  };
+}
+function loadHris() {
+  idbGet(HRIS_KEY).then(function (data) {
+    if (data && data.records) HRIS = buildHrisIndex(data);
+    renderHrisBar();
+  }).catch(function () {
+    renderHrisBar();
+  });
+}
+function clearHris() {
+  if (!confirm('ล้างข้อมูล HRIS ที่เก็บไว้ในเครื่องนี้? (ต้องนำเข้าไฟล์ใหม่ก่อนตรวจสอบรายชื่อครั้งถัดไป)')) return;
+  var done = function done() {
+    HRIS = null;
+    renderHrisBar();
+  };
+  idbDelete(HRIS_KEY).then(done, done);
+}
+function showHrisMapping(rows, det, fileName) {
+  pendingHrisImport = {
+    rows: rows,
+    headerIdx: det.headerIdx,
+    map: det.map,
+    fileName: fileName
+  };
+  var headers = (rows[det.headerIdx] || []).map(function (h, i) {
+    return hrisClean(h) || 'คอลัมน์ ' + (i + 1);
+  });
+  var selects = HRIS_REQUIRED.map(function (f) {
+    var opts = '<option value="">— เลือกคอลัมน์ —</option>' + headers.map(function (h, i) {
+      return '<option value="' + i + '"' + (det.map[f.key] === i ? ' selected' : '') + '>' + escapeHtml(h) + '</option>';
+    }).join('');
+    return '<label class="hris-map-field">' + f.label + '<select id="hris-map-' + f.key + '">' + opts + '</select></label>';
+  }).join('');
+  document.getElementById('hris-bar').innerHTML = '<div class="hris-status hris-warn"><strong>จับคู่คอลัมน์อัตโนมัติไม่ครบ</strong> (ไฟล์ ' + escapeHtml(fileName) + ') — กรุณาเลือกว่าคอลัมน์ใดคือข้อมูลต่อไปนี้ (ทำครั้งเดียวต่อการนำเข้า)</div>' + '<div class="hris-map-grid">' + selects + '</div>' + '<div class="hris-actions"><button class="primary" onclick="confirmHrisMapping()">นำเข้าด้วยการจับคู่นี้</button>' + '<button class="secondary" onclick="cancelHrisMapping()">ยกเลิก</button></div>';
+}
+function confirmHrisMapping() {
+  if (!pendingHrisImport) return;
+  var map = Object.assign({}, pendingHrisImport.map);
+  var chosen = {};
+  for (var i = 0; i < HRIS_REQUIRED.length; i++) {
+    var f = HRIS_REQUIRED[i];
+    var v = document.getElementById('hris-map-' + f.key).value;
+    if (v === '') {
+      alert('กรุณาเลือกคอลัมน์สำหรับ "' + f.label + '"');
+      return;
+    }
+    if (chosen[v]) {
+      alert('เลือกคอลัมน์ซ้ำกัน กรุณาตรวจสอบอีกครั้ง');
+      return;
+    }
+    chosen[v] = true;
+    map[f.key] = +v;
+  }
+  hrisFinishImport(pendingHrisImport.rows, pendingHrisImport.headerIdx, map, pendingHrisImport.fileName);
+}
+function cancelHrisMapping() {
+  pendingHrisImport = null;
+  renderHrisBar();
+}
+function renderHrisBar() {
+  var bar = document.getElementById('hris-bar');
+  if (!bar) return;
+  var buttons = '<div class="hris-actions"><button class="secondary" onclick="openHrisPicker()">' + (HRIS ? 'นำเข้าไฟล์ HRIS ฉบับใหม่' : 'นำเข้าไฟล์ HRIS') + '</button>' + (HRIS ? '<button class="secondary" onclick="clearHris()">ล้างข้อมูลในเครื่องนี้</button>' : '') + '</div>';
+  if (!HRIS) {
+    bar.innerHTML = '<div class="hris-status hris-warn"><strong>ยังไม่ได้นำเข้าข้อมูล HRIS ในเครื่องนี้</strong> — ' + 'ต้องนำเข้าไฟล์ Excel ก่อนจึงจะตรวจสอบรายชื่อได้ (ข้อมูลเก็บไว้ในเครื่องนี้เท่านั้น ไม่ส่งขึ้นเซิร์ฟเวอร์)</div>' + buttons;
+    return;
+  }
+  var m = HRIS.meta;
+  var extracted = m.extractedAt ? hrisToDate(m.extractedAt) : null;
+  var ageDays = extracted ? Math.floor((Date.now() - extracted.getTime()) / 86400000) : null;
+  var stale = ageDays !== null && ageDays > HRIS_STALE_DAYS;
+  bar.innerHTML = '<div class="hris-status' + (stale ? ' hris-warn' : '') + '">' + '<strong>ข้อมูล HRIS: ' + m.count.toLocaleString() + ' รายการ</strong>' + (extracted ? ' · ข้อมูล ณ ' + escapeHtml(hrisThaiDate(m.extractedAt)) : '') + ' · ไฟล์ ' + escapeHtml(m.fileName) + ' · นำเข้าในเครื่องนี้เมื่อ ' + escapeHtml(formatThaiDateTime(m.importedAt)) + (stale ? '<div>⚠ ข้อมูลเก่ากว่า ' + HRIS_STALE_DAYS + ' วัน (' + ageDays + ' วัน) ควรนำเข้าไฟล์ HRIS ฉบับล่าสุด</div>' : '') + '</div>' + buttons;
+}
+function requireHris() {
+  if (HRIS) return true;
+  alert('ยังไม่ได้นำเข้าข้อมูล HRIS ในเครื่องนี้ — กลับไปหน้ารายชื่อสัญญา แล้วกด "นำเข้าไฟล์ HRIS" ก่อน');
+  return false;
+}
+function hrisToClient(r) {
+  var education = [];
+  if (r.eduDom) education.push(r.eduDom + hrisYearRange(r.eduDomStart, r.eduDomEnd));
+  if (r.eduAbr) education.push(r.eduAbr + hrisYearRange(r.eduAbrStart, r.eduAbrEnd));
+  return Object.assign({}, r, {
+    education: education
+  });
+}
+function hrisFind(officialId, first, last) {
+  if (!HRIS) return [];
+  var id = normOfficialId(officialId);
+  if (id && HRIS.byId.has(id)) return HRIS.byId.get(id).map(hrisToClient);
+  return (HRIS.byName.get(hrisNameKey(first, last)) || []).map(hrisToClient);
+}
+function enrichFromHris(record) {
+  if (!record || !HRIS || record.marital !== undefined) return record;
+  var recs = HRIS.byId.get(normOfficialId(record.officialId));
+  return recs && recs.length ? Object.assign({}, hrisToClient(recs[0]), record, {
+    marital: recs[0].marital
+  }) : record;
+}
+function isMarriedStatus(m) {
+  return /สมรส/.test(m) && !/หย่า|ม่าย|หม้าย/.test(m);
+}
+function renderMaritalWarnings(sub) {
+  var box = document.getElementById('marital-warnings');
+  if (!box) return;
+  if (!HRIS) {
+    box.innerHTML = '';
+    return;
+  }
+  var warnings = [];
+  var check = function check(label, officialId, consentId) {
+    var recs = officialId ? HRIS.byId.get(normOfficialId(officialId)) : null;
+    if (!recs || !recs.length || !recs[0].marital) return;
+    var m = recs[0].marital;
+    var e = docEntry(sub, consentId);
+    if (isMarriedStatus(m) && e.status === 'skipped') warnings.push(label + ': HRIS ระบุสถานภาพ "' + m + '" แต่แจ้งในระบบว่าไม่มีคู่สมรส');
+    if (!isMarriedStatus(m) && e.status === 'uploaded') warnings.push(label + ': HRIS ระบุสถานภาพ "' + m + '" แต่มีการแนบเอกสารคู่สมรส');
+  };
+  var own = sub.matchResult && sub.matchResult.type === 'matched' && sub.matchResult.record.officialId || sub.personal.officialId;
+  check('ผู้ทำสัญญา', own, 'cs1');
+  activeGuarantors(sub.personal.eduType).forEach(function (g) {
+    var info = sub.guarantorInfo && sub.guarantorInfo[g.n];
+    if (info) check('ผู้ค้ำประกันคนที่ ' + g.n, info.officialId, 'gs' + g.n + '_1');
+  });
+  box.innerHTML = warnings.length ? '<div class="match-box status-multi"><h3>⚠ สถานภาพสมรสไม่ตรงกับเอกสาร</h3>' + warnings.map(function (w) {
+    return '<div class="match-detail">' + escapeHtml(w) + '</div>';
+  }).join('') + '<div class="match-detail">กรุณาตรวจสอบก่อนตั้งผลตรวจหนังสือยินยอมคู่สมรส</div></div>' : '';
+}
 function initAdminView() {
   document.getElementById('officer-header-sub').textContent = 'เข้าสู่ระบบด้วย ' + (currentUser.displayName || currentUser.email);
   refreshList();
+  loadHris();
 }
 boot();
 </script>
