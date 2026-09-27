@@ -341,6 +341,40 @@
   .hris-map-field select{font-family:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:4px;}
   .doc-row-waived{opacity:.6;}
   @media print{ .hris-card{display:none;} }
+  .prep-box{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:#FFF8EA;border:1px solid #E8C57A;border-radius:8px;padding:12px 16px;margin-bottom:16px;}
+  .prep-sub{font-size:12px;color:var(--steel);margin-top:2px;}
+  .doc-original-note{font-size:12px;color:#8A5A00;font-weight:600;margin-top:3px;}
+  .ck-group{margin-top:18px;page-break-inside:avoid;break-inside:avoid;}
+  .ck-group h3{font-size:15px;color:var(--navy);margin:0 0 4px;}
+  .ck-hint{font-size:12px;color:var(--steel);margin:0 0 6px;}
+  .ck-list{list-style:none;margin:0;padding:0;}
+  .ck-list li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--line);}
+  .ck-box{flex:none;width:14px;height:14px;border:1.5px solid var(--steel);border-radius:2px;margin-top:4px;}
+  .ck-name{font-size:14px;}
+  .ck-note{font-size:12px;color:var(--steel);}
+  .ck-note-original{color:#8A5A00;font-weight:700;}
+  .ck-footer{margin-top:16px;font-size:12px;color:var(--steel);line-height:1.7;}
+  @media print{
+    .prep-box{display:none;}
+    .ck-list li{padding:4px 0;}
+    .ck-name{font-size:12px;}
+    .ck-note{font-size:10.5px;}
+    .ck-note-original{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+  .tr-link{font-size:13px;margin:-4px 0 12px;}
+  .tr-link a{color:var(--steel);}
+  #transfer-modal .field{margin-bottom:10px;}
+  #transfer-modal .field input{width:100%;box-sizing:border-box;}
+  .tr-item{border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-top:10px;font-size:13px;}
+  .tr-contracts{margin:6px 0;padding-left:10px;border-left:3px solid var(--line);}
+  .tr-warn{font-size:12px;color:#8A5A00;margin-top:4px;}
+  .acct-tools{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;}
+  .link-btn{background:none;border:none;padding:0;font-family:inherit;font-size:12px;color:var(--steel);text-decoration:underline;cursor:pointer;}
+  .id-fix{margin-top:8px;padding:10px 12px;border:1px solid #E8C57A;background:#FFF6E5;border-radius:6px;font-size:13px;color:#7A5712;}
+  .ocr-manual{margin-top:12px;padding:10px 12px;border:1px dashed var(--line);border-radius:6px;background:#fff;}
+  .ocr-manual-title{font-size:12px;color:var(--steel);margin-bottom:8px;}
+  .match-box.status-manual{border-color:#9DB3CF;background:#F1F5FA;}
+  .match-box.status-manual h3{color:#2B4C73;}
 </style>
 </head>
 <body>
@@ -400,9 +434,15 @@ setTimeout(function () {
 
   <!-- STEP 1 -->
   <div class="panel" id="panel-1">
+    <div class="prep-box">
+      <div><strong>ก่อนเริ่ม: เตรียมเอกสารให้พร้อม</strong>
+        <div class="prep-sub">ดูรายการเอกสารทั้งหมดที่ต้องใช้ (พิมพ์ได้) และเตรียมไฟล์ PDF ของแต่ละรายการไว้ล่วงหน้า</div></div>
+      <button class="secondary" onclick="openDocChecklist()">📋 รายการเอกสารที่ต้องใช้</button>
+    </div>
     <div class="card">
       <h2>ข้อมูลผู้ทำสัญญา</h2>
       <p class="hint">กรอกข้อมูลตามบัตรข้าราชการ เพื่อใช้ในการตรวจสอบกับฐานข้อมูล</p>
+      <p class="tr-link" id="tr-link-wrap"><a href="#" onclick="openTransferModal(); return false;">เคยยื่นสัญญาด้วยบัญชี Google อื่น? ขอย้ายสัญญามายังบัญชีนี้</a></p>
       <div class="field-row">
         <div class="field" style="flex:0 0 150px" id="f-title">
           <label>คำนำหน้า/ยศ</label>
@@ -553,6 +593,23 @@ setTimeout(function () {
   </div>
 
   <!-- APPLICANT PRINTABLE SUMMARY -->
+  <div class="panel" id="panel-doclist">
+    <button class="back-link no-print" onclick="closeDocChecklist()">← กลับ</button>
+    <div class="card">
+      <h2>รายการเอกสารที่ต้องใช้ประกอบการทำสัญญา</h2>
+      <p class="hint">ใช้เป็นรายการตรวจสอบก่อนเริ่มส่งเอกสาร — ทุกรายการส่งเป็นไฟล์ PDF ในระบบ รายการที่ระบุ "ตัวจริง" ให้นำส่งพร้อมรายงานสรุปที่ลงนามแล้ว</p>
+      <div id="doclist-body"></div>
+      <div class="ck-footer">
+        <div>• ไฟล์ต้องเป็น PDF ขนาดไม่เกิน 10 MB ต่อไฟล์</div>
+        <div>• เอกสารที่มีหมายเหตุ "(ถ้ามี)" ส่งเฉพาะกรณีที่มีเอกสารนั้น</div>
+        <div>• ผู้ค้ำประกันที่เป็นข้าราชการ ทอ. ไม่ต้องใช้หนังสือรับรองการเป็นข้าราชการ และเงินได้รายเดือน (ติ๊ก "เป็นข้าราชการ ทอ." ในระบบ)</div>
+      </div>
+      <div class="no-print" style="margin-top:16px;text-align:right">
+        <button class="primary" onclick="window.print()">พิมพ์รายการเอกสาร</button>
+      </div>
+    </div>
+  </div>
+
   <div class="panel" id="panel-user-report">
     <button class="back-link no-print" onclick="closeUserReport()">← กลับ</button>
     <div class="card">
@@ -603,6 +660,28 @@ setTimeout(function () {
 </div>
 
 <!-- PDPA / resubmission consent modal -->
+<div class="modal-overlay" id="transfer-modal">
+  <div class="modal-box">
+    <div id="tr-form">
+      <h3>ขอย้ายสัญญาจากบัญชี Google เดิม</h3>
+      <p class="modal-meta">เจ้าหน้าที่จะติดต่อยืนยันตัวตนตามเบอร์โทรที่ระบุ เมื่ออนุมัติแล้ว สัญญาเดิมจะแสดงในบัญชีนี้</p>
+      <div class="field"><label>เลขประจำตัวข้าราชการ (10 หลัก)</label><input type="text" id="tr-id" maxlength="10" inputmode="numeric"></div>
+      <div class="field"><label>อีเมลบัญชี Google เดิม (ถ้าจำได้)</label><input type="email" id="tr-oldemail"></div>
+      <div class="field"><label>เบอร์โทรศัพท์สำหรับติดต่อกลับ</label><input type="text" id="tr-phone" maxlength="10" inputmode="numeric"></div>
+      <div class="field"><label>เหตุผล</label><input type="text" id="tr-reason" placeholder="เช่น ลืมรหัสผ่านบัญชีเดิม / เปลี่ยนมาใช้บัญชีใหม่"></div>
+      <div class="modal-actions">
+        <button class="secondary" onclick="closeTransferModal()">ยกเลิก</button>
+        <button class="primary" id="tr-submit" onclick="submitTransferRequest()">ส่งคำขอ</button>
+      </div>
+    </div>
+    <div id="tr-done" style="display:none">
+      <h3>ส่งคำขอแล้ว</h3>
+      <p>เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันตัวตน เมื่ออนุมัติแล้ว ให้เข้าสู่ระบบด้วยบัญชีนี้อีกครั้ง จะพบสัญญาเดิมของท่าน</p>
+      <div class="modal-actions"><button class="primary" onclick="closeTransferModal()">ปิด</button></div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="pdpa-modal">
   <div class="modal-box">
     <h3 id="pdpa-title"></h3>
@@ -632,6 +711,10 @@ setTimeout(function () {
 
   <!-- LIST VIEW -->
   <div class="panel active" id="panel-list">
+    <div class="card" id="transfer-card" style="display:none">
+      <div class="hris-title">คำขอย้ายบัญชี Google (รอดำเนินการ <span id="transfer-count">0</span> รายการ)</div>
+      <div id="transfer-list"></div>
+    </div>
     <div class="card hris-card">
       <div class="hris-title">ข้อมูลสำหรับตรวจสอบรายชื่อ (HRIS)</div>
       <div id="hris-bar"></div>
@@ -666,11 +749,16 @@ setTimeout(function () {
           <h2 id="d-name"></h2>
           <div class="contract-tag" id="d-contract-tag"></div>
           <div class="meta" id="d-meta"></div>
+          <div class="acct-tools no-print">
+            <button class="link-btn" onclick="officerChangeEmail()">เปลี่ยนบัญชี Google ของผู้ทำสัญญา</button>
+            <button class="link-btn" onclick="officerChangeOfficialId()">แก้ไขเลขประจำตัว</button>
+          </div>
         </div>
         <button class="primary" id="btn-match" onclick="runMatch()">ตรวจสอบรายชื่อกับระบบ</button>
       </div>
       <div id="match-result"></div>
       <div id="marital-warnings"></div>
+      <div id="rtaf-warnings"></div>
       <div id="sibling-contracts"></div>
     </div>
 
@@ -775,6 +863,15 @@ setTimeout(function () {
           <button class="primary" id="ocr-save-btn" onclick="saveOcrGuarantorInfo()">บันทึกข้อมูลผู้ค้ำประกัน</button>
           <span id="ocr-save-status" class="ocr-status"></span>
         </div>
+        <div id="ocr-manual" class="ocr-manual" style="display:none">
+          <div class="ocr-manual-title">ไม่พบใน HRIS? เช่น ผู้ค้ำประกันไม่ใช่ข้าราชการ ทอ. — กรอกตำแหน่งและหน่วยงานจากหนังสือรับรองของผู้ค้ำ แล้วบันทึกตามข้อมูลที่กรอก</div>
+          <div class="ocr-fields-row">
+            <div class="field"><label>ตำแหน่ง</label><input id="ocr-position"></div>
+            <div class="field"><label>หน่วยงาน/สังกัด</label><input id="ocr-unit"></div>
+          </div>
+          <button class="secondary" id="ocr-manual-btn" onclick="saveOcrGuarantorManual()">บันทึกตามข้อมูลที่กรอก (ไม่พบใน HRIS)</button>
+          <span id="ocr-manual-status" class="ocr-status"></span>
+        </div>
         <p class="field-note" id="ocr-spouse-note" style="display:none;margin-top:10px">ข้อมูลคู่สมรสของผู้ค้ำประกันไม่ต้องบันทึกแยก — เมื่อตั้งผลตรวจเอกสารนี้เป็น "ผ่าน" ด้านล่าง ถือว่าตรวจสอบแล้วเสร็จสมบูรณ์</p>
       </div>
       <div class="doc-modal-review">
@@ -840,7 +937,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 var currentUser = null;
 var SESSION = null;
 var PUBLIC_CFG = null;
-var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval'];
+var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval', 'requestAccountTransfer', 'listTransferRequests', 'decideTransferRequest', 'transferSubmissionOwner', 'updateOfficialId'];
 function callApi(fn, args) {
   return fetch(API_URL, {
     method: 'POST',
@@ -1100,8 +1197,14 @@ function noSpouseDeclared(getEntryFn, docId) {
 function isWaivedDoc(getEntryFn, docId) {
   return noSpouseDeclared(getEntryFn, docId) && !isSpouseConsentId(docId);
 }
+// Guarantor document 4 (salary certificate) is only for guarantors who are NOT
+// RTAF officers; ticking "เป็นข้าราชการ ทอ." (status 'skipped') removes it from
+// the required list. Must match the server's stampApproval rule.
+function isRtafExemptId(docId) {
+  return /^g[1-3]_4$/.test(docId);
+}
 function isRequiredDoc(getEntryFn, doc) {
-  return !doc.optional && !isWaivedDoc(getEntryFn, doc.id);
+  return !doc.optional && !isWaivedDoc(getEntryFn, doc.id) && !(isRtafExemptId(doc.id) && getEntryFn(doc.id).status === 'skipped');
 }
 function isDocSatisfied(getEntryFn, doc) {
   var e = getEntryFn(doc.id);
@@ -1165,6 +1268,7 @@ function hydrateSubmission(result) {
       officialId: String(g.officialId),
       unit: g.unit,
       position: g.position,
+      source: g.source || 'hris',
       education: []
     };
   });
@@ -1218,7 +1322,15 @@ function fillFormFromState() {
   document.getElementById('in-first').value = state.personal.first || '';
   document.getElementById('in-last').value = state.personal.last || '';
   document.getElementById('in-id').value = state.personal.officialId || '';
-  document.getElementById('in-id').readOnly = !!state.subId;
+  var idEditable = !state.subId || applicantCanEditId();
+  document.getElementById('in-id').readOnly = !idEditable;
+  var idNote = document.querySelector('#f-id .field-note');
+  if (idNote) idNote.textContent = !state.subId
+    ? 'ใช้ประกอบการตรวจสอบกับฐานข้อมูลข้าราชการ กรุณาตรวจให้ถูกต้อง'
+    : idEditable ? 'แก้ไขได้จนกว่าเจ้าหน้าที่จะเริ่มตรวจสัญญานี้'
+    : 'เจ้าหน้าที่เริ่มตรวจแล้ว — หากเลขประจำตัวไม่ถูกต้อง กรุณาติดต่อเจ้าหน้าที่';
+  var trLink = document.getElementById('tr-link-wrap');
+  if (trLink) trLink.style.display = state.subId ? 'none' : '';
   document.getElementById('in-edutype').value = state.personal.eduType || '';
   document.getElementById('in-phone').value = state.personal.phone || '';
   document.getElementById('in-work-phone').value = state.personal.workPhone || '';
@@ -1269,9 +1381,16 @@ function renderDocList(containerId, docs) {
       note.textContent = 'หมายเหตุจากเจ้าหน้าที่: ' + entry.comment;
       nameEl.appendChild(note);
     }
+    if (DOC_SUBMIT_NOTES[doc.id]) {
+      var orig = document.createElement('div');
+      orig.className = 'doc-original-note';
+      orig.textContent = '📌 ' + DOC_SUBMIT_NOTES[doc.id];
+      nameEl.appendChild(orig);
+    }
     row.appendChild(nameEl);
     var spouseConsent = isSpouseConsentId(doc.id);
-    if ((doc.optional || spouseConsent) && !locked) {
+    var rtafExempt = isRtafExemptId(doc.id);
+    if ((doc.optional || spouseConsent || rtafExempt) && !locked) {
       var skipWrap = document.createElement('label');
       skipWrap.className = 'doc-skip';
       var cb = document.createElement('input');
@@ -1290,7 +1409,7 @@ function renderDocList(containerId, docs) {
         }).setDocumentSkipped(SESSION, state.subId, doc.id, wanted);
       };
       skipWrap.appendChild(cb);
-      skipWrap.appendChild(document.createTextNode(spouseConsent ? 'ไม่มีคู่สมรส (ไม่ต้องแนบเอกสารคู่สมรส)' : 'ไม่มีเอกสารนี้'));
+      skipWrap.appendChild(document.createTextNode(spouseConsent ? 'ไม่มีคู่สมรส (ไม่ต้องแนบเอกสารคู่สมรส)' : rtafExempt ? 'เป็นข้าราชการ ทอ. (ไม่ต้องใช้เอกสารนี้)' : 'ไม่มีเอกสารนี้'));
       row.appendChild(skipWrap);
     }
     var fileWrap = document.createElement('div');
@@ -1327,7 +1446,7 @@ function renderDocList(containerId, docs) {
       badge.textContent = (entry.originalFileName || 'อัพโหลดแล้ว') + ' (รอตรวจ)';
     } else if (entry.status === 'skipped') {
       badge.className = 'badge skipped';
-      badge.textContent = spouseConsent ? 'แจ้งว่าไม่มีคู่สมรส' : 'ไม่มีเอกสารนี้';
+      badge.textContent = spouseConsent ? 'แจ้งว่าไม่มีคู่สมรส' : rtafExempt ? 'เป็นข้าราชการ ทอ. — ไม่ต้องใช้' : 'ไม่มีเอกสารนี้';
     } else {
       badge.className = 'badge pending';
       badge.textContent = 'ยังไม่อัพโหลด';
@@ -1399,6 +1518,34 @@ var savedPersonalKey = null;
 function personalKey(p) {
   return JSON.stringify([p.title, p.first, p.last, p.eduType, p.phone, p.workPhone || '']);
 }
+var savedOfficialId = null;
+// Same rule as the server (officerStartedReview_): no name check, no guarantor
+// confirmed, no document reviewed yet.
+function applicantCanEditId() {
+  if (!state.subId || state.stamped || state.matchResult) return false;
+  if (Object.keys(state.guarantorInfo || {}).length) return false;
+  return !Object.keys(state.documents || {}).some(function (k) {
+    var r = state.documents[k].reviewStatus;
+    return r && r !== 'pending';
+  });
+}
+function saveOfficialIdThenGo(n) {
+  showLoading('กำลังบันทึกเลขประจำตัว...');
+  gsRun().withSuccessHandler(function (res) {
+    hideLoading();
+    savedOfficialId = res.officialId;
+    state.personal.officialId = res.officialId;
+    state.personalSeq = res.personalSeq;
+    renderContractNumberLine();
+    goStep(n);
+  }).withFailureHandler(function (err) {
+    hideLoading();
+    state.personal.officialId = savedOfficialId;
+    fillFormFromState();
+    showStep(1);
+    alert('แก้ไขเลขประจำตัวไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+  }).updateOfficialId(SESSION, state.subId, state.personal.officialId, '');
+}
 function goStep(n) {
   if (n >= 2) {
     if (!validatePersonal()) {
@@ -1408,6 +1555,10 @@ function goStep(n) {
     if (!state.subId) {
       pendingStepAfterConsent = n;
       openConsentModal();
+      return;
+    }
+    if (state.personal.officialId !== savedOfficialId) {
+      saveOfficialIdThenGo(n);
       return;
     }
     if (personalKey(state.personal) !== savedPersonalKey) {
@@ -1422,6 +1573,7 @@ function savePersonalThenGo(n) {
   gsRun().withSuccessHandler(function (res) {
     hideLoading();
     savedPersonalKey = personalKey(state.personal);
+    savedOfficialId = state.personal.officialId;
     if (res && res.matchReset) state.matchResult = null;
     showStep(n);
   }).withFailureHandler(function (err) {
@@ -1511,7 +1663,7 @@ function renderDocSummary(listId, docs) {
     var s = getEntry(d.id);
     var li = document.createElement('li');
     var label;
-    if (s.reviewStatus === 'pass') label = '<span style="color:var(--ok)">🔒 ตรวจถูกต้องแล้ว</span>';else if (s.reviewStatus === 'fail') label = '<span style="color:var(--warn);font-weight:600">🔒 ไม่ผ่าน</span>';else if (s.reviewStatus === 'needs-revision') label = '<span style="color:var(--warn);font-weight:600">⚠ ต้องแก้ไข</span>';else if (isWaivedDoc(getEntry, d.id)) label = '– ไม่ต้องส่ง (ไม่มีคู่สมรส)';else if (s.status === 'uploaded') label = '✓ อัพโหลดแล้ว (รอตรวจ)';else if (s.status === 'skipped') label = isSpouseConsentId(d.id) ? '– แจ้งว่าไม่มีคู่สมรส' : '– ไม่มีเอกสารนี้';else label = d.optional ? '– ยังไม่อัพโหลด (ถ้ามี)' : '✗ ยังไม่อัพโหลด';
+    if (s.reviewStatus === 'pass') label = '<span style="color:var(--ok)">🔒 ตรวจถูกต้องแล้ว</span>';else if (s.reviewStatus === 'fail') label = '<span style="color:var(--warn);font-weight:600">🔒 ไม่ผ่าน</span>';else if (s.reviewStatus === 'needs-revision') label = '<span style="color:var(--warn);font-weight:600">⚠ ต้องแก้ไข</span>';else if (isWaivedDoc(getEntry, d.id)) label = '– ไม่ต้องส่ง (ไม่มีคู่สมรส)';else if (s.status === 'uploaded') label = '✓ อัพโหลดแล้ว (รอตรวจ)';else if (s.status === 'skipped') label = isSpouseConsentId(d.id) ? '– แจ้งว่าไม่มีคู่สมรส' : isRtafExemptId(d.id) ? '– เป็นข้าราชการ ทอ. (ไม่ต้องใช้)' : '– ไม่มีเอกสารนี้';else label = d.optional ? '– ยังไม่อัพโหลด (ถ้ามี)' : '✗ ยังไม่อัพโหลด';
     li.innerHTML = "<span>".concat(d.name, "</span><span>").concat(label, "</span>");
     list.appendChild(li);
   });
@@ -1585,6 +1737,7 @@ function confirmCreateSubmission() {
     state.consentedAt = row.consentedAt;
     state.submittedAt = row.submittedAt;
     savedPersonalKey = personalKey(state.personal);
+    savedOfficialId = state.personal.officialId;
     document.getElementById('in-id').readOnly = true;
     closeConsentModal();
     showStep(pendingStepAfterConsent || 2);
@@ -1666,6 +1819,7 @@ function resumeContract(contractId) {
     hideLoading();
     state = hydrateSubmission(result);
     savedPersonalKey = personalKey(state.personal);
+    savedOfficialId = state.personal.officialId;
     fillFormFromState();
     closeContractPicker();
     showStep(1);
@@ -1703,6 +1857,74 @@ function escapeHtml(v) {
       "'": '&#39;'
     }[c];
   });
+}
+// ---------- Checklist of documents to prepare (printable) ----------
+var DOC_SUBMIT_NOTES = {
+  c1: 'ส่งออนไลน์ และตัวจริง 1 ชุด พร้อมรูปถ่ายขนาด 4x5 ซม.',
+  c2: 'ส่งออนไลน์ และตัวจริง 1 ชุด พร้อมติดรูปถ่ายขนาด 4x5 ซม.และอากรสแตมป์'
+};
+function docSubmitNote(docId) {
+  return DOC_SUBMIT_NOTES[docId] || 'ส่งออนไลน์';
+}
+var docChecklistReturnPanel = null;
+// ---------- "เคยยื่นสัญญาด้วยบัญชี Google อื่น" ----------
+function openTransferModal() {
+  ['tr-id', 'tr-oldemail', 'tr-phone', 'tr-reason'].forEach(function (id) { document.getElementById(id).value = ''; });
+  document.getElementById('tr-phone').value = state.personal.phone || '';
+  document.getElementById('tr-id').value = document.getElementById('in-id').value || '';
+  document.getElementById('tr-form').style.display = '';
+  document.getElementById('tr-done').style.display = 'none';
+  document.getElementById('transfer-modal').classList.add('active');
+}
+function closeTransferModal() { document.getElementById('transfer-modal').classList.remove('active'); }
+function submitTransferRequest() {
+  var id = document.getElementById('tr-id').value.trim();
+  var phone = document.getElementById('tr-phone').value.trim();
+  var reason = document.getElementById('tr-reason').value.trim();
+  if (!/^[0-9]{10}$/.test(id)) { alert('เลขประจำตัวข้าราชการต้องเป็นตัวเลข 10 หลัก'); return; }
+  if (!/^[0-9]{9,10}$/.test(phone)) { alert('กรุณาระบุเบอร์โทรศัพท์ (ตัวเลข 9-10 หลัก) เพื่อให้เจ้าหน้าที่ติดต่อยืนยันตัวตน'); return; }
+  if (!reason) { alert('กรุณาระบุเหตุผล เช่น ลืมรหัสผ่านบัญชีเดิม / เปลี่ยนมาใช้บัญชีใหม่'); return; }
+  var btn = document.getElementById('tr-submit');
+  btn.disabled = true;
+  gsRun().withSuccessHandler(function () {
+    btn.disabled = false;
+    document.getElementById('tr-form').style.display = 'none';
+    document.getElementById('tr-done').style.display = '';
+  }).withFailureHandler(function (err) {
+    btn.disabled = false;
+    alert('ส่งคำขอไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+  }).requestAccountTransfer(SESSION, id, document.getElementById('tr-oldemail').value.trim(), phone, reason);
+}
+
+function openDocChecklist() {
+  var groups = [
+    {title: '1. เอกสารของผู้ทำสัญญา', docs: DOCS_CONTRACTOR},
+    {title: '2. เอกสารของคู่สมรสผู้ทำสัญญา', docs: DOCS_CONTRACTOR_SPOUSE,
+     hint: 'เฉพาะกรณีสมรส — ถ้าไม่มีคู่สมรส ให้ติ๊ก "ไม่มีคู่สมรส" ในระบบ และไม่ต้องเตรียมเอกสารกลุ่มนี้'},
+    {title: '3. เอกสารของผู้ค้ำประกัน (เตรียมชุดนี้ให้ครบทุกคน)', docs: GUARANTORS[0].docs,
+     hint: 'ศึกษาต่างประเทศ ใช้ผู้ค้ำประกัน 3 คน · ศึกษาในประเทศ (ทุน ทอ./ทุนส่วนตัว) ใช้ผู้ค้ำประกัน 1 คน — ผู้ค้ำประกันแต่ละคนใช้เอกสารชุดเดียวกันนี้'},
+    {title: '4. เอกสารของคู่สมรสผู้ค้ำประกัน', docs: GUARANTORS[0].spouseDocs,
+     hint: 'เฉพาะผู้ค้ำประกันที่สมรส (เตรียมแยกของผู้ค้ำประกันแต่ละคน) — ถ้าไม่มีคู่สมรส ให้ติ๊ก "ไม่มีคู่สมรส" ในระบบ'}
+  ];
+  document.getElementById('doclist-body').innerHTML = groups.map(function (g) {
+    var items = g.docs.map(function (doc) {
+      return '<li><span class="ck-box"></span><div><div class="ck-name">' + escapeHtml(doc.name) +
+        (doc.optional ? ' <span class="doc-optional">(ถ้ามี)</span>' : '') + '</div>' +
+        '<div class="ck-note' + (DOC_SUBMIT_NOTES[doc.id] ? ' ck-note-original' : '') + '">(' + escapeHtml(docSubmitNote(doc.id)) + ')</div></div></li>';
+    }).join('');
+    return '<div class="ck-group"><h3>' + g.title + '</h3>' + (g.hint ? '<p class="ck-hint">' + g.hint + '</p>' : '') +
+      '<ol class="ck-list">' + items + '</ol></div>';
+  }).join('');
+  var active = document.querySelector('#app-user .panel.active');
+  docChecklistReturnPanel = active && active.id !== 'panel-doclist' ? active.id : 'panel-1';
+  document.querySelectorAll('#app-user .panel').forEach(function (el) { el.classList.remove('active'); });
+  document.getElementById('panel-doclist').classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+function closeDocChecklist() {
+  document.getElementById('panel-doclist').classList.remove('active');
+  document.getElementById(docChecklistReturnPanel || 'panel-1').classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
 }
 function openUserReport() {
   var p = state.personal;
@@ -1752,7 +1974,7 @@ function openUserReport() {
         label = '– แจ้งว่าไม่มีคู่สมรส';
         cls = 'result-empty';
       } else if (e.status === 'skipped') {
-        label = '– ไม่มีเอกสารนี้';
+        label = isRtafExemptId(doc.id) ? '– เป็นข้าราชการ ทอ. (ไม่ต้องใช้)' : '– ไม่มีเอกสารนี้';
         cls = 'result-empty';
       } else if (e.reviewStatus === 'needs-revision') {
         label = '⚠ ต้องแก้ไข';
@@ -1865,6 +2087,7 @@ function adaptFlatSubmission(row) {
   };
 }
 function refreshList() {
+  loadTransferRequests();
   showLoading('กำลังโหลดรายชื่อสัญญา...');
   gsRun().withSuccessHandler(function (rows) {
     hideLoading();
@@ -1983,6 +2206,10 @@ function renderDetail(sub) {
   renderStampArea(sub);
   document.getElementById('panel-list').classList.remove('active');
   document.getElementById('panel-detail').classList.add('active');
+  if (pendingAutoMatchSubId === sub.subId && HRIS) {
+    pendingAutoMatchSubId = null;
+    runMatch();
+  }
   window.scrollTo({
     top: 0,
     behavior: 'smooth'
@@ -2013,7 +2240,14 @@ function runMatch() {
     return s.subId === currentSubId;
   });
   if (!requireHris()) return;
-  finalizeMatch(sub, hrisFind(sub.personal.officialId, sub.personal.first, sub.personal.last));
+  var result = hrisMatch(sub.personal.officialId, sub.personal.first, sub.personal.last);
+  sub.matchResult = result;
+  renderMatchResult(sub);
+  renderMaritalWarnings(sub);
+  if (result.type === 'mismatch') return; // not saved: the officer must resolve the ID first
+  gsRun().withFailureHandler(function (err) {
+    alert('บันทึกผลตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+  }).setMatchResult(SESSION, sub.subId, result.type, result.record || null);
 }
 function finalizeMatch(sub, matches) {
   var matchResult;
@@ -2069,6 +2303,19 @@ function matchResultHtml(matchResult, selectCallback) {
   if (matchResult.type === 'notfound') {
     return '<div class="match-box status-notfound"><h3>ไม่พบชื่อนี้ในข้อมูล HRIS</h3>' + '<p class="match-detail">ตรวจสอบว่าเลขประจำตัว/ชื่อ-สกุลถูกต้องหรือไม่ หรือไฟล์ HRIS ที่นำเข้ายังไม่มีข้อมูลของบุคคลนี้</p></div>';
   }
+  if (matchResult.type === 'manual') {
+    var mr = matchResult.record;
+    return '<div class="match-box status-manual"><h3>บันทึกข้อมูลแล้ว — ไม่พบในข้อมูล HRIS (บันทึกตามที่กรอก)</h3><div class="match-detail">' +
+      '<div><strong>' + escapeHtml(mr.title + ' ' + mr.first + ' ' + mr.last) + '</strong>' + (mr.officialId ? ' — เลข ' + escapeHtml(mr.officialId) : '') + '</div>' +
+      '<div>ตำแหน่ง: ' + escapeHtml(mr.position || '-') + ' · หน่วยงาน/สังกัด: ' + escapeHtml(mr.unit || '-') + '</div></div></div>';
+  }
+  if (matchResult.type === 'mismatch') {
+    var hr = enrichFromHris(matchResult.record);
+    return '<div class="match-box status-notfound"><h3>⚠ เลขประจำตัวตรงกับ HRIS แต่ชื่อไม่ตรง — ยังไม่ยืนยัน</h3><div class="match-detail">' +
+      '<div>ใน HRIS เลข ' + escapeHtml(hr.officialId) + ' เป็นของ <strong>' + escapeHtml(hr.title + ' ' + hr.first + ' ' + hr.last) + '</strong></div>' +
+      '<div>ชื่อที่กรอก/อ่านได้: <strong>' + escapeHtml(matchResult.typed.first + ' ' + matchResult.typed.last) + '</strong></div>' +
+      '<div>อาจกรอกเลขประจำตัวผิด หรืออ่านชื่อผิด กรุณาตรวจสอบก่อน</div></div></div>';
+  }
   if (matchResult.type === 'multi') {
     var rows = matchResult.candidates.map(function (c, i) {
       return '<div class="candidate"><div class="info"><strong>' + escapeHtml(c.title + ' ' + c.first + ' ' + c.last) + '</strong> ' + 'เลขประจำตัว ' + escapeHtml(c.officialId || '-') + '<div class="edu-history">' + personDetailHtml(c) + '</div></div>' + '<button class="secondary" onclick="' + selectCallback.replace('INDEX', i) + '">เลือกคนนี้</button></div>';
@@ -2079,7 +2326,21 @@ function matchResultHtml(matchResult, selectCallback) {
   return '<div class="match-box status-matched"><h3>ชื่อตรงกับฐานข้อมูล HRIS</h3><div class="match-detail">' + '<div><strong>' + escapeHtml(r.title + ' ' + r.first + ' ' + r.last) + '</strong> — เลขประจำตัว ' + escapeHtml(r.officialId || '-') + '</div>' + personDetailHtml(r) + '</div></div>';
 }
 function renderMatchResult(sub) {
-  document.getElementById('match-result').innerHTML = matchResultHtml(sub.matchResult, 'selectCandidate(INDEX)');
+  var html = matchResultHtml(sub.matchResult, 'selectCandidate(INDEX)');
+  var m = sub.matchResult;
+  var fixBtn = function (id) {
+    return '<button class="secondary" onclick="fixIdFromHris(\'' + sub.subId + '\', \'' + id + '\')">แก้เป็น ' + escapeHtml(id) + ' ตาม HRIS</button>';
+  };
+  if (m && m.type === 'mismatch') {
+    var alts = (m.byName || []).filter(function (r) { return r.officialId && r.officialId !== m.typed.officialId; });
+    if (alts.length) html += '<div class="id-fix"><div>พบชื่อ ' + escapeHtml(m.typed.first + ' ' + m.typed.last) + ' ใน HRIS ด้วยเลขประจำตัว: ' +
+      alts.map(function (r) { return '<strong>' + escapeHtml(r.officialId) + '</strong>'; }).join(', ') + '</div>' +
+      '<div class="hris-actions">' + alts.map(function (r) { return fixBtn(r.officialId); }).join('') + '</div></div>';
+  } else if (m && m.type === 'matched' && m.record && m.record.officialId && sub.personal.officialId !== m.record.officialId) {
+    html += '<div class="id-fix"><div>⚠ เลขประจำตัวที่ผู้ทำสัญญากรอก (' + escapeHtml(sub.personal.officialId || '-') + ') ไม่พบใน HRIS — พบชื่อนี้ด้วยเลข <strong>' +
+      escapeHtml(m.record.officialId) + '</strong> น่าจะกรอกผิด</div><div class="hris-actions">' + fixBtn(m.record.officialId) + '</div></div>';
+  }
+  document.getElementById('match-result').innerHTML = html;
 }
 function renderAllDocTables(sub) {
   renderDocTable('doc-rows-contractor', DOCS_CONTRACTOR, sub);
@@ -2090,7 +2351,9 @@ function renderAllDocTables(sub) {
     var h1 = document.createElement('div');
     h1.className = 'guarantor-heading';
     var confirmed = sub.guarantorInfo && sub.guarantorInfo[g.n];
-    var confirmedBadge = confirmed ? " <span class=\"badge matched\">\u0E22\u0E37\u0E19\u0E22\u0E31\u0E19\u0E15\u0E31\u0E27\u0E15\u0E19\u0E41\u0E25\u0E49\u0E27: ".concat(confirmed.title, " ").concat(confirmed.first, " ").concat(confirmed.last, " \xB7 ").concat(confirmed.position, " \xB7 ").concat(confirmed.unit, "</span>") : '';
+    var confirmedBadge = !confirmed ? '' : confirmed.source === 'manual'
+      ? ' <span class="badge revision">บันทึกข้อมูลแล้ว (ไม่พบใน HRIS): ' + escapeHtml(confirmed.title + ' ' + confirmed.first + ' ' + confirmed.last + ' · ' + (confirmed.position || '-') + ' · ' + (confirmed.unit || '-')) + '</span>'
+      : ' <span class="badge matched">ยืนยันตัวตนแล้ว (HRIS): ' + escapeHtml(confirmed.title + ' ' + confirmed.first + ' ' + confirmed.last + ' · ' + (confirmed.position || '-') + ' · ' + (confirmed.unit || '-')) + '</span>';
     h1.innerHTML = "<span class=\"num-badge\">".concat(g.n, "</span> \u0E1C\u0E39\u0E49\u0E04\u0E49\u0E33\u0E1B\u0E23\u0E30\u0E01\u0E31\u0E19\u0E04\u0E19\u0E17\u0E35\u0E48 ").concat(g.n, " \u2014 \u0E40\u0E2D\u0E01\u0E2A\u0E32\u0E23\u0E02\u0E2D\u0E07\u0E1C\u0E39\u0E49\u0E04\u0E49\u0E33\u0E1B\u0E23\u0E30\u0E01\u0E31\u0E19").concat(confirmedBadge);
     gContainer.appendChild(h1);
     var t1 = document.createElement('table');
@@ -2121,7 +2384,7 @@ function renderDocTable(containerId, docs, sub) {
     };
     var waived = isWaivedDoc(g, doc.id);
     var declaredNoSpouse = isSpouseConsentId(doc.id) && entry.status === 'skipped';
-    var fileBadge = waived ? '<span class="badge skipped">ไม่ต้องส่ง (ไม่มีคู่สมรส)</span>' : declaredNoSpouse ? '<span class="badge revision">ผู้ยื่นแจ้ง: ไม่มีคู่สมรส</span>' : entry.status === 'uploaded' ? "<button class=\"file-link\" onclick=\"openDocModal('".concat(sub.subId, "','").concat(doc.id, "')\">\uD83D\uDCC4 ").concat(adminFileName(sub, entry), "</button>") : doc.optional ? '<span class="badge pending">ไม่มีเอกสารนี้</span>' : '<span class="badge fail">ยังไม่อัพโหลด</span>';
+    var fileBadge = waived ? '<span class="badge skipped">ไม่ต้องส่ง (ไม่มีคู่สมรส)</span>' : declaredNoSpouse ? '<span class="badge revision">ผู้ยื่นแจ้ง: ไม่มีคู่สมรส</span>' : isRtafExemptId(doc.id) && entry.status === 'skipped' ? '<span class="badge skipped">ผู้ยื่นแจ้ง: ผู้ค้ำเป็นข้าราชการ ทอ.</span>' : entry.status === 'uploaded' ? "<button class=\"file-link\" onclick=\"openDocModal('".concat(sub.subId, "','").concat(doc.id, "')\">\uD83D\uDCC4 ").concat(adminFileName(sub, entry), "</button>") : doc.optional ? '<span class="badge pending">ไม่มีเอกสารนี้</span>' : '<span class="badge fail">ยังไม่อัพโหลด</span>';
     var canReview = entry.status === 'uploaded' || declaredNoSpouse;
     var select = canReview ? "\n      <select onchange=\"setReview('".concat(doc.id, "','").concat(sub.subId, "',this.value)\">\n        <option value=\"pending\" ").concat(entry.reviewStatus === 'pending' ? 'selected' : '', ">\u0E23\u0E2D\u0E15\u0E23\u0E27\u0E08</option>\n        <option value=\"pass\" ").concat(entry.reviewStatus === 'pass' ? 'selected' : '', ">\u0E1C\u0E48\u0E32\u0E19</option>\n        <option value=\"needs-revision\" ").concat(entry.reviewStatus === 'needs-revision' ? 'selected' : '', ">\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02</option>\n        <option value=\"fail\" ").concat(entry.reviewStatus === 'fail' ? 'selected' : '', ">\u0E44\u0E21\u0E48\u0E1C\u0E48\u0E32\u0E19</option>\n      </select>") : '<span class="sub-cell">—</span>';
     var commentBox = canReview ? "\n      <textarea placeholder=\"comment (\u0E16\u0E49\u0E32\u0E21\u0E35) \u2014 \u0E08\u0E33\u0E40\u0E1B\u0E47\u0E19\u0E40\u0E21\u0E37\u0E48\u0E2D\u0E40\u0E25\u0E37\u0E2D\u0E01 '\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02'\" onchange=\"setComment('".concat(doc.id, "','").concat(sub.subId, "',this.value)\">").concat(entry.comment || '', "</textarea>") : '';
@@ -2336,7 +2599,7 @@ function openDocModal(subId, docId) {
       document.getElementById('ocr-last').value = confirmed.last;
       document.getElementById('ocr-idnum').value = confirmed.officialId;
       ocrMatchResult = {
-        type: 'matched',
+        type: confirmed.source === 'manual' ? 'manual' : 'matched',
         record: confirmed
       };
       document.getElementById('doc-modal-match-result').innerHTML = matchResultHtml(ocrMatchResult, 'selectOcrCandidate(INDEX)');
@@ -2352,6 +2615,12 @@ function openDocModal(subId, docId) {
         document.getElementById('ocr-save-btn').textContent = 'บันทึกข้อมูลผู้ค้ำประกัน';
       }
     }
+    var isManual = !!(confirmed && confirmed.source === 'manual');
+    document.getElementById('ocr-manual').style.display = gNum && isManual ? '' : 'none';
+    document.getElementById('ocr-position').value = isManual ? confirmed.position || '' : '';
+    document.getElementById('ocr-unit').value = isManual ? confirmed.unit || '' : '';
+    document.getElementById('ocr-manual-status').textContent = '';
+    if (isManual) document.getElementById('ocr-save-btn').disabled = true;
   }
   document.getElementById('doc-modal').classList.add('active');
 }
@@ -2586,18 +2855,7 @@ function runDocOcrMatch() {
   var last = document.getElementById('ocr-last').value.trim();
   var officialId = cardType === 'civil' ? idNum : '';
   if (!requireHris()) return;
-  var matches = hrisFind(officialId, first, last);
-  var result;
-  if (matches.length === 0) result = {
-    type: 'notfound'
-  };else if (matches.length === 1) result = {
-    type: 'matched',
-    record: matches[0]
-  };else result = {
-    type: 'multi',
-    candidates: matches
-  };
-  applyOcrMatchResult(result);
+  applyOcrMatchResult(hrisMatch(officialId, first, last));
 }
 function selectOcrCandidate(index) {
   applyOcrMatchResult({
@@ -2614,33 +2872,65 @@ function applyOcrMatchResult(result) {
   if (gNum) {
     saveBtn.disabled = result.type !== 'matched';
     saveBtn.textContent = 'บันทึกข้อมูลผู้ค้ำประกัน';
+    // Not found / wrong person / several namesakes: the guarantor may simply not be
+    // an RTAF officer, so offer the deliberate "save what was entered" path.
+    document.getElementById('ocr-manual').style.display = result.type === 'matched' ? 'none' : '';
   }
 }
-function saveOcrGuarantorInfo() {
-  if (!docModalCurrent || !ocrMatchResult || ocrMatchResult.type !== 'matched') return;
+function doSaveGuarantor(record, btn, doneText) {
   var gNum = guarantorNumberFromIdDocId(docModalCurrent.docId);
-  if (!gNum) return;
-  var sub = SUBMISSIONS.find(function (s) {
-    return s.subId === docModalCurrent.subId;
-  });
-  var record = ocrMatchResult.record;
-  var btn = document.getElementById('ocr-save-btn');
+  var sub = SUBMISSIONS.find(function (x) { return x.subId === docModalCurrent.subId; });
   var status = document.getElementById('ocr-save-status');
+  var manualStatus = document.getElementById('ocr-manual-status');
   btn.disabled = true;
-  status.textContent = 'กำลังบันทึก...';
+  (record.source === 'manual' ? manualStatus : status).textContent = 'กำลังบันทึก...';
   gsRun().withSuccessHandler(function () {
     sub.guarantorInfo = sub.guarantorInfo || {};
     sub.guarantorInfo[gNum] = _objectSpread({}, record);
     renderAllDocTables(sub);
     renderMaritalWarnings(sub);
-    status.textContent = '✓ บันทึกข้อมูลผู้ค้ำประกันแล้ว';
+    if (record.source === 'manual') {
+      ocrMatchResult = {type: 'manual', record: record};
+      document.getElementById('doc-modal-match-result').innerHTML = matchResultHtml(ocrMatchResult, 'selectOcrCandidate(INDEX)');
+      manualStatus.textContent = doneText;
+      status.textContent = '';
+    } else {
+      status.textContent = doneText;
+      manualStatus.textContent = '';
+      document.getElementById('ocr-manual').style.display = 'none';
+    }
     btn.disabled = false;
-    btn.textContent = 'บันทึกซ้ำ / อัปเดตข้อมูล';
   }).withFailureHandler(function (err) {
     btn.disabled = false;
     status.textContent = '';
+    manualStatus.textContent = '';
     alert('บันทึกข้อมูลผู้ค้ำไม่สำเร็จ: ' + (err && err.message ? err.message : err));
   }).saveGuarantorInfo(SESSION, sub.subId, gNum, record);
+}
+function saveOcrGuarantorInfo() {
+  if (!docModalCurrent || !ocrMatchResult || ocrMatchResult.type !== 'matched') return;
+  if (!guarantorNumberFromIdDocId(docModalCurrent.docId)) return;
+  var btn = document.getElementById('ocr-save-btn');
+  doSaveGuarantor(_objectSpread({}, ocrMatchResult.record, {source: 'hris'}), btn, '✓ บันทึกข้อมูลผู้ค้ำประกันแล้ว (ยืนยันกับ HRIS)');
+  btn.textContent = 'บันทึกซ้ำ / อัปเดตข้อมูล';
+}
+// For guarantors who are not in RTAF HRIS (other agencies, state enterprises):
+// save exactly what the officer entered, after an explicit confirmation.
+function saveOcrGuarantorManual() {
+  if (!docModalCurrent || !guarantorNumberFromIdDocId(docModalCurrent.docId)) return;
+  var v = function (id) { return document.getElementById(id).value.trim(); };
+  var record = {title: v('ocr-title'), first: v('ocr-first'), last: v('ocr-last'), officialId: v('ocr-idnum'),
+    position: v('ocr-position'), unit: v('ocr-unit'), source: 'manual', education: []};
+  if (!record.first || !record.last) { alert('กรุณากรอกชื่อและนามสกุลผู้ค้ำประกัน'); return; }
+  if (!record.position || !record.unit) { alert('กรุณากรอกตำแหน่งและหน่วยงาน/สังกัดของผู้ค้ำประกัน (ดูได้จากหนังสือรับรองการเป็นข้าราชการและเงินได้รายเดือน)'); return; }
+  var m = ocrMatchResult;
+  var msg = m && m.type === 'mismatch'
+    ? 'เลขประจำตัวนี้ใน HRIS เป็นของ ' + m.record.title + ' ' + m.record.first + ' ' + m.record.last + '\nยืนยันว่าผู้ค้ำประกันไม่ใช่บุคคลนี้ และบันทึกตามข้อมูลที่กรอก?'
+    : m && m.type === 'multi'
+    ? 'พบชื่อนี้ใน HRIS หลายคนแต่ไม่ได้เลือกคนใด\nยืนยันว่าผู้ค้ำประกันไม่ใช่บุคคลใน HRIS และบันทึกตามข้อมูลที่กรอก?'
+    : 'ยืนยันบันทึกข้อมูลผู้ค้ำประกันตามที่กรอก (ไม่พบในข้อมูล HRIS เช่น ไม่ใช่ข้าราชการ ทอ.)?';
+  if (!confirm(msg)) return;
+  doSaveGuarantor(record, document.getElementById('ocr-manual-btn'), '✓ บันทึกตามข้อมูลที่กรอกแล้ว (ไม่พบใน HRIS)');
 }
 function renderStampArea(sub) {
   var g = function g(id) {
@@ -2739,7 +3029,7 @@ function openReport(subId) {
         resultText = 'ไม่มีคู่สมรส · ' + (REPORT_RESULT_LABEL[entry.reviewStatus] || REPORT_RESULT_LABEL.pending);
         resultClass = entry.reviewStatus === 'pass' ? 'result-pass' : 'result-pending';
       } else if (entry.status === 'skipped') {
-        resultText = '– ไม่มี';
+        resultText = isRtafExemptId(doc.id) ? '– เป็นข้าราชการ ทอ. (ไม่ต้องใช้)' : '– ไม่มี';
         resultClass = 'result-empty';
       } else if (entry.status !== 'uploaded') {
         resultText = doc.optional ? '– ยังไม่ส่ง (ถ้ามี)' : '– ยังไม่ส่ง';
@@ -3255,11 +3545,144 @@ function renderMaritalWarnings(sub) {
     return '<div class="match-detail">' + escapeHtml(w) + '</div>';
   }).join('') + '<div class="match-detail">กรุณาตรวจสอบก่อนตั้งผลตรวจหนังสือยินยอมคู่สมรส</div></div>' : '';
 }
+// ---------- Account transfer requests ----------
+var TRANSFER_REQUESTS = [];
+function loadTransferRequests() {
+  gsRun().withSuccessHandler(function (rows) {
+    TRANSFER_REQUESTS = rows || [];
+    renderTransferRequests();
+  }).withFailureHandler(function () {}).listTransferRequests(SESSION);
+}
+function renderTransferRequests() {
+  var card = document.getElementById('transfer-card');
+  var pending = TRANSFER_REQUESTS.filter(function (r) { return r.status === 'pending'; });
+  card.style.display = pending.length ? '' : 'none';
+  document.getElementById('transfer-count').textContent = pending.length;
+  document.getElementById('transfer-list').innerHTML = pending.map(function (r) {
+    var contracts = (r.contracts || []).length
+      ? r.contracts.map(function (c) {
+          return '<div>' + escapeHtml(c.subId + ' — ' + c.name) + ' <span class="sub-cell">(บัญชีปัจจุบัน ' + escapeHtml(c.googleEmail) +
+            (c.phone ? ', โทร ' + escapeHtml(c.phone) : '') + ')</span></div>';
+        }).join('')
+      : '<div class="sub-cell">ไม่พบสัญญาของเลขประจำตัวนี้ในระบบ</div>';
+    return '<div class="tr-item"><div class="tr-head"><strong>' + escapeHtml(r.requesterEmail) + '</strong> ขอย้ายสัญญาของเลขประจำตัว <strong>' +
+      escapeHtml(r.officialId) + '</strong> <span class="sub-cell">· ' + escapeHtml(formatThaiDateTime(r.createdAt)) + '</span></div>' +
+      '<div class="sub-cell">บัญชีเดิมที่แจ้ง: ' + escapeHtml(r.oldEmail || '-') + ' · โทร ' + escapeHtml(r.phone || '-') + ' · เหตุผล: ' + escapeHtml(r.reason || '-') + '</div>' +
+      '<div class="tr-contracts">' + contracts + '</div>' +
+      '<div class="tr-warn">ยืนยันตัวตนก่อนอนุมัติ เช่น โทรกลับตามเบอร์ในสัญญาเดิม หรือให้แสดงบัตรประจำตัว</div>' +
+      '<div class="hris-actions"><button class="primary" onclick="decideTransfer(\'' + r.requestId + '\', true)"' + ((r.contracts || []).length ? '' : ' disabled') + '>อนุมัติ ย้ายสัญญามาบัญชีนี้</button>' +
+      '<button class="secondary" onclick="decideTransfer(\'' + r.requestId + '\', false)">ปฏิเสธ</button></div></div>';
+  }).join('');
+}
+function decideTransfer(requestId, approve) {
+  var note = prompt(approve ? 'บันทึกวิธียืนยันตัวตน (เช่น โทรยืนยันกับเบอร์ในสัญญาเดิมแล้ว):' : 'เหตุผลที่ปฏิเสธ:');
+  if (note === null) return;
+  if (!note.trim()) { alert('กรุณาระบุข้อความ'); return; }
+  showLoading('กำลังบันทึก...');
+  gsRun().withSuccessHandler(function (res) {
+    hideLoading();
+    alert(approve ? 'ย้ายสัญญาแล้ว ' + res.moved + ' ฉบับ' : 'ปฏิเสธคำขอแล้ว');
+    refreshList();
+  }).withFailureHandler(function (err) {
+    hideLoading();
+    alert('บันทึกไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+  }).decideTransferRequest(SESSION, requestId, approve, note.trim());
+}
+
+// ---------- Officer tools on a contract: change Google account / correct official ID ----------
+function officerChangeEmail() {
+  var sub = SUBMISSIONS.find(function (s) { return s.subId === currentSubId; });
+  var email = prompt('อีเมลบัญชี Google ใหม่ของผู้ทำสัญญา (ปัจจุบัน: ' + sub.personal.email + '):');
+  if (email === null) return;
+  var reason = prompt('เหตุผล / วิธียืนยันตัวตน:');
+  if (reason === null) return;
+  var others = siblingContractsForOfficialId(sub.personal.officialId).filter(function (s) { return s.subId !== sub.subId; }).length;
+  var all = others > 0 && confirm('บุคคลนี้มีสัญญาอื่นอีก ' + others + ' ฉบับ ย้ายทุกฉบับไปบัญชีใหม่ด้วยหรือไม่?\n(ตกลง = ทุกฉบับ, ยกเลิก = เฉพาะฉบับนี้)');
+  showLoading('กำลังย้ายบัญชี...');
+  gsRun().withSuccessHandler(function (res) {
+    hideLoading();
+    alert('ย้ายไปบัญชีใหม่แล้ว ' + res.moved + ' ฉบับ');
+    refreshList();
+    showDetail(sub.subId);
+  }).withFailureHandler(function (err) {
+    hideLoading();
+    alert('ย้ายบัญชีไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+  }).transferSubmissionOwner(SESSION, sub.subId, email.trim(), (reason || '').trim(), all);
+}
+var pendingAutoMatchSubId = null;
+function officerSetOfficialId(subId, newId, reason) {
+  showLoading('กำลังแก้ไขเลขประจำตัว...');
+  gsRun().withSuccessHandler(function () {
+    hideLoading();
+    pendingAutoMatchSubId = subId; // re-check against HRIS as soon as it reloads
+    refreshList();
+    showDetail(subId);
+  }).withFailureHandler(function (err) {
+    hideLoading();
+    alert('แก้ไขไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+  }).updateOfficialId(SESSION, subId, newId, reason);
+}
+function officerChangeOfficialId() {
+  var sub = SUBMISSIONS.find(function (s) { return s.subId === currentSubId; });
+  var id = prompt('เลขประจำตัวข้าราชการที่ถูกต้อง (ปัจจุบัน: ' + (sub.personal.officialId || '-') + '):');
+  if (id === null) return;
+  if (!/^[0-9]{10}$/.test(id.trim())) { alert('ต้องเป็นตัวเลข 10 หลัก'); return; }
+  var reason = prompt('เหตุผลในการแก้ไข:');
+  if (reason === null) return;
+  if (!reason.trim()) { alert('กรุณาระบุเหตุผล'); return; }
+  officerSetOfficialId(sub.subId, id.trim(), reason.trim());
+}
+function fixIdFromHris(subId, newId) {
+  var sub = SUBMISSIONS.find(function (s) { return s.subId === subId; });
+  if (!confirm('แก้เลขประจำตัวของสัญญานี้จาก ' + sub.personal.officialId + ' เป็น ' + newId + ' ตามข้อมูล HRIS?')) return;
+  officerSetOfficialId(subId, newId, 'แก้ตามข้อมูล HRIS (เดิม ' + sub.personal.officialId + ')');
+}
+
+// ---------- HRIS match with typo detection ----------
+// ID first, but a hit on the ID only counts if the NAME also agrees — a mistyped
+// ID can land on another real person. If the ID isn't in HRIS but the name is,
+// that's almost always a typo, which renderMatchResult offers to fix.
+function hrisMatch(officialId, first, last) {
+  var id = normOfficialId(officialId);
+  var key = hrisNameKey(first, last);
+  var byId = id && HRIS.byId.has(id) ? HRIS.byId.get(id).map(hrisToClient) : [];
+  var byName = (first && last) ? (HRIS.byName.get(key) || []).map(hrisToClient) : [];
+  if (byId.length) {
+    var same = byId.filter(function (r) { return hrisNameKey(r.first, r.last) === key; });
+    if (same.length === 1) return {type: 'matched', record: same[0]};
+    if (!(first && last)) return byId.length === 1 ? {type: 'matched', record: byId[0]} : {type: 'multi', candidates: byId};
+    return {type: 'mismatch', record: byId[0], typed: {first: first, last: last, officialId: id}, byName: byName};
+  }
+  if (byName.length === 1) return {type: 'matched', record: byName[0]};
+  if (byName.length > 1) return {type: 'multi', candidates: byName};
+  return {type: 'notfound'};
+}
+
 function initAdminView() {
   document.getElementById('officer-header-sub').textContent = 'เข้าสู่ระบบด้วย ' + (currentUser.displayName || currentUser.email);
   refreshList();
   loadHris();
 }
+function renderGuarantorClaimWarnings(sub) {
+  var box = document.getElementById('rtaf-warnings');
+  if (!box || !sub) return;
+  var w = [];
+  activeGuarantors(sub.personal.eduType).forEach(function (g) {
+    var info = sub.guarantorInfo && sub.guarantorInfo[g.n];
+    if (info && info.source === 'manual' && docEntry(sub, 'g' + g.n + '_4').status === 'skipped') {
+      w.push('ผู้ค้ำประกันคนที่ ' + g.n + ': ไม่พบในข้อมูล HRIS แต่ผู้ยื่นแจ้งว่าเป็นข้าราชการ ทอ. จึงไม่ได้ส่งหนังสือรับรองการเป็นข้าราชการและเงินได้รายเดือน');
+    }
+  });
+  box.innerHTML = w.length ? '<div class="match-box status-multi"><h3>⚠ ข้อมูลผู้ค้ำประกันไม่สอดคล้องกัน</h3>' +
+    w.map(function (t) { return '<div class="match-detail">' + escapeHtml(t) + '</div>'; }).join('') + '</div>' : '';
+}
+// run alongside every marital-status check (same moments: detail load, match, guarantor save)
+var _renderMaritalWarningsBase = renderMaritalWarnings;
+renderMaritalWarnings = function (sub) {
+  _renderMaritalWarningsBase(sub);
+  renderGuarantorClaimWarnings(sub);
+};
+
 boot();
 </script>
 
