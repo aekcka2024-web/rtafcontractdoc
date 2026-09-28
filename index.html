@@ -7,6 +7,128 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* ─── Design Tokens ─────────────────────────────── */
+  :root{
+    --navy:#16233F;--navy-2:#1E3054;--gold:#C9A84C;
+    --warn:#B91C1C;--warn-bg:#FEF2F2;--warn-mid:#FCA5A5;
+    --ok:#15803D;--ok-bg:#F0FDF4;--ok-mid:#86EFAC;
+    --info:#1D4ED8;--info-bg:#EFF6FF;--info-mid:#93C5FD;
+    --amber:#92400E;--amber-bg:#FEF3C7;
+    --steel:#637087;--muted:#8FA3C0;--text:#1A2540;
+    --bg:#F4F6FA;--card:#FFFFFF;--line:#DDE3EE;
+    --r-sm:5px;--r-md:8px;--r-lg:12px;--r-pill:999px;
+    --sh-xs:0 1px 2px rgba(22,35,63,.07);
+    --sh-sm:0 1px 3px rgba(22,35,63,.08),0 4px 14px rgba(22,35,63,.06);
+    --sh-md:0 4px 16px rgba(22,35,63,.10),0 1px 4px rgba(22,35,63,.07);
+    --sh-lg:0 8px 32px rgba(22,35,63,.14),0 2px 8px rgba(22,35,63,.08);
+    --tr:.15s ease;
+  }
+  /* ─── Header (single definition) ────────────────── */
+  header.top{background:var(--navy);color:#fff;padding:18px 0;}
+  .top-inner{max-width:980px;margin:0 auto;padding:0 24px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .top-text{min-width:0;}
+  .brand{display:flex;align-items:center;gap:9px;margin:0;padding:0;}
+  .brand .mark{width:9px;height:9px;border-radius:50%;background:var(--gold);flex:none;}
+  .brand h1{font-size:17px;font-weight:700;margin:0;letter-spacing:-.01em;}
+  header.top p{margin:4px 0 0;font-size:12.5px;color:#C7CEDB;}
+  .logout-btn{flex:none;background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:var(--r-sm);padding:6px 14px;font-family:inherit;font-size:12.5px;cursor:pointer;transition:background var(--tr),border-color var(--tr);}
+  .logout-btn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.6);}
+  @media(max-width:640px){.top-inner{flex-wrap:wrap;}}
+  /* ─── Cards ──────────────────────────────────────── */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:22px 24px;margin-bottom:14px;box-shadow:var(--sh-xs);}
+  .card h2{font-size:15.5px;font-weight:700;margin:0 0 4px;color:var(--navy);}
+  .card .hint{font-size:13px;color:var(--muted);margin:0 0 14px;}
+  /* ─── Buttons ────────────────────────────────────── */
+  button,input[type=button],input[type=submit]{font-family:'Sarabun',sans-serif;}
+  button.primary{background:var(--navy);color:#fff;border:none;border-radius:var(--r-sm);padding:9px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:background var(--tr),box-shadow var(--tr);}
+  button.primary:hover:not(:disabled){background:var(--navy-2);box-shadow:var(--sh-xs);}
+  button.primary:disabled{background:#94A3B8;cursor:not-allowed;}
+  button.secondary{background:transparent;color:var(--navy);border:1.5px solid #B0BCCE;border-radius:var(--r-sm);padding:8px 18px;font-size:14px;cursor:pointer;transition:background var(--tr),border-color var(--tr);}
+  button.secondary:hover:not(:disabled){background:rgba(22,35,63,.05);border-color:var(--navy);}
+  button.secondary:disabled{opacity:.5;cursor:not-allowed;}
+  button.danger-btn{background:#DC2626;color:#fff;border:none;border-radius:var(--r-sm);padding:9px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:background var(--tr);}
+  button.danger-btn:hover{background:#B91C1C;}
+  button.back-link{background:none;border:1.5px solid var(--line);color:var(--steel);border-radius:var(--r-sm);padding:7px 14px;font-family:inherit;font-size:13px;cursor:pointer;margin-bottom:16px;display:inline-flex;align-items:center;gap:5px;transition:border-color var(--tr),color var(--tr);}
+  button.back-link:hover{border-color:var(--navy);color:var(--navy);}
+  .link-btn{background:none;border:none;padding:0;font-family:inherit;font-size:13px;color:var(--steel);text-decoration:underline;cursor:pointer;}
+  .link-btn:hover{color:var(--navy);}
+  /* ─── Inputs / Selects ───────────────────────────── */
+  input[type=text],input[type=email],input[type=number],select,textarea{
+    font-family:'Sarabun',sans-serif;font-size:14px;color:var(--text);
+    border:1.5px solid var(--line);border-radius:var(--r-sm);
+    padding:8px 12px;background:#fff;outline:none;width:100%;
+    box-sizing:border-box;transition:border-color var(--tr),box-shadow var(--tr);}
+  input:focus,select:focus,textarea:focus{border-color:#7E97BF;box-shadow:0 0 0 3px rgba(22,35,63,.09);}
+  input[readonly]{background:var(--bg);color:var(--muted);cursor:default;}
+  input[readonly]:focus{border-color:var(--line);box-shadow:none;}
+  select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23637087' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+  .field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+  .field label{font-size:13px;font-weight:600;color:var(--steel);}
+  .field .field-note{font-size:12px;color:var(--muted);margin-top:2px;}
+  .field .error{font-size:12px;color:var(--warn);display:none;margin-top:2px;}
+  .field.invalid input,.field.invalid select{border-color:var(--warn-mid);}
+  .field.invalid .error{display:block;}
+  /* ─── Status badges ──────────────────────────────── */
+  .badge{display:inline-block;padding:2px 10px;border-radius:var(--r-pill);font-size:12px;font-weight:600;line-height:1.6;}
+  .badge.pending{background:#F1F5F9;color:#475569;}
+  .badge.uploaded{background:var(--info-bg);color:var(--info);}
+  .badge.matched{background:var(--ok-bg);color:var(--ok);}
+  .badge.pass{background:var(--ok-bg);color:var(--ok);}
+  .badge.fail,.badge.revision{background:var(--warn-bg);color:var(--warn);}
+  .badge.skipped{background:var(--amber-bg);color:var(--amber);}
+  .badge.stamped,.badge.approved{background:var(--ok);color:#fff;}
+  /* ─── Steps ──────────────────────────────────────── */
+  .steps{display:flex;margin-bottom:20px;overflow-x:auto;gap:0;}
+  .step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;}
+  .step::after{content:'';position:absolute;top:13px;left:50%;right:-50%;height:2px;background:var(--line);z-index:0;}
+  .step:last-child::after{display:none;}
+  .step-num{width:27px;height:27px;border-radius:50%;border:2px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);z-index:1;position:relative;transition:all var(--tr);}
+  .step-label{font-size:12px;color:var(--muted);text-align:center;white-space:nowrap;}
+  .step.active .step-num{background:var(--gold);border-color:var(--gold);color:#fff;}
+  .step.active .step-label{color:var(--navy);font-weight:600;}
+  .step.done .step-num{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .step.done .step-label{color:var(--navy);}
+  /* ─── Toast ──────────────────────────────────────── */
+  #toast-container{position:fixed;bottom:24px;right:24px;z-index:9000;display:flex;flex-direction:column-reverse;gap:8px;pointer-events:none;max-width:380px;}
+  .toast{pointer-events:auto;display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:var(--r-md);box-shadow:var(--sh-md);font-size:13.5px;line-height:1.45;opacity:0;transform:translateY(6px);transition:opacity .2s ease,transform .2s ease;border-left:4px solid;cursor:pointer;}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .toast.hide{opacity:0;transform:translateY(6px);}
+  .t-success{background:var(--ok-bg);border-color:var(--ok);color:#14532D;}
+  .t-error{background:var(--warn-bg);border-color:var(--warn);color:#7F1D1D;}
+  .t-info{background:var(--info-bg);border-color:var(--info);color:#1E3A8A;}
+  .t-warn{background:var(--amber-bg);border-color:#D97706;color:var(--amber);}
+  .toast-icon{font-size:15px;flex:none;margin-top:1px;}
+  .toast-body{flex:1;}
+  .toast-x{flex:none;opacity:.4;font-size:16px;font-weight:700;background:none;border:none;color:inherit;cursor:pointer;padding:0 2px;line-height:1;}
+  .toast-x:hover{opacity:1;}
+  /* ─── App dialog (confirm / form prompt) ─────────── */
+  #app-dialog{position:fixed;inset:0;background:rgba(22,35,63,.45);z-index:8000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .18s ease;}
+  #app-dialog.open{opacity:1;pointer-events:auto;}
+  .adlg-box{background:#fff;border-radius:var(--r-lg);box-shadow:var(--sh-lg);width:100%;max-width:440px;overflow:hidden;transform:scale(.96);transition:transform .18s ease;}
+  #app-dialog.open .adlg-box{transform:scale(1);}
+  .adlg-head{padding:18px 22px 14px;border-bottom:1px solid var(--line);}
+  .adlg-head h3{margin:0 0 4px;font-size:16px;font-weight:700;color:var(--navy);}
+  .adlg-head p{margin:0;font-size:13.5px;color:var(--steel);line-height:1.45;}
+  .adlg-body{padding:16px 22px;}
+  .adlg-body .field{margin-bottom:12px;}
+  .adlg-body .field:last-child{margin-bottom:0;}
+  .adlg-foot{padding:10px 22px 18px;display:flex;justify-content:flex-end;gap:10px;}
+  /* ─── Doc rows ───────────────────────────────────── */
+  .doc-row{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid #F0F3F8;}
+  .doc-row:last-child{border-bottom:none;}
+  .doc-name{flex:1;font-size:13.5px;line-height:1.4;}
+  .doc-optional{font-size:11.5px;color:var(--muted);margin-left:3px;}
+  .doc-file{display:flex;flex-direction:column;align-items:flex-end;gap:5px;min-width:155px;}
+  .doc-comment{font-size:12px;color:var(--warn);margin-top:2px;}
+  .upload-btn{font-size:12.5px;padding:5px 12px;}
+  .file-link{background:none;border:none;color:var(--info);font-size:12.5px;font-family:inherit;cursor:pointer;padding:0;text-decoration:underline;}
+  .file-link:hover{color:var(--navy);}
+  /* ─── Table ──────────────────────────────────────── */
+  .doc-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px;}
+  .doc-table th{font-size:12px;font-weight:600;color:var(--steel);padding:5px 8px;border-bottom:2px solid var(--line);text-align:left;white-space:nowrap;}
+  .doc-table td{padding:7px 8px;border-bottom:1px solid #F0F3F8;vertical-align:top;}
+  .doc-table tr:hover td{background:#F8FAFC;}
+
 
   .app-view{display:none;}
   .app-view.active{display:block;}
@@ -20,10 +142,7 @@
   }
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
-  header.top{background:var(--navy);color:#fff;padding:20px 24px;}
-  header.top .brand{display:flex;align-items:baseline;gap:10px;max-width:760px;margin:0 auto;}
-  header.top .brand .mark{width:10px;height:10px;border-radius:50%;background:var(--gold);flex:none;}
-  header.top h1{font-size:18px;font-weight:600;margin:0;}
+header.top h1{font-size:18px;font-weight:600;margin:0;}
   header.top p{max-width:760px;margin:6px auto 0;font-size:13px;color:#C7CEDB;}
   .wrap{max-width:760px;margin:0 auto;padding:28px 20px 80px;}
   .steps{display:flex;gap:8px;margin-bottom:16px;}
@@ -123,10 +242,7 @@
   }
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
-  header.top{background:var(--navy);color:#fff;padding:20px 24px;}
-  header.top .brand{display:flex;align-items:baseline;gap:10px;max-width:980px;margin:0 auto;}
-  header.top .brand .mark{width:10px;height:10px;border-radius:50%;background:var(--gold);flex:none;}
-  header.top h1{font-size:18px;font-weight:600;margin:0;}
+header.top h1{font-size:18px;font-weight:600;margin:0;}
   header.top p{max-width:980px;margin:6px auto 0;font-size:13px;color:#C7CEDB;}
   .wrap{max-width:980px;margin:0 auto;padding:28px 20px 80px;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:24px;margin-bottom:16px;}
@@ -382,16 +498,155 @@
   .ocr-manual-title{font-size:12px;color:var(--steel);margin-bottom:8px;}
   .match-box.status-manual{border-color:#9DB3CF;background:#F1F5FA;}
   .match-box.status-manual h3{color:#2B4C73;}
-  /* header content sits in the same 980px column as the page content, so the
-     logout button lines up with the right edge of the cards below */
-  header.top{padding:20px 0;}
-  .top-inner{max-width:980px;margin:0 auto;padding:0 20px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:16px;}
-  .top-inner .brand{max-width:none;margin:0;padding-left:24px;}
-  .top-inner p{max-width:none;margin:6px 0 0;padding-left:24px;}
-  .top-text{min-width:0;}
-  .logout-btn{flex:none;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:6px;padding:6px 14px;font-family:inherit;font-size:13px;cursor:pointer;}
-  .logout-btn:hover{background:rgba(255,255,255,.1);}
-  @media (max-width:640px){ .top-inner{flex-wrap:wrap;} }
+
+
+  /* ── Stats panel ──────────────────────────────────── */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+  .stat-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;cursor:pointer;transition:box-shadow var(--tr),border-color var(--tr);position:relative;overflow:hidden;}
+  .stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;}
+  .stat-card.s-all::before{background:#94A3B8;}
+  .stat-card.s-waiting::before{background:var(--steel);}
+  .stat-card.s-revision::before{background:var(--gold);}
+  .stat-card.s-stamped::before{background:var(--ok);}
+  .stat-card:hover,.stat-card.active{box-shadow:var(--sh-sm);border-color:#7E97BF;}
+  .stat-card.active{border-color:var(--navy);}
+  .stat-card.s-revision.active{border-color:var(--gold);}
+  .stat-card.s-stamped.active{border-color:var(--ok);}
+  .stat-num{font-size:28px;font-weight:800;line-height:1;margin-bottom:4px;color:var(--navy);}
+  .stat-card.s-revision .stat-num{color:var(--amber);}
+  .stat-card.s-stamped .stat-num{color:var(--ok);}
+  .stat-label{font-size:12px;color:var(--steel);}
+  @media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+  /* ── Search / filter bar ─────────────────────────── */
+  .list-toolbar{display:flex;gap:10px;margin:12px 0 10px;flex-wrap:wrap;align-items:center;}
+  .search-wrap{position:relative;flex:1;min-width:180px;}
+  .search-wrap input{padding-left:34px;}
+  .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none;}
+  .filter-chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .chip{padding:5px 12px;border-radius:var(--r-pill);font-size:12.5px;cursor:pointer;border:1.5px solid var(--line);background:#fff;color:var(--steel);transition:all var(--tr);}
+  .chip:hover{border-color:var(--navy);color:var(--navy);}
+  .chip.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .chip-all.active{background:var(--steel);border-color:var(--steel);}
+  .chip-revision.active{background:var(--gold);border-color:var(--gold);color:#fff;}
+  .chip-stamped.active{background:var(--ok);border-color:var(--ok);}
+  .list-count{font-size:12.5px;color:var(--muted);white-space:nowrap;}
+  /* ── Contract list table ─────────────────────────── */
+  .applicants{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .applicants th{font-size:12px;font-weight:600;color:var(--steel);padding:7px 10px;border-bottom:2px solid var(--line);text-align:left;white-space:nowrap;cursor:pointer;user-select:none;}
+  .applicants th:hover{color:var(--navy);}
+  .applicants th.sort-asc::after{content:' ↑';}
+  .applicants th.sort-desc::after{content:' ↓';}
+  .applicants td{padding:10px 10px;border-bottom:1px solid #F0F3F8;vertical-align:middle;}
+  .applicants tr.data-row{cursor:pointer;}
+  .applicants tr.data-row:hover td{background:#F5F7FB;}
+  .applicants tr.data-row.row-flagged td{background:#FFFBF0;}
+  .applicants tr.data-row.row-flagged:hover td{background:#FFF5D9;}
+  .contract-id{font-weight:600;color:var(--navy);font-size:13px;}
+  .sub-cell{font-size:12px;color:var(--muted);margin-top:2px;}
+  .progress-bar-wrap{width:80px;}
+  .progress-bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:4px;}
+  .progress-bar-fill{height:100%;border-radius:2px;transition:width .3s ease;}
+  .fill-ok{background:var(--ok);}
+  .fill-mid{background:var(--gold);}
+  .fill-none{background:var(--line);}
+  /* ── Detail panel: two-column on wide screens ─────── */
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .detail-grid .card{margin-bottom:0;}
+  .detail-full{grid-column:1/-1;}
+  @media(max-width:800px){.detail-grid{grid-template-columns:1fr;}}
+  /* ── Match result boxes ───────────────────────────── */
+  .match-box{border-radius:var(--r-md);padding:12px 14px;margin-top:8px;font-size:13px;}
+  .status-matched{background:var(--ok-bg);border:1px solid var(--ok-mid);}
+  .status-matched h3{color:var(--ok);font-size:13.5px;margin:0 0 6px;}
+  .status-notfound{background:var(--warn-bg);border:1px solid var(--warn-mid);}
+  .status-notfound h3{color:var(--warn);font-size:13.5px;margin:0 0 4px;}
+  .status-multi{background:var(--amber-bg);border:1px solid var(--amber-mid);}
+  .status-multi h3{color:var(--amber);font-size:13.5px;margin:0 0 8px;}
+  .status-mismatch,.status-manual{background:var(--info-bg);border:1px solid var(--info-mid);}
+  .status-mismatch h3,.status-manual h3{color:var(--info);font-size:13.5px;margin:0 0 4px;}
+  .match-detail{margin-top:4px;color:var(--steel);}
+  .edu-history{font-size:12px;color:var(--muted);margin-top:3px;}
+  .candidate{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-top:1px solid rgba(0,0,0,.07);}
+  .candidate:first-child{border-top:none;}
+  .candidate .info{font-size:13px;}
+  .id-fix{margin-top:8px;padding:10px 12px;border:1px solid var(--amber-mid);background:var(--amber-bg);border-radius:var(--r-md);font-size:12.5px;color:var(--amber);}
+  /* ── Stamp area ───────────────────────────────────── */
+  .stamp-area{margin-top:14px;padding:14px 16px;border-radius:var(--r-md);border:1.5px dashed var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .stamp-area.ready{border-color:var(--ok-mid);background:var(--ok-bg);}
+  .stamp-area.not-ready{border-color:var(--line);background:var(--bg);}
+  .stamp-progress{font-size:13px;color:var(--steel);}
+  .stamp-progress strong{color:var(--navy);}
+  /* ── Doc table inside detail ──────────────────────── */
+  .doc-section{margin-top:8px;}
+  .doc-section-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+  .doc-section-sub{font-size:12px;color:var(--muted);font-weight:400;}
+  .doc-review-row{display:grid;grid-template-columns:1fr auto auto minmax(140px,1fr);gap:8px;align-items:start;padding:8px 0;border-bottom:1px solid #F0F3F8;font-size:13px;}
+  .doc-review-row:last-child{border-bottom:none;}
+  .doc-review-name{line-height:1.3;}
+  .doc-review-file{}
+  .doc-review-result select{font-size:12.5px;padding:4px 28px 4px 8px;border-radius:var(--r-sm);border:1.5px solid var(--line);}
+  .doc-review-comment textarea{font-size:12.5px;padding:5px 8px;border:1.5px solid var(--line);border-radius:var(--r-sm);resize:vertical;min-height:34px;width:100%;box-sizing:border-box;}
+  /* ── No results ───────────────────────────────────── */
+  .no-results{text-align:center;padding:32px 0;color:var(--muted);font-size:14px;}
+
+
+  /* ── Responsive: applicant side ──────────────────────────── */
+  @media (max-width:600px){
+    .wrap{padding:16px 12px 80px;}
+    .card{padding:16px 14px;}
+    .steps{gap:4px;margin-bottom:12px;}
+    .step-label{display:none;}           /* numbers only on narrow screens */
+    .step-num{width:24px;height:24px;font-size:11px;}
+    .prep-box{flex-direction:column;gap:10px;}
+    .prep-box button{width:100%;}
+    .field-row{flex-direction:column;}
+    .field-row > .field{width:100% !important;}
+    .doc-file{min-width:120px;}
+    /* sticky submit / next bar */
+    .sticky-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;justify-content:flex-end;z-index:50;box-shadow:0 -2px 8px rgba(22,35,63,.08);}
+    .sticky-bar button{min-height:44px;font-size:15px;flex:1;}
+    .sticky-bar .secondary{max-width:120px;}
+    .no-sticky .sticky-bar{display:none;}
+  }
+  @media (min-width:601px){.sticky-bar{display:none;}}
+
+  /* ── Responsive: admin side ──────────────────────────────── */
+  @media (max-width:700px){
+    .stats-grid{grid-template-columns:repeat(2,1fr);}
+    .stat-num{font-size:22px;}
+    .list-toolbar{flex-direction:column;align-items:stretch;}
+    .filter-chips{flex-wrap:wrap;}
+    .applicants th:nth-child(3),.applicants td:nth-child(3),
+    .applicants th:nth-child(5),.applicants td:nth-child(5){display:none;}
+  }
+  @media (max-width:480px){
+    .top-inner h1{font-size:14px;}
+    .logout-btn{font-size:11.5px;padding:4px 10px;}
+    .stat-card{padding:10px 12px;}
+    .stat-num{font-size:18px;}
+  }
+  /* ── Upload button — touch-friendly ─────────────────────── */
+  @media (max-width:600px){
+    .upload-btn{min-height:40px;width:100%;text-align:center;}
+    .doc-file{min-width:unset;width:100%;}
+    .doc-row{flex-wrap:wrap;}
+    .doc-name{width:100%;}
+  }
+
+
+  /* ── Officer report ───────────────────────────────────────── */
+  .report-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px;flex-wrap:wrap;}
+  .report-meta{font-size:13px;color:var(--steel);}
+  .report-meta-fields{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;}
+  .report-summary-row{display:flex;align-items:center;gap:20px;background:var(--navy);color:#fff;border-radius:var(--r-md);padding:12px 16px;margin:12px 0;}
+  .report-summary-num{font-size:26px;font-weight:800;line-height:1;}
+  .report-summary-label{font-size:12px;opacity:.75;}
+  .report-qr{text-align:center;}
+  .report-qr img{border:4px solid var(--navy);border-radius:var(--r-sm);max-width:110px;}
+  @media print{
+    .report-summary-row{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+
 </style>
 </head>
 <body>
@@ -446,10 +701,10 @@ setTimeout(function () {
 <div class="wrap">
 
   <div class="steps">
-    <div class="step" data-step="1" onclick="goStep(1)"><span class="num">1</span><span class="label">ข้อมูลผู้ทำสัญญา</span></div>
-    <div class="step" data-step="2" onclick="goStep(2)"><span class="num">2</span><span class="label">เอกสารผู้ทำสัญญา</span></div>
-    <div class="step" data-step="3" onclick="goStep(3)"><span class="num">3</span><span class="label">เอกสารผู้ค้ำประกัน</span></div>
-    <div class="step" data-step="4" onclick="goStep(4)"><span class="num">4</span><span class="label">ตรวจสอบและส่ง</span></div>
+    <div class="step" data-step="1" onclick="goStep(1)"><span class="num">1</span><span class="label">1. ข้อมูล</span></div>
+    <div class="step" data-step="2" onclick="goStep(2)"><span class="num">2</span><span class="label">2. เอกสาร</span></div>
+    <div class="step" data-step="3" onclick="goStep(3)"><span class="num">3</span><span class="label">3. ผู้ค้ำ</span></div>
+    <div class="step" data-step="4" onclick="goStep(4)"><span class="num">4</span><span class="label">4. ส่ง</span></div>
   </div>
 
   <div class="contract-number-line" id="contract-number-line"></div>
@@ -746,21 +1001,55 @@ setTimeout(function () {
       <input type="file" id="hris-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="onHrisFileChosen(this)">
     </div>
     <div class="card">
-      <div class="list-header">
-        <div>
-          <h2>รายชื่อสัญญาทั้งหมด</h2>
-          <p class="hint">หนึ่งคนอาจมีได้หลายสัญญา (คนละภารกิจ/คนละครั้ง) — คลิกแถวเพื่อดูรายละเอียด</p>
+      <!-- Stats tiles -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card s-all active" onclick="setFilter('all')">
+          <div class="stat-num" id="stat-all">0</div>
+          <div class="stat-label">สัญญาทั้งหมด</div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="secondary" onclick="refreshList()">รีเฟรชรายการ</button>
+        <div class="stat-card s-waiting" onclick="setFilter('waiting')">
+          <div class="stat-num" id="stat-waiting">0</div>
+          <div class="stat-label">รอตรวจ</div>
+        </div>
+        <div class="stat-card s-revision" onclick="setFilter('revision')">
+          <div class="stat-num" id="stat-revision">0</div>
+          <div class="stat-label">รอผู้ยื่นแก้ไข</div>
+        </div>
+        <div class="stat-card s-stamped" onclick="setFilter('stamped')">
+          <div class="stat-num" id="stat-stamped">0</div>
+          <div class="stat-label">ประทับตราแล้ว</div>
         </div>
       </div>
+      <!-- Toolbar: search + chips + refresh -->
+      <div class="list-toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="list-search" placeholder="ค้นหาชื่อ เลขประจำตัว เลขที่สัญญา..." oninput="renderList()">
+        </div>
+        <div class="filter-chips">
+          <span class="chip chip-all active" id="chip-all" onclick="setFilter('all')">ทั้งหมด</span>
+          <span class="chip chip-waiting" id="chip-waiting" onclick="setFilter('waiting')">รอตรวจ</span>
+          <span class="chip chip-revision" id="chip-revision" onclick="setFilter('revision')">แก้ไข</span>
+          <span class="chip chip-stamped" id="chip-stamped" onclick="setFilter('stamped')">เสร็จแล้ว</span>
+        </div>
+        <span class="list-count" id="list-count"></span>
+        <button class="secondary" onclick="refreshList()">รีเฟรช</button>
+      </div>
+      <!-- Table -->
       <table class="applicants">
         <thead>
-          <tr><th>เลขที่สัญญา</th><th>ชื่อ-สกุล</th><th>ฉบับที่</th><th>ประเภทการศึกษา</th><th>ส่งล่าสุด</th><th>เอกสาร</th><th>สถานะรวม</th></tr>
+          <tr>
+            <th onclick="sortList('contractNumber')">เลขที่สัญญา</th>
+            <th onclick="sortList('name')">ชื่อ-สกุล</th>
+            <th>ประเภทการศึกษา</th>
+            <th onclick="sortList('submittedAt')">ส่งล่าสุด</th>
+            <th>ความคืบหน้า</th>
+            <th>สถานะ</th>
+          </tr>
         </thead>
         <tbody id="applicant-rows"></tbody>
       </table>
+      <div id="list-empty" class="no-results" style="display:none">ไม่พบสัญญาที่ตรงกับเงื่อนไขที่เลือก</div>
     </div>
   </div>
 
@@ -962,6 +1251,131 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 var currentUser = null;
 var SESSION = null;
 var PUBLIC_CFG = null;
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST  —  showToast(msg, type='success'|'error'|'info'|'warn')
+   ═══════════════════════════════════════════════════════════════ */
+var TOAST_ICONS = {success:'✓', error:'✕', info:'ℹ', warn:'⚠'};
+var _toastId = 0;
+function showToast(msg, type, duration) {
+  type = type || 'info'; duration = duration == null ? 4500 : duration;
+  var tc = document.getElementById('toast-container');
+  var t = document.createElement('div');
+  t.className = 'toast t-' + type;
+  t.setAttribute('role','alert');
+  t.innerHTML = '<span class="toast-icon">' + (TOAST_ICONS[type]||'•') + '</span>' +
+    '<span class="toast-body">' + String(msg).replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</span>' +
+    '<button class="toast-x" aria-label="ปิด">×</button>';
+  t.querySelector('.toast-x').onclick = function(){ dismissToast(t); };
+  t.onclick = function(e){ if(e.target.classList.contains('toast-x')) return; dismissToast(t); };
+  tc.appendChild(t);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ t.classList.add('show'); }); });
+  if(duration > 0) setTimeout(function(){ dismissToast(t); }, duration);
+  return t;
+}
+function dismissToast(t) {
+  if(!t.parentNode) return;
+  t.classList.remove('show'); t.classList.add('hide');
+  setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 220);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   APP DIALOG  —  confirm / multi-field prompt
+   ═══════════════════════════════════════════════════════════════ */
+
+// Mobile sticky action bar: mirrors the bottom panel's primary action.
+// Only visible on narrow screens (CSS hides it on wide ones).
+var _stickyStep = 0, _stickyNextFn = null, _stickyBackFn = null;
+function updateStickyBar(step) {
+  _stickyStep = step;
+  var bar = document.getElementById('sticky-bar');
+  if(!bar) return;
+  var back = document.getElementById('sticky-back');
+  var next = document.getElementById('sticky-next');
+  if(step === 1) {
+    if(back) back.style.display='none';
+    if(next) { next.textContent='ถัดไป →'; next.className='primary'; }
+  } else if(step === 4) {
+    if(back) { back.style.display=''; back.textContent='← ย้อนกลับ'; }
+    if(next) { next.textContent='ส่งเอกสาร'; next.className='primary'; }
+  } else {
+    if(back) { back.style.display=''; back.textContent='← ย้อนกลับ'; }
+    if(next) { next.textContent='ถัดไป →'; next.className='primary'; }
+  }
+  bar.style.display='';
+}
+function stickyBack() { if(_stickyStep>1) goStep(_stickyStep-1); }
+function stickyNext() {
+  if(_stickyStep===4) finalizeSubmission();
+  else goStep(_stickyStep+1);
+}
+
+var _dlgCallback = null;
+function _openDialog(title, bodyText, fields, okLabel, danger, onOk, onCancel) {
+  document.getElementById('adlg-title').textContent = title;
+  document.getElementById('adlg-body').textContent = bodyText || '';
+  var fb = document.getElementById('adlg-fields');
+  fb.innerHTML = '';
+  (fields || []).forEach(function(f) {
+    var wrap = document.createElement('div'); wrap.className = 'field';
+    if(f.label){ var l=document.createElement('label'); l.textContent=f.label; wrap.appendChild(l); }
+    var inp;
+    if(f.type === 'textarea'){ inp=document.createElement('textarea'); inp.rows=3; }
+    else { inp=document.createElement('input'); inp.type=f.type||'text'; }
+    inp.id='adlg-f-'+f.id; inp.placeholder=f.placeholder||''; inp.value=f.value||'';
+    if(f.readonly) inp.readOnly=true;
+    wrap.appendChild(inp);
+    if(f.note){ var n=document.createElement('div'); n.className='field-note'; n.textContent=f.note; wrap.appendChild(n); }
+    fb.appendChild(wrap);
+  });
+  var ok = document.getElementById('adlg-ok');
+  ok.textContent = okLabel || 'ยืนยัน';
+  ok.className = danger ? 'danger-btn' : 'primary';
+  var cancel = document.getElementById('adlg-cancel');
+  cancel.style.display = onCancel === false ? 'none' : '';
+  _dlgCallback = {onOk:onOk, onCancel:onCancel, fields:fields||[]};
+  ok.onclick = _dlgOk;
+  var dlg=document.getElementById('app-dialog'); dlg.classList.add('open');
+  var first=fb.querySelector('input:not([readonly]),textarea');
+  if(first) setTimeout(function(){first.focus();}, 180);
+  else ok.focus();
+  dlg.onkeydown=function(e){ if(e.key==='Escape') closeAppDialog(); };
+}
+function _dlgOk() {
+  if(!_dlgCallback) return;
+  var vals={};
+  _dlgCallback.fields.forEach(function(f){
+    var el=document.getElementById('adlg-f-'+f.id);
+    if(el) vals[f.id]=el.value.trim();
+    if(f.required && el && !el.value.trim()){ el.focus(); showToast('กรุณากรอก'+f.label,'error'); throw new Error('required'); }
+    if(f.validate && el){
+      var err=f.validate(el.value.trim());
+      if(err){ el.focus(); showToast(err,'error'); throw new Error('validate'); }
+    }
+  });
+  var _cb = _dlgCallback;
+  closeAppDialog();
+  if(_cb && _cb.onOk) _cb.onOk(vals);
+}
+function closeAppDialog() {
+  var dlg=document.getElementById('app-dialog'); dlg.classList.remove('open');
+  var cb=_dlgCallback; _dlgCallback=null;
+  if(cb && cb.onCancel && cb.onCancel!==false) cb.onCancel();
+}
+// showConfirm: simple yes/no
+function showConfirm(title, body, okLabel, onOk, danger) {
+  _openDialog(title, body, [], okLabel||'ยืนยัน', danger||false, onOk, null);
+}
+// showAlert: single dismissible message (for errors / validation that need prominence)
+function showAlert(title, body) {
+  _openDialog(title, body, [], 'รับทราบ', false, null, false);
+  document.getElementById('adlg-cancel').style.display='none';
+}
+// showFormDialog: one or more input fields
+function showFormDialog(title, body, fields, okLabel, onOk, danger) {
+  _openDialog(title, body, fields, okLabel||'บันทึก', danger||false, onOk, null);
+}
+
 var API_METHODS = ['getPublicConfig', 'login', 'resumeSession', 'logout', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval', 'requestAccountTransfer', 'listTransferRequests', 'decideTransferRequest', 'transferSubmissionOwner', 'updateOfficialId'];
 var TAB_SESSION_KEY = 'rtaf.session';
 var TAB_NAV_KEY = 'rtaf.nav';
@@ -1016,7 +1430,7 @@ function gsRun() {
       callApi(name, args).then(function (r) {
         if (ok) ok(r);
       }, function (err) {
-        if (bad) bad(err);else alert(err.message);
+        if (bad) bad(err);else showToast(err.message, 'error');
       });
     };
   });
@@ -1454,7 +1868,7 @@ function renderDocList(containerId, docs) {
         }).withFailureHandler(function (err) {
           cb.checked = !wanted;
           cb.disabled = false;
-          alert('บันทึกไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+          showToast('บันทึกไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
         }).setDocumentSkipped(SESSION, state.subId, doc.id, wanted);
       };
       skipWrap.appendChild(cb);
@@ -1509,17 +1923,17 @@ function handleFile(e, docId, containerId, docs) {
   var file = e.target.files[0];
   if (!file) return;
   if (file.type !== 'application/pdf') {
-    alert('กรุณาเลือกไฟล์ PDF เท่านั้น');
+    showToast('กรุณาเลือกไฟล์ PDF เท่านั้น', 'error');;
     e.target.value = '';
     return;
   }
   if (file.size > 10 * 1024 * 1024) {
-    alert('ไฟล์มีขนาดใหญ่เกิน 10MB กรุณาบีบอัดไฟล์ก่อนอัพโหลด');
+    showToast('ไฟล์มีขนาดใหญ่เกิน 10MB กรุณาบีบอัดไฟล์ก่อนอัพโหลด', 'error');;
     e.target.value = '';
     return;
   }
   if (!state.subId) {
-    alert('ยังไม่มีเลขที่สัญญา กรุณากลับไปกรอกข้อมูลผู้ทำสัญญาในขั้นตอนที่ 1 ก่อน');
+    showToast('ยังไม่มีเลขที่สัญญา กรุณากลับไปกรอกข้อมูลผู้ทำสัญญาในขั้นตอนที่ 1 ก่อน', 'error');;
     return;
   }
   var btn = document.getElementById('upload-btn-' + docId);
@@ -1538,12 +1952,12 @@ function handleFile(e, docId, containerId, docs) {
     }).withFailureHandler(function (err) {
       if (btn) btn.disabled = false;
       renderDocList(containerId, docs);
-      alert('อัพโหลดไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+      showToast('อัพโหลดไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
     }).uploadDocumentFile(SESSION, state.subId, docId, base64Only, file.type, file.name);
   };
   reader.onerror = function () {
     if (btn) btn.disabled = false;
-    alert('อ่านไฟล์ไม่สำเร็จ กรุณาลองใหม่');
+    showToast('อ่านไฟล์ไม่สำเร็จ กรุณาลองใหม่', 'error');;
   };
   reader.readAsDataURL(file);
 }
@@ -1568,6 +1982,9 @@ function personalKey(p) {
   return JSON.stringify([p.title, p.first, p.last, p.eduType, p.phone, p.workPhone || '']);
 }
 var savedOfficialId = null;
+var pendingAutoMatchSubId = null;
+var listFilter = 'all';
+var listSort = {key:'contractNumber', dir:-1};
 // Same rule as the server (officerStartedReview_): no name check, no guarantor
 // confirmed, no document reviewed yet.
 function applicantCanEditId() {
@@ -1592,7 +2009,7 @@ function saveOfficialIdThenGo(n) {
     state.personal.officialId = savedOfficialId;
     fillFormFromState();
     showStep(1);
-    alert('แก้ไขเลขประจำตัวไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('แก้ไขเลขประจำตัวไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).updateOfficialId(SESSION, state.subId, state.personal.officialId, '');
 }
 function goStep(n) {
@@ -1628,11 +2045,12 @@ function savePersonalThenGo(n) {
   }).withFailureHandler(function (err) {
     hideLoading();
     showStep(1);
-    alert('บันทึกข้อมูลไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('บันทึกข้อมูลไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).updateSubmissionPersonal(SESSION, state.subId, state.personal);
 }
 function showStep(n) {
   saveUserNav(n);
+  updateStickyBar(n);
   renderContractNumberLine();
   document.querySelectorAll('#app-user .panel').forEach(function (p) {
     return p.classList.remove('active');
@@ -1795,7 +2213,7 @@ function confirmCreateSubmission() {
   }).withFailureHandler(function (err) {
     confirmBtn.disabled = false;
     confirmBtn.textContent = 'ยินยอมและเริ่มกรอกเอกสาร';
-    alert('บันทึกไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('บันทึกไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).createSubmission(SESSION, state.personal);
 }
 function finalizeSubmission() {
@@ -1824,7 +2242,7 @@ function doFinalizeSubmission() {
   }).withFailureHandler(function (err) {
     btn.disabled = false;
     btn.textContent = 'ส่งเอกสาร';
-    alert('ส่งไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('ส่งไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).touchSubmission(SESSION, state.subId);
 }
 var myExistingContracts = [];
@@ -1840,7 +2258,7 @@ function checkForExistingContracts() {
     }
   }).withFailureHandler(function (err) {
     hideLoading();
-    alert('ตรวจสอบสัญญาเดิมไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('ตรวจสอบสัญญาเดิมไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
     showStep(1);
   }).listMySubmissions(SESSION);
 }
@@ -1875,11 +2293,15 @@ function resumeContract(contractId) {
     showStep(1);
   }).withFailureHandler(function (err) {
     hideLoading();
-    alert('โหลดสัญญาไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('โหลดสัญญาไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).getSubmission(SESSION, contractId);
 }
 function startNewContractFromPicker() {
-  if (!confirm('ยืนยันเริ่มทำสัญญาฉบับใหม่? (สำหรับภารกิจ/หลักสูตรใหม่เท่านั้น ถ้าต้องการส่งเอกสารของสัญญาเดิม ให้กด "ยกเลิก" แล้วเลือก "ดำเนินการต่อ")')) return;
+  showConfirm('เริ่มทำสัญญาฉบับใหม่?',
+    'ใช้สำหรับภารกิจ/หลักสูตรใหม่เท่านั้น ถ้าต้องการส่งเอกสารของสัญญาเดิม ให้ปิดหน้าต่างนี้แล้วเลือก "ดำเนินการต่อ"',
+    'เริ่มสัญญาฉบับใหม่', function() { _doStartNewContract(); }, true);
+}
+function _doStartNewContract() {
   var latest = myExistingContracts.slice().sort(function (a, b) {
     return new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0);
   })[0];
@@ -1931,9 +2353,9 @@ function submitTransferRequest() {
   var id = document.getElementById('tr-id').value.trim();
   var phone = document.getElementById('tr-phone').value.trim();
   var reason = document.getElementById('tr-reason').value.trim();
-  if (!/^[0-9]{10}$/.test(id)) { alert('เลขประจำตัวข้าราชการต้องเป็นตัวเลข 10 หลัก'); return; }
-  if (!/^[0-9]{9,10}$/.test(phone)) { alert('กรุณาระบุเบอร์โทรศัพท์ (ตัวเลข 9-10 หลัก) เพื่อให้เจ้าหน้าที่ติดต่อยืนยันตัวตน'); return; }
-  if (!reason) { alert('กรุณาระบุเหตุผล เช่น ลืมรหัสผ่านบัญชีเดิม / เปลี่ยนมาใช้บัญชีใหม่'); return; }
+  if (!/^[0-9]{10}$/.test(id)) { showToast('เลขประจำตัวข้าราชการต้องเป็นตัวเลข 10 หลัก', 'error');; return; }
+  if (!/^[0-9]{9,10}$/.test(phone)) { showToast('กรุณาระบุเบอร์โทรศัพท์ (ตัวเลข 9-10 หลัก) เพื่อให้เจ้าหน้าที่ติดต่อยืนยัน', 'error');; return; }
+  if (!reason) { showToast('กรุณาระบุเหตุผล เช่น ลืมรหัสผ่านบัญชีเดิม / เปลี่ยนมาใช้บัญชีใหม่', 'error');; return; }
   var btn = document.getElementById('tr-submit');
   btn.disabled = true;
   gsRun().withSuccessHandler(function () {
@@ -1942,7 +2364,7 @@ function submitTransferRequest() {
     document.getElementById('tr-done').style.display = '';
   }).withFailureHandler(function (err) {
     btn.disabled = false;
-    alert('ส่งคำขอไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('ส่งคำขอไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).requestAccountTransfer(SESSION, id, document.getElementById('tr-oldemail').value.trim(), phone, reason);
 }
 
@@ -2195,7 +2617,7 @@ function refreshList() {
     }
   }).withFailureHandler(function (err) {
     hideLoading();
-    alert('โหลดรายชื่อไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('โหลดรายชื่อไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).listAllSubmissions(SESSION);
 }
 function siblingContractsForOfficialId(id) {
@@ -2251,21 +2673,87 @@ function overallBadge(sub) {
   if (anyFail) return '<span class="badge fail">พบเอกสารไม่ผ่าน</span>';
   return '<span class="badge pending">อยู่ระหว่างตรวจ</span>';
 }
+
+function setFilter(f) {
+  listFilter = f;
+  ['all','waiting','revision','stamped'].forEach(function(k){
+    var card = document.querySelector('.stat-card.s-'+k);
+    var chip = document.getElementById('chip-'+k);
+    if(card) card.classList.toggle('active', k===f);
+    if(chip) chip.classList.toggle('active', k===f);
+  });
+  renderList();
+}
+function sortList(key) {
+  if(listSort.key===key) listSort.dir*=-1; else{listSort.key=key; listSort.dir=-1;}
+  document.querySelectorAll('.applicants th').forEach(function(th){th.classList.remove('sort-asc','sort-desc');});
+  var th=document.querySelector('.applicants th[onclick*="'+key+'"]');
+  if(th) th.classList.add(listSort.dir>0?'sort-asc':'sort-desc');
+  renderList();
+}
+function subMatchesSearch(sub,q){
+  if(!q) return true;
+  var ql=q.toLowerCase();
+  var name=(sub.personal.title+' '+sub.personal.first+' '+sub.personal.last).toLowerCase();
+  return name.includes(ql)||(sub.personal.officialId||'').includes(ql)||(sub.subId||'').toLowerCase().includes(ql);
+}
+function subMatchesFilter(sub,f){
+  if(f==='all') return true;
+  if(f==='stamped') return !!sub.stamped;
+  var hasFlagged=Object.values(sub.documents||{}).some(function(d){return d.reviewStatus==='needs-revision'||d.reviewStatus==='fail';});
+  if(f==='revision') return !sub.stamped&&hasFlagged;
+  if(f==='waiting')  return !sub.stamped&&!hasFlagged;
+  return true;
+}
+function updateStats(){
+  var c={all:0,waiting:0,revision:0,stamped:0};
+  SUBMISSIONS.forEach(function(sub){
+    c.all++;
+    if(sub.stamped){c.stamped++;return;}
+    var hf=Object.values(sub.documents||{}).some(function(d){return d.reviewStatus==='needs-revision'||d.reviewStatus==='fail';});
+    if(hf) c.revision++; else c.waiting++;
+  });
+  ['all','waiting','revision','stamped'].forEach(function(k){var el=document.getElementById('stat-'+k);if(el)el.textContent=c[k];});
+}
 function renderList() {
+  updateStats();
+  var q = (document.getElementById('list-search')||{}).value||'';
+  var rows = SUBMISSIONS.filter(function(sub){ return subMatchesSearch(sub,q) && subMatchesFilter(sub,listFilter); });
+  rows.sort(function(a,b){
+    var d=listSort.dir;
+    if(listSort.key==='name'){ var na=(a.personal.last||'')+(a.personal.first||''); var nb=(b.personal.last||'')+(b.personal.first||''); return d*(na<nb?-1:na>nb?1:0); }
+    if(listSort.key==='submittedAt') return d*(String(a.submittedAt||'') < String(b.submittedAt||'')?-1:1);
+    return d*((b.contractNumber||0)-(a.contractNumber||0));
+  });
   var tbody = document.getElementById('applicant-rows');
   tbody.innerHTML = '';
-  SUBMISSIONS.slice().sort(function (a, b) {
-    return (b.contractNumber || 0) - (a.contractNumber || 0);
-  }).forEach(function (sub) {
-    var _overallDocProgress = overallDocProgress(sub),
-      done = _overallDocProgress.done,
-      total = _overallDocProgress.total;
+  var empty = document.getElementById('list-empty');
+  var cntEl = document.getElementById('list-count');
+  if(!rows.length){ if(empty) empty.style.display=''; if(cntEl) cntEl.textContent=''; return; }
+  if(empty) empty.style.display='none';
+  if(cntEl) cntEl.textContent = rows.length + ' รายการ' + (rows.length < SUBMISSIONS.length?' (กรอง)':'');
+
+  rows.forEach(function(sub){
+    var prog = overallDocProgress(sub), done = prog.done, total = prog.total;
+    var hasFlagged = Object.values(sub.documents||{}).some(function(d){ return d.reviewStatus==='needs-revision'||d.reviewStatus==='fail'; });
+    var overallLabel = sub.stamped ? 'ตรวจถูกต้อง ✓' : hasFlagged ? 'รอผู้ยื่นแก้ไข' : (total>0?'อยู่ระหว่างตรวจ':'ยังไม่ส่งเอกสาร');
+    var badgeCls = sub.stamped ? 'approved' : hasFlagged ? 'revision' : 'pending';
+    var pct = total>0 ? Math.round(100*(done||0)/total) : 0;
+    var barCls = pct===100?'fill-ok':pct>0?'fill-mid':'fill-none';
+    var progressCell = done===null
+      ? '<span class="sub-cell">ยังไม่ได้ส่ง</span>'
+      : '<div class="progress-bar-wrap"><span style="font-size:12px;color:var(--steel)">'+(done||0)+' / '+total+'</span><div class="progress-bar"><div class="progress-bar-fill '+barCls+'" style="width:'+pct+'%"></div></div></div>';
+    var eduLabel = {'domestic-rtaf':'ในประเทศ ทุน ทอ.','domestic-private':'ในประเทศ ทุนส่วนตัว','abroad':'ต่างประเทศ'}[sub.personal.eduType]||'–';
     var tr = document.createElement('tr');
-    tr.className = 'row-link';
-    tr.onclick = function () {
-      return showDetail(sub.subId);
-    };
-    tr.innerHTML = "\n        <td>".concat(formatContractNumber(sub), "</td>\n        <td><div class=\"name-cell\">").concat(sub.personal.title, " ").concat(sub.personal.first, " ").concat(sub.personal.last, "</div>\n            <div class=\"sub-cell\">").concat(sub.personal.email, "</div></td>\n        <td>\u0E09\u0E1A\u0E31\u0E1A\u0E17\u0E35\u0E48 ").concat(sub.personalSeq || 1, "</td>\n        <td>").concat(EDU_TYPE_LABEL[sub.personal.eduType] || '-', "</td>\n        <td>").concat(formatShortDate(sub.submittedAt), "</td>\n        <td class=\"progress-mini\">").concat(done === null ? '–' : done + ' / ' + total + ' รายการบังคับ', "</td>\n        <td>").concat(overallBadge(sub), "</td>\n      ");
+    tr.className = 'data-row' + (hasFlagged && !sub.stamped ? ' row-flagged' : '');
+    tr.onclick = function(){ showDetail(sub.subId); };
+    tr.innerHTML =
+      '<td><div class="contract-id">'+escapeHtml(formatContractNumber(sub))+'</div><div class="sub-cell">'+escapeHtml(sub.personal.email||'')+'</div></td>'+
+      '<td><strong>'+escapeHtml(sub.personal.title+' '+sub.personal.first+' '+sub.personal.last)+'</strong><div class="sub-cell">ฉบับที่ '+(sub.personalSeq||1)+'</div></td>'+
+      '<td>'+escapeHtml(eduLabel)+'</td>'+
+      '<td>'+escapeHtml(sub.submittedAt ? formatShortDate(sub.submittedAt) : '–')+'</td>'+
+      '<td>'+progressCell+'</td>'+
+      '<td><span class="badge '+badgeCls+'">'+overallLabel+'</span></td>';
     tbody.appendChild(tr);
   });
 }
@@ -2291,7 +2779,7 @@ function showDetail(subId) {
     renderDetail(hydrated);
   }).withFailureHandler(function (err) {
     hideLoading();
-    alert('โหลดรายละเอียดสัญญาไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('โหลดรายละเอียดสัญญาไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).getSubmission(SESSION, subId);
 }
 function renderDetail(sub) {
@@ -2348,7 +2836,7 @@ function runMatch() {
   renderMaritalWarnings(sub);
   if (result.type === 'mismatch') return; // not saved: the officer must resolve the ID first
   gsRun().withFailureHandler(function (err) {
-    alert('บันทึกผลตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('บันทึกผลตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).setMatchResult(SESSION, sub.subId, result.type, result.record || null);
 }
 function finalizeMatch(sub, matches) {
@@ -2366,7 +2854,7 @@ function finalizeMatch(sub, matches) {
   renderMatchResult(sub);
   renderMaritalWarnings(sub);
   gsRun().withFailureHandler(function (err) {
-    alert('บันทึกผลตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('บันทึกผลตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).setMatchResult(SESSION, sub.subId, matchResult.type, matchResult.record || null);
 }
 function selectCandidate(index) {
@@ -2381,7 +2869,7 @@ function selectCandidate(index) {
   renderMatchResult(sub);
   renderMaritalWarnings(sub);
   gsRun().withFailureHandler(function (err) {
-    alert('บันทึกผลตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('บันทึกผลตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).setMatchResult(SESSION, sub.subId, 'matched', record);
 }
 function personDetailHtml(r) {
@@ -2524,14 +3012,14 @@ function setComment(docId, subId, value) {
 function persistDocumentReview_(sub, docId) {
   var entry = sub.documents[docId];
   gsRun().withFailureHandler(function (err) {
-    alert('บันทึกผลตรวจไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('บันทึกผลตรวจไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).setDocumentReview(SESSION, sub.subId, docId, entry.reviewStatus, entry.comment || '');
 }
 function toggleCompare(docId, checkboxEl) {
   if (checkboxEl.checked) {
     if (compareSelection.length >= 3) {
       checkboxEl.checked = false;
-      alert('เลือกเปรียบเทียบพร้อมกันได้สูงสุด 3 รายการ');
+      showToast('เลือกเปรียบเทียบพร้อมกันได้สูงสุด 3 รายการ', 'error');;
       return;
     }
     compareSelection.push(docId);
@@ -3006,7 +3494,7 @@ function doSaveGuarantor(record, btn, doneText) {
     btn.disabled = false;
     status.textContent = '';
     manualStatus.textContent = '';
-    alert('บันทึกข้อมูลผู้ค้ำไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('บันทึกข้อมูลผู้ค้ำไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).saveGuarantorInfo(SESSION, sub.subId, gNum, record);
 }
 function saveOcrGuarantorInfo() {
@@ -3023,16 +3511,18 @@ function saveOcrGuarantorManual() {
   var v = function (id) { return document.getElementById(id).value.trim(); };
   var record = {title: v('ocr-title'), first: v('ocr-first'), last: v('ocr-last'), officialId: v('ocr-idnum'),
     position: v('ocr-position'), unit: v('ocr-unit'), source: 'manual', education: []};
-  if (!record.first || !record.last) { alert('กรุณากรอกชื่อและนามสกุลผู้ค้ำประกัน'); return; }
-  if (!record.position || !record.unit) { alert('กรุณากรอกตำแหน่งและหน่วยงาน/สังกัดของผู้ค้ำประกัน (ดูได้จากหนังสือรับรองการเป็นข้าราชการและเงินได้รายเดือน)'); return; }
+  if (!record.first || !record.last) { showToast('กรุณากรอกชื่อและนามสกุลผู้ค้ำประกัน', 'error');; return; }
+  if (!record.position || !record.unit) { showToast('กรุณากรอกตำแหน่งและหน่วยงาน/สังกัดของผู้ค้ำประกัน', 'error'); return; }
   var m = ocrMatchResult;
   var msg = m && m.type === 'mismatch'
     ? 'เลขประจำตัวนี้ใน HRIS เป็นของ ' + m.record.title + ' ' + m.record.first + ' ' + m.record.last + '\nยืนยันว่าผู้ค้ำประกันไม่ใช่บุคคลนี้ และบันทึกตามข้อมูลที่กรอก?'
     : m && m.type === 'multi'
     ? 'พบชื่อนี้ใน HRIS หลายคนแต่ไม่ได้เลือกคนใด\nยืนยันว่าผู้ค้ำประกันไม่ใช่บุคคลใน HRIS และบันทึกตามข้อมูลที่กรอก?'
     : 'ยืนยันบันทึกข้อมูลผู้ค้ำประกันตามที่กรอก (ไม่พบในข้อมูล HRIS เช่น ไม่ใช่ข้าราชการ ทอ.)?';
-  if (!confirm(msg)) return;
-  doSaveGuarantor(record, document.getElementById('ocr-manual-btn'), '✓ บันทึกตามข้อมูลที่กรอกแล้ว (ไม่พบใน HRIS)');
+  var _recordToSave = record;
+  showConfirm('ยืนยันการบันทึก', msg, 'บันทึกตามข้อมูลที่กรอก', function(){
+    doSaveGuarantor(_recordToSave, document.getElementById('ocr-manual-btn'), '✓ บันทึกตามข้อมูลที่กรอกแล้ว (ไม่พบใน HRIS)');
+  }); return;
 }
 function renderStampArea(sub) {
   var g = function g(id) {
@@ -3057,7 +3547,11 @@ function renderStampArea(sub) {
   }
 }
 function stampApproval(subId) {
-  if (!confirm('ยืนยันประทับตราตรวจถูกต้องสำหรับสัญญานี้ใช่หรือไม่? การกระทำนี้จะบันทึกชื่อของท่าน (' + currentUser.email + ') เป็นผู้ตรวจ')) return;
+  showConfirm('ประทับตราตรวจถูกต้อง',
+    'การกระทำนี้จะบันทึกชื่อ ' + currentUser.email + ' เป็นผู้ตรวจ และไม่สามารถยกเลิกได้',
+    'ประทับตรา', function(){ _doStamp(subId); }, true);
+}
+function _doStamp(subId) {
   var sub = SUBMISSIONS.find(function (s) {
     return s.subId === subId;
   });
@@ -3069,7 +3563,7 @@ function stampApproval(subId) {
     renderStampArea(sub);
     renderList();
   }).withFailureHandler(function (err) {
-    alert('ประทับตราไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('ประทับตราไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).stampApproval(SESSION, subId);
 }
 function openReport(subId) {
@@ -3434,7 +3928,7 @@ function hrisImportFile(file) {
     hrisFinishImport(chosen.rows, chosen.det.headerIdx, chosen.det.map, file.name);
   }).catch(function (err) {
     hideLoading();
-    alert('อ่านไฟล์ HRIS ไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('อ่านไฟล์ HRIS ไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   });
 }
 function hrisFinishImport(rows, headerIdx, map, fileName) {
@@ -3477,7 +3971,7 @@ function hrisFinishImport(rows, headerIdx, map, fileName) {
     records.push(rec);
   }
   if (!records.length) {
-    alert('ไม่พบข้อมูลที่ใช้ได้ในไฟล์นี้ — ตรวจสอบว่าเลือกไฟล์ HRIS ถูกต้อง');
+    showToast('ไม่พบข้อมูลที่ใช้ได้ในไฟล์นี้ — ตรวจสอบว่าเลือกไฟล์ HRIS ถูกต้อง', 'error');;
     return;
   }
   var meta = {
@@ -3497,9 +3991,9 @@ function hrisFinishImport(rows, headerIdx, map, fileName) {
   renderHrisBar();
   var summary = 'นำเข้าข้อมูล HRIS แล้ว ' + records.length.toLocaleString() + ' รายการ' + (skipped ? ' (ข้าม ' + skipped + ' แถวที่ไม่มีทั้งเลขประจำตัวและชื่อ-สกุล)' : '') + (noId ? ' — มี ' + noId + ' รายการที่ไม่มีเลขประจำตัว ตรวจได้ด้วยชื่อ-สกุลเท่านั้น' : '');
   idbPut(HRIS_KEY, data).then(function () {
-    alert(summary);
+    showToast(summary, 'success');
   }).catch(function () {
-    alert(summary + '\n\nหมายเหตุ: บันทึกไว้ในเครื่องไม่สำเร็จ ข้อมูลใช้ได้จนกว่าจะปิดหน้านี้');
+    showToast(summary + ' (บันทึกในเครื่องไม่สำเร็จ ข้อมูลใช้ได้จนกว่าจะปิดหน้านี้)', 'warn');
   });
 }
 function buildHrisIndex(data) {
@@ -3529,12 +4023,9 @@ function loadHris() {
   });
 }
 function clearHris() {
-  if (!confirm('ล้างข้อมูล HRIS ที่เก็บไว้ในเครื่องนี้? (ต้องนำเข้าไฟล์ใหม่ก่อนตรวจสอบรายชื่อครั้งถัดไป)')) return;
-  var done = function done() {
-    HRIS = null;
-    renderHrisBar();
-  };
-  idbDelete(HRIS_KEY).then(done, done);
+  showConfirm('ล้างข้อมูล HRIS?', 'ต้องนำเข้าไฟล์ใหม่ก่อนตรวจสอบรายชื่อครั้งถัดไป',
+    'ล้างข้อมูล', function(){ var done = function () { HRIS = null; renderHrisBar(); }; idbDelete(HRIS_KEY).then(done, done); }, true);
+
 }
 function showHrisMapping(rows, det, fileName) {
   pendingHrisImport = {
@@ -3562,11 +4053,11 @@ function confirmHrisMapping() {
     var f = HRIS_REQUIRED[i];
     var v = document.getElementById('hris-map-' + f.key).value;
     if (v === '') {
-      alert('กรุณาเลือกคอลัมน์สำหรับ "' + f.label + '"');
+      showToast('กรุณาเลือกคอลัมน์สำหรับ', 'error');;
       return;
     }
     if (chosen[v]) {
-      alert('เลือกคอลัมน์ซ้ำกัน กรุณาตรวจสอบอีกครั้ง');
+      showToast('เลือกคอลัมน์ซ้ำกัน กรุณาตรวจสอบอีกครั้ง', 'error');;
       return;
     }
     chosen[v] = true;
@@ -3594,7 +4085,7 @@ function renderHrisBar() {
 }
 function requireHris() {
   if (HRIS) return true;
-  alert('ยังไม่ได้นำเข้าข้อมูล HRIS ในเครื่องนี้ — กลับไปหน้ารายชื่อสัญญา แล้วกด "นำเข้าไฟล์ HRIS" ก่อน');
+  showToast('ยังไม่ได้นำเข้าข้อมูล HRIS ในเครื่องนี้', 'error');;
   return false;
 }
 function hrisToClient(r) {
@@ -3677,41 +4168,60 @@ function renderTransferRequests() {
   }).join('');
 }
 function decideTransfer(requestId, approve) {
-  var note = prompt(approve ? 'บันทึกวิธียืนยันตัวตน (เช่น โทรยืนยันกับเบอร์ในสัญญาเดิมแล้ว):' : 'เหตุผลที่ปฏิเสธ:');
-  if (note === null) return;
-  if (!note.trim()) { alert('กรุณาระบุข้อความ'); return; }
-  showLoading('กำลังบันทึก...');
-  gsRun().withSuccessHandler(function (res) {
-    hideLoading();
-    alert(approve ? 'ย้ายสัญญาแล้ว ' + res.moved + ' ฉบับ' : 'ปฏิเสธคำขอแล้ว');
-    refreshList();
-  }).withFailureHandler(function (err) {
-    hideLoading();
-    alert('บันทึกไม่สำเร็จ: ' + (err && err.message ? err.message : err));
-  }).decideTransferRequest(SESSION, requestId, approve, note.trim());
+  showFormDialog(
+    approve ? 'อนุมัติคำขอย้ายบัญชี' : 'ปฏิเสธคำขอ',
+    approve ? 'กรุณาบันทึกวิธีที่ยืนยันตัวตนผู้ขอก่อนอนุมัติ' : 'กรุณาระบุเหตุผลที่ปฏิเสธ',
+    [{id:'note', label: approve ? 'วิธียืนยันตัวตน' : 'เหตุผล', required:true,
+      placeholder: approve ? 'เช่น โทรยืนยันกับเบอร์ในสัญญาเดิมแล้ว' : 'เหตุผล...'}],
+    approve ? 'อนุมัติ' : 'ปฏิเสธ',
+    function(vals) {
+      showLoading('กำลังบันทึก...');
+      gsRun().withSuccessHandler(function (res) {
+        hideLoading();
+        showToast(approve ? 'อนุมัติแล้ว ย้ายสัญญา ' + res.moved + ' ฉบับ' : 'ปฏิเสธคำขอแล้ว', approve ? 'success' : 'info');
+        refreshList();
+      }).withFailureHandler(function (err) {
+        hideLoading();
+        showToast('บันทึกไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
+      }).decideTransferRequest(SESSION, requestId, approve, vals.note.trim());
+    }, approve);
 }
-
-// ---------- Officer tools on a contract: change Google account / correct official ID ----------
 function officerChangeEmail() {
-  var sub = SUBMISSIONS.find(function (s) { return s.subId === currentSubId; });
-  var email = prompt('อีเมลบัญชี Google ใหม่ของผู้ทำสัญญา (ปัจจุบัน: ' + sub.personal.email + '):');
-  if (email === null) return;
-  var reason = prompt('เหตุผล / วิธียืนยันตัวตน:');
-  if (reason === null) return;
-  var others = siblingContractsForOfficialId(sub.personal.officialId).filter(function (s) { return s.subId !== sub.subId; }).length;
-  var all = others > 0 && confirm('บุคคลนี้มีสัญญาอื่นอีก ' + others + ' ฉบับ ย้ายทุกฉบับไปบัญชีใหม่ด้วยหรือไม่?\n(ตกลง = ทุกฉบับ, ยกเลิก = เฉพาะฉบับนี้)');
-  showLoading('กำลังย้ายบัญชี...');
-  gsRun().withSuccessHandler(function (res) {
-    hideLoading();
-    alert('ย้ายไปบัญชีใหม่แล้ว ' + res.moved + ' ฉบับ');
-    refreshList();
-    showDetail(sub.subId);
-  }).withFailureHandler(function (err) {
-    hideLoading();
-    alert('ย้ายบัญชีไม่สำเร็จ: ' + (err && err.message ? err.message : err));
-  }).transferSubmissionOwner(SESSION, sub.subId, email.trim(), (reason || '').trim(), all);
+  var sub = SUBMISSIONS.find(function (ss) { return ss.subId === currentSubId; });
+  showFormDialog('เปลี่ยนบัญชี Google ผู้ทำสัญญา',
+    'บัญชีปัจจุบัน: ' + sub.personal.email,
+    [{id:'email', label:'อีเมลบัญชี Google ใหม่', type:'email', required:true,
+      validate:function(v){return /^[^\x20@]+@[^\x20@]+\.[^\x20@]+$/.test(v)?null:'รูปแบบอีเมลไม่ถูกต้อง';}},
+     {id:'reason', label:'เหตุผล / วิธียืนยันตัวตน', required:true,
+      placeholder:'เช่น ผู้ทำสัญญาโทรแจ้ง ยืนยันด้วยบัตรแล้ว'}],
+    'เปลี่ยนบัญชี',
+    function(vals) {
+      var email = vals.email.trim(), reason = vals.reason.trim();
+      var others = siblingContractsForOfficialId(sub.personal.officialId)
+        .filter(function(x){ return x.subId !== sub.subId; }).length;
+      function doTransfer(all) {
+        showLoading('กำลังย้ายบัญชี...');
+        gsRun().withSuccessHandler(function (res) {
+          hideLoading();
+          showToast('ย้ายสัญญาไปบัญชีใหม่แล้ว ' + res.moved + ' ฉบับ', 'success');
+          refreshList(); showDetail(sub.subId);
+        }).withFailureHandler(function (err) {
+          hideLoading();
+          showToast('ย้ายบัญชีไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
+        }).transferSubmissionOwner(SESSION, sub.subId, email, reason, all);
+      }
+      if (others > 0) {
+        showConfirm('ย้ายทั้งหมดหรือเฉพาะฉบับนี้?',
+          'บุคคลนี้มีสัญญาอีก ' + others + ' ฉบับ',
+          'ย้ายทุกฉบับ', function(){ doTransfer(true); });
+        var foot = document.querySelector('.adlg-foot');
+        var btn2 = document.createElement('button');
+        btn2.className = 'secondary'; btn2.textContent = 'เฉพาะฉบับนี้';
+        btn2.onclick = function(){ closeAppDialog(); doTransfer(false); };
+        foot.insertBefore(btn2, document.getElementById('adlg-ok'));
+      } else { doTransfer(false); }
+    });
 }
-var pendingAutoMatchSubId = null;
 function officerSetOfficialId(subId, newId, reason) {
   showLoading('กำลังแก้ไขเลขประจำตัว...');
   gsRun().withSuccessHandler(function () {
@@ -3721,23 +4231,26 @@ function officerSetOfficialId(subId, newId, reason) {
     showDetail(subId);
   }).withFailureHandler(function (err) {
     hideLoading();
-    alert('แก้ไขไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    showToast('แก้ไขไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).updateOfficialId(SESSION, subId, newId, reason);
 }
 function officerChangeOfficialId() {
-  var sub = SUBMISSIONS.find(function (s) { return s.subId === currentSubId; });
-  var id = prompt('เลขประจำตัวข้าราชการที่ถูกต้อง (ปัจจุบัน: ' + (sub.personal.officialId || '-') + '):');
-  if (id === null) return;
-  if (!/^[0-9]{10}$/.test(id.trim())) { alert('ต้องเป็นตัวเลข 10 หลัก'); return; }
-  var reason = prompt('เหตุผลในการแก้ไข:');
-  if (reason === null) return;
-  if (!reason.trim()) { alert('กรุณาระบุเหตุผล'); return; }
-  officerSetOfficialId(sub.subId, id.trim(), reason.trim());
+  var sub = SUBMISSIONS.find(function (ss) { return ss.subId === currentSubId; });
+  showFormDialog('แก้ไขเลขประจำตัวข้าราชการ',
+    'เลขปัจจุบัน: ' + (sub.personal.officialId || '-'),
+    [{id:'nid', label:'เลขประจำตัวที่ถูกต้อง (10 หลัก)', required:true, placeholder:'ตัวเลข 10 หลัก',
+      validate:function(v){return /^[0-9]{10}$/.test(v)?null:'ต้องเป็นตัวเลข 10 หลัก';}},
+     {id:'reason', label:'เหตุผลในการแก้ไข', required:true,
+      placeholder:'เช่น ผู้ทำสัญญาแจ้งว่าพิมพ์ผิด'}],
+    'แก้ไข',
+    function(vals) {
+      officerSetOfficialId(sub.subId, vals.nid.trim(), vals.reason.trim());
+    });
 }
 function fixIdFromHris(subId, newId) {
   var sub = SUBMISSIONS.find(function (s) { return s.subId === subId; });
-  if (!confirm('แก้เลขประจำตัวของสัญญานี้จาก ' + sub.personal.officialId + ' เป็น ' + newId + ' ตามข้อมูล HRIS?')) return;
-  officerSetOfficialId(subId, newId, 'แก้ตามข้อมูล HRIS (เดิม ' + sub.personal.officialId + ')');
+  showConfirm('แก้ไขเลขประจำตัว', 'แก้จาก ' + sub.personal.officialId + ' เป็น ' + newId + ' ตาม HRIS',
+    'แก้ไข', function(){ officerSetOfficialId(subId, newId, 'แก้ตามข้อมูล HRIS (เดิม ' + sub.personal.officialId + ')'); }); return;
 }
 
 // ---------- HRIS match with typo detection ----------
@@ -3791,5 +4304,27 @@ renderMaritalWarnings = function (sub) {
 boot();
 </script>
 
+
+<!-- ── Toast container ─────────────────────────────── -->
+<div id="toast-container"></div>
+
+<!-- ── App dialog (confirm / form-prompt) ───────────── -->
+<div id="app-dialog" role="dialog" aria-modal="true">
+  <div class="adlg-box">
+    <div class="adlg-head">
+      <h3 id="adlg-title"></h3>
+      <p id="adlg-body"></p>
+    </div>
+    <div class="adlg-body" id="adlg-fields"></div>
+    <div class="adlg-foot">
+      <button class="secondary" id="adlg-cancel" onclick="closeAppDialog()">ยกเลิก</button>
+      <button class="primary" id="adlg-ok">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+<div class="sticky-bar" id="sticky-bar" style="display:none">
+  <button class="secondary" id="sticky-back" onclick="stickyBack()">← ย้อนกลับ</button>
+  <button class="primary" id="sticky-next" onclick="stickyNext()">ถัดไป</button>
+</div>
 </body>
 </html>
