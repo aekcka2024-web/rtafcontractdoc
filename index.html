@@ -385,6 +385,7 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .report-footnotes ol{margin:4px 0 0;padding-left:18px;}
   .report-footnotes li{margin-bottom:2px;color:var(--warn);font-weight:600;}
   @media print{
+    .report-table{border-bottom:1px solid var(--line);}  /* last-row border hidden by :last-child rule → restore on the table itself */
     .report-table td, .report-table th{padding:1.5px 5px;font-size:10px;line-height:1.05;}
     .report-meta{font-size:10px;padding:5px 10px;gap:10px;}
     .report-meta-fields{gap:1px 12px;}
@@ -647,6 +648,15 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
     .report-summary-row{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   }
 
+
+  .stats-edu{margin-top:8px;}
+  .stat-card.s-edu::before{background:var(--steel);}
+  .stat-card.s-edu{cursor:pointer;}
+  .stat-card.s-edu.active{border-color:var(--navy);}
+  .stat-card.s-edu.active .stat-num{color:var(--navy);}
+  .edu-filter-badge{display:inline-flex;align-items:center;gap:4px;background:var(--info-bg);border:1px solid var(--info-mid);color:var(--info);border-radius:var(--r-pill);padding:2px 8px;font-size:12px;margin-left:6px;vertical-align:middle;}
+  .edu-filter-badge button{background:none;border:none;cursor:pointer;color:inherit;font-size:13px;line-height:1;padding:0 1px;}
+
 </style>
 </head>
 <body>
@@ -770,6 +780,7 @@ setTimeout(function () {
             <option value="abroad">ต่างประเทศ</option>
             <option value="domestic-rtaf">ในประเทศ ทุน ทอ.</option>
             <option value="domestic-private">ในประเทศ ทุนส่วนตัว</option>
+            <option value="pilot">ศิษย์การบิน</option>
           </select>
           <div class="error">กรุณาเลือกประเภทการศึกษา</div>
         </div>
@@ -1018,6 +1029,25 @@ setTimeout(function () {
         <div class="stat-card s-stamped" onclick="setFilter('stamped')">
           <div class="stat-num" id="stat-stamped">0</div>
           <div class="stat-label">ประทับตราแล้ว</div>
+        </div>
+      </div>
+      <!-- แถว 2: ประเภทการศึกษา -->
+      <div class="stats-grid stats-edu" id="stats-edu-grid">
+        <div class="stat-card s-edu" onclick="setEduFilter('abroad')">
+          <div class="stat-num" id="stat-edu-abroad">0</div>
+          <div class="stat-label">ต่างประเทศ</div>
+        </div>
+        <div class="stat-card s-edu" onclick="setEduFilter('domestic-rtaf')">
+          <div class="stat-num" id="stat-edu-domestic-rtaf">0</div>
+          <div class="stat-label">ในประเทศ ทุน ทอ.</div>
+        </div>
+        <div class="stat-card s-edu" onclick="setEduFilter('domestic-private')">
+          <div class="stat-num" id="stat-edu-domestic-private">0</div>
+          <div class="stat-label">ในประเทศ ทุนส่วนตัว</div>
+        </div>
+        <div class="stat-card s-edu" onclick="setEduFilter('pilot')">
+          <div class="stat-num" id="stat-edu-pilot">0</div>
+          <div class="stat-label">ศิษย์การบิน</div>
         </div>
       </div>
       <!-- Toolbar: search + chips + refresh -->
@@ -1640,7 +1670,7 @@ var GUARANTORS = [1, 2, 3].map(function (n) {
   };
 });
 function guarantorCountForEduType(eduType) {
-  return eduType === 'domestic-rtaf' || eduType === 'domestic-private' ? 1 : 3;
+  return eduType === 'domestic-rtaf' || eduType === 'domestic-private' || eduType === 'pilot' ? 1 : 3;
 }
 function activeGuarantors(eduType) {
   return GUARANTORS.slice(0, guarantorCountForEduType(eduType));
@@ -2075,7 +2105,8 @@ function showStep(n) {
 var EDU_TYPE_LABEL = {
   'abroad': 'ต่างประเทศ',
   'domestic-rtaf': 'ในประเทศ ทุน ทอ.',
-  'domestic-private': 'ในประเทศ ทุนส่วนตัว'
+  'domestic-private': 'ในประเทศ ทุนส่วนตัว',
+  'pilot': 'ศิษย์การบิน'
 };
 function validatePersonal() {
   var ok = true;
@@ -2674,6 +2705,15 @@ function overallBadge(sub) {
   return '<span class="badge pending">อยู่ระหว่างตรวจ</span>';
 }
 
+var listEduFilter = '';
+function setEduFilter(edu) {
+  listEduFilter = listEduFilter === edu ? '' : edu;
+  document.querySelectorAll('.stat-card.s-edu').forEach(function(c){
+    var oc = c.getAttribute('onclick') || '';
+    c.classList.toggle('active', listEduFilter !== '' && oc.indexOf("'"+listEduFilter+"'") > -1);
+  });
+  renderList();
+}
 function setFilter(f) {
   listFilter = f;
   ['all','waiting','revision','stamped'].forEach(function(k){
@@ -2698,6 +2738,7 @@ function subMatchesSearch(sub,q){
   return name.includes(ql)||(sub.personal.officialId||'').includes(ql)||(sub.subId||'').toLowerCase().includes(ql);
 }
 function subMatchesFilter(sub,f){
+  if(listEduFilter && sub.personal.eduType !== listEduFilter) return false;
   if(f==='all') return true;
   if(f==='stamped') return !!sub.stamped;
   var hasFlagged=Object.values(sub.documents||{}).some(function(d){return d.reviewStatus==='needs-revision'||d.reviewStatus==='fail';});
@@ -2714,6 +2755,10 @@ function updateStats(){
     if(hf) c.revision++; else c.waiting++;
   });
   ['all','waiting','revision','stamped'].forEach(function(k){var el=document.getElementById('stat-'+k);if(el)el.textContent=c[k];});
+  var eduKeys=['abroad','domestic-rtaf','domestic-private','pilot'];
+  var ec={}; eduKeys.forEach(function(k){ec[k]=0;});
+  SUBMISSIONS.forEach(function(sub){ if(ec[sub.personal.eduType]!==undefined) ec[sub.personal.eduType]++; });
+  eduKeys.forEach(function(k){var el=document.getElementById('stat-edu-'+k);if(el)el.textContent=ec[k];});
 }
 function renderList() {
   updateStats();
@@ -2731,7 +2776,9 @@ function renderList() {
   var cntEl = document.getElementById('list-count');
   if(!rows.length){ if(empty) empty.style.display=''; if(cntEl) cntEl.textContent=''; return; }
   if(empty) empty.style.display='none';
-  if(cntEl) cntEl.textContent = rows.length + ' รายการ' + (rows.length < SUBMISSIONS.length?' (กรอง)':'');
+  var isFiltered = rows.length < SUBMISSIONS.length;
+  var eduBadge = listEduFilter ? ' <span class="edu-filter-badge">'+(EDU_TYPE_LABEL[listEduFilter]||listEduFilter)+'<button onclick="setEduFilter(listEduFilter)" title="ล้างตัวกรอง">×</button></span>' : '';
+  if(cntEl) cntEl.innerHTML = rows.length + ' รายการ' + (isFiltered?' (กรอง)':'') + eduBadge;
 
   rows.forEach(function(sub){
     var prog = overallDocProgress(sub), done = prog.done, total = prog.total;
