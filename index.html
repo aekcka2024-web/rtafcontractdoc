@@ -382,10 +382,16 @@
   .ocr-manual-title{font-size:12px;color:var(--steel);margin-bottom:8px;}
   .match-box.status-manual{border-color:#9DB3CF;background:#F1F5FA;}
   .match-box.status-manual h3{color:#2B4C73;}
-  header.top{position:relative;}
-  .logout-btn{position:absolute;top:50%;right:20px;transform:translateY(-50%);background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:4px;padding:5px 12px;font-family:inherit;font-size:12px;cursor:pointer;}
+  /* header content sits in the same 980px column as the page content, so the
+     logout button lines up with the right edge of the cards below */
+  header.top{padding:20px 0;}
+  .top-inner{max-width:980px;margin:0 auto;padding:0 20px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .top-inner .brand{max-width:none;margin:0;padding-left:24px;}
+  .top-inner p{max-width:none;margin:6px 0 0;padding-left:24px;}
+  .top-text{min-width:0;}
+  .logout-btn{flex:none;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:6px;padding:6px 14px;font-family:inherit;font-size:13px;cursor:pointer;}
   .logout-btn:hover{background:rgba(255,255,255,.1);}
-  @media (max-width:640px){ .logout-btn{position:static;transform:none;margin-top:8px;} }
+  @media (max-width:640px){ .top-inner{flex-wrap:wrap;} }
 </style>
 </head>
 <body>
@@ -428,9 +434,13 @@ setTimeout(function () {
 
 
 <header class="top">
-  <div class="brand"><span class="mark"></span><h1>ระบบตรวจสัญญา — ผู้ทำสัญญาเข้ารับการศึกษา</h1></div>
-  <p id="user-header-sub">ระบบตรวจสัญญา สำหรับข้าราชการกองทัพอากาศ</p>
-  <button class="logout-btn no-print" onclick="logout()">ออกจากระบบ</button>
+  <div class="top-inner">
+    <div class="top-text">
+      <div class="brand"><span class="mark"></span><h1>ระบบตรวจสัญญา — ผู้ทำสัญญาเข้ารับการศึกษา</h1></div>
+      <p id="user-header-sub">ระบบตรวจสัญญา สำหรับข้าราชการกองทัพอากาศ</p>
+    </div>
+    <button class="logout-btn no-print" onclick="logout()">ออกจากระบบ</button>
+  </div>
 </header>
 
 <div class="wrap">
@@ -713,9 +723,13 @@ setTimeout(function () {
 
 
 <header class="top">
-  <div class="brand"><span class="mark"></span><h1>ระบบตรวจสัญญา — สำหรับเจ้าหน้าที่</h1></div>
-  <p id="officer-header-sub">รายชื่อสัญญาทั้งหมดในระบบ</p>
-  <button class="logout-btn no-print" onclick="logout()">ออกจากระบบ</button>
+  <div class="top-inner">
+    <div class="top-text">
+      <div class="brand"><span class="mark"></span><h1>ระบบตรวจสัญญา — สำหรับเจ้าหน้าที่</h1></div>
+      <p id="officer-header-sub">รายชื่อสัญญาทั้งหมดในระบบ</p>
+    </div>
+    <button class="logout-btn no-print" onclick="logout()">ออกจากระบบ</button>
+  </div>
 </header>
 
 <div class="wrap">
