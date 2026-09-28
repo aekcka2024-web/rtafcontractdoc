@@ -382,6 +382,10 @@
   .ocr-manual-title{font-size:12px;color:var(--steel);margin-bottom:8px;}
   .match-box.status-manual{border-color:#9DB3CF;background:#F1F5FA;}
   .match-box.status-manual h3{color:#2B4C73;}
+  header.top{position:relative;}
+  .logout-btn{position:absolute;top:50%;right:20px;transform:translateY(-50%);background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:4px;padding:5px 12px;font-family:inherit;font-size:12px;cursor:pointer;}
+  .logout-btn:hover{background:rgba(255,255,255,.1);}
+  @media (max-width:640px){ .logout-btn{position:static;transform:none;margin-top:8px;} }
 </style>
 </head>
 <body>
@@ -426,6 +430,7 @@ setTimeout(function () {
 <header class="top">
   <div class="brand"><span class="mark"></span><h1>ระบบตรวจสัญญา — ผู้ทำสัญญาเข้ารับการศึกษา</h1></div>
   <p id="user-header-sub">ระบบตรวจสัญญา สำหรับข้าราชการกองทัพอากาศ</p>
+  <button class="logout-btn no-print" onclick="logout()">ออกจากระบบ</button>
 </header>
 
 <div class="wrap">
@@ -710,6 +715,7 @@ setTimeout(function () {
 <header class="top">
   <div class="brand"><span class="mark"></span><h1>ระบบตรวจสัญญา — สำหรับเจ้าหน้าที่</h1></div>
   <p id="officer-header-sub">รายชื่อสัญญาทั้งหมดในระบบ</p>
+  <button class="logout-btn no-print" onclick="logout()">ออกจากระบบ</button>
 </header>
 
 <div class="wrap">
@@ -942,7 +948,18 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 var currentUser = null;
 var SESSION = null;
 var PUBLIC_CFG = null;
-var API_METHODS = ['getPublicConfig', 'login', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval', 'requestAccountTransfer', 'listTransferRequests', 'decideTransferRequest', 'transferSubmissionOwner', 'updateOfficialId'];
+var API_METHODS = ['getPublicConfig', 'login', 'resumeSession', 'logout', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval', 'requestAccountTransfer', 'listTransferRequests', 'decideTransferRequest', 'transferSubmissionOwner', 'updateOfficialId'];
+var TAB_SESSION_KEY = 'rtaf.session';
+var TAB_NAV_KEY = 'rtaf.nav';
+function tabGet(key) {
+  try { return JSON.parse(window.sessionStorage.getItem(key) || 'null'); } catch (e) { return null; }
+}
+function tabSet(key, val) {
+  try { window.sessionStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+}
+function tabClear() {
+  try { window.sessionStorage.removeItem(TAB_SESSION_KEY); window.sessionStorage.removeItem(TAB_NAV_KEY); } catch (e) {}
+}
 function callApi(fn, args) {
   return fetch(API_URL, {
     method: 'POST',
@@ -959,7 +976,10 @@ function callApi(fn, args) {
   }, function () {
     throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ — ตรวจสอบอินเทอร์เน็ต, API_URL และการ Deploy (Execute as: Me, Who has access: Anyone)');
   }).then(function (data) {
-    if (!data || !data.ok) throw new Error(data && data.error || 'เกิดข้อผิดพลาดที่เซิร์ฟเวอร์');
+    if (!data || !data.ok) {
+      if (data && data.error && data.error.indexOf('เซสชันหมดอายุ') > -1) tabClear();
+      throw new Error(data && data.error || 'เกิดข้อผิดพลาดที่เซิร์ฟเวอร์');
+    }
     return data.result;
   });
 }
@@ -1005,7 +1025,16 @@ function boot() {
       __showBootError('ผู้ดูแลระบบยังไม่ได้ตั้งค่า GOOGLE_CLIENT_ID ในไฟล์ Config');
       return;
     }
-    waitForGsi(0);
+    var saved = tabGet(TAB_SESSION_KEY);
+    if (!saved || !saved.sessionId) { waitForGsi(0); return; }
+    setBootStatus('กำลังกลับเข้าสู่ระบบ...', true);
+    gsRun().withSuccessHandler(function (identity) {
+      if (identity && identity.sessionId) onBootSuccess(identity);
+      else { tabClear(); waitForGsi(0); } // expired: sign in again as usual
+    }).withFailureHandler(function () {
+      tabClear();
+      waitForGsi(0);
+    }).resumeSession(saved.sessionId);
   }).withFailureHandler(onBootError).getPublicConfig();
 }
 function waitForGsi(tries) {
@@ -1055,6 +1084,7 @@ function onBootSuccess(identity) {
   }
   currentUser = identity;
   SESSION = identity.sessionId;
+  tabSet(TAB_SESSION_KEY, {sessionId: SESSION});
   try {
     document.getElementById('boot-gate').style.display = 'none';
     if (identity.role === 'officer') {
@@ -1588,6 +1618,7 @@ function savePersonalThenGo(n) {
   }).updateSubmissionPersonal(SESSION, state.subId, state.personal);
 }
 function showStep(n) {
+  saveUserNav(n);
   renderContractNumberLine();
   document.querySelectorAll('#app-user .panel').forEach(function (p) {
     return p.classList.remove('active');
@@ -2019,10 +2050,45 @@ function closeUserReport() {
   document.getElementById('panel-user-report').classList.remove('active');
   showStep(4);
 }
+function logout() {
+  var done = function () {
+    tabClear();
+    try { if (window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect(); } catch (e) {}
+    window.location.reload();
+  };
+  showLoading('กำลังออกจากระบบ...');
+  var finished = false;
+  var finish = function () { if (!finished) { finished = true; done(); } };
+  gsRun().withSuccessHandler(finish).withFailureHandler(finish).logout(SESSION);
+  setTimeout(finish, 4000); // don't keep the user waiting if the server is slow
+}
+
+// ---------- return to the same place after a refresh ----------
+function saveUserNav(step) {
+  tabSet(TAB_NAV_KEY, state.subId ? {view: 'user', subId: state.subId, step: step} : null);
+}
+function restoreUserNav(nav) {
+  showLoading('กำลังโหลดข้อมูลสัญญา...');
+  gsRun().withSuccessHandler(function (result) {
+    hideLoading();
+    if (!result) { checkForExistingContracts(); return; }
+    state = hydrateSubmission(result);
+    savedPersonalKey = personalKey(state.personal);
+    savedOfficialId = state.personal.officialId;
+    fillFormFromState();
+    showStep(nav.step >= 1 && nav.step <= 4 ? nav.step : 1);
+  }).withFailureHandler(function () {
+    hideLoading();
+    checkForExistingContracts();
+  }).getSubmission(SESSION, nav.subId);
+}
+
 function initUserView() {
   document.getElementById('user-header-sub').textContent = 'เข้าสู่ระบบด้วย ' + currentUser.email;
   fillFormFromState();
-  checkForExistingContracts();
+  var nav = tabGet(TAB_NAV_KEY);
+  if (nav && nav.view === 'user' && nav.subId) restoreUserNav(nav);
+  else checkForExistingContracts();
 }
 var ALL_DOCS = [].concat(DOCS_CONTRACTOR, DOCS_CONTRACTOR_SPOUSE, _toConsumableArray(GUARANTORS.flatMap(function (g) {
   return [].concat(_toConsumableArray(g.docs), _toConsumableArray(g.spouseDocs));
@@ -2100,8 +2166,19 @@ function refreshList() {
   showLoading('กำลังโหลดรายชื่อสัญญา...');
   gsRun().withSuccessHandler(function (rows) {
     hideLoading();
+    var detailOpen = document.getElementById('panel-detail').classList.contains('active');
+    var keep = detailOpen ? SUBMISSIONS.find(function (x) { return x.subId === currentSubId; }) : null;
     SUBMISSIONS = rows.map(adaptFlatSubmission);
+    if (keep) {
+      var ki = SUBMISSIONS.findIndex(function (x) { return x.subId === keep.subId; });
+      if (ki > -1) SUBMISSIONS[ki] = keep;
+    }
     renderList();
+    if (pendingRestoreDetail) {
+      var rid = pendingRestoreDetail;
+      pendingRestoreDetail = null;
+      if (SUBMISSIONS.some(function (x) { return x.subId === rid; })) showDetail(rid);
+    }
   }).withFailureHandler(function (err) {
     hideLoading();
     alert('โหลดรายชื่อไม่สำเร็จ: ' + (err && err.message ? err.message : err));
@@ -2179,6 +2256,7 @@ function renderList() {
   });
 }
 function showList() {
+  tabSet(TAB_NAV_KEY, {view: 'admin'});
   document.getElementById('panel-list').classList.add('active');
   document.getElementById('panel-detail').classList.remove('active');
   document.getElementById('panel-report').classList.remove('active');
@@ -2203,6 +2281,7 @@ function showDetail(subId) {
   }).getSubmission(SESSION, subId);
 }
 function renderDetail(sub) {
+  tabSet(TAB_NAV_KEY, {view: 'admin', subId: sub.subId});
   document.getElementById('d-name').textContent = "".concat(sub.personal.title, " ").concat(sub.personal.first, " ").concat(sub.personal.last);
   document.getElementById('d-contract-tag').textContent = "\u0E40\u0E25\u0E02\u0E17\u0E35\u0E48\u0E2A\u0E31\u0E0D\u0E0D\u0E32 ".concat(formatContractNumber(sub), " \u2014 \u0E09\u0E1A\u0E31\u0E1A\u0E17\u0E35\u0E48 ").concat(sub.personalSeq || 1, " \u0E02\u0E2D\u0E07\u0E1A\u0E38\u0E04\u0E04\u0E25\u0E19\u0E35\u0E49");
   document.getElementById('d-meta').textContent = "\u0E2A\u0E48\u0E07\u0E40\u0E2D\u0E01\u0E2A\u0E32\u0E23\u0E25\u0E48\u0E32\u0E2A\u0E38\u0E14\u0E40\u0E21\u0E37\u0E48\u0E2D: ".concat(formatThaiDateTime(sub.submittedAt), " \xB7 \u0E40\u0E25\u0E02\u0E1B\u0E23\u0E30\u0E08\u0E33\u0E15\u0E31\u0E27: ").concat(sub.personal.officialId || 'ไม่ได้กรอก', " \xB7 \u0E1B\u0E23\u0E30\u0E40\u0E20\u0E17\u0E01\u0E32\u0E23\u0E28\u0E36\u0E01\u0E29\u0E32: ").concat(EDU_TYPE_LABEL[sub.personal.eduType] || '-', " \xB7 \u0E42\u0E17\u0E23 ").concat(sub.personal.phone).concat(sub.personal.workPhone ? ' (ที่ทำงาน ' + sub.personal.workPhone + ')' : '', " \xB7 ").concat(sub.personal.email);
@@ -3667,8 +3746,11 @@ function hrisMatch(officialId, first, last) {
   return {type: 'notfound'};
 }
 
+var pendingRestoreDetail = null;
 function initAdminView() {
   document.getElementById('officer-header-sub').textContent = 'เข้าสู่ระบบด้วย ' + (currentUser.displayName || currentUser.email);
+  var nav = tabGet(TAB_NAV_KEY);
+  if (nav && nav.view === 'admin' && nav.subId) pendingRestoreDetail = nav.subId; // opened once the list has loaded
   refreshList();
   loadHris();
 }
