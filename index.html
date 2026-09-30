@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ระบบบริหารจัดการสัญญาการศึกษาด้วยเทคโนโลยีดิจิทัล กองทัพอากาศ</title>
+<title>ระบบบริหารจัดการสัญญาการศึกษาด้วยเทคโนโลยีดิจิตอล กองทัพอากาศ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -797,6 +797,17 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
 
   .role-tag{display:inline-block;vertical-align:middle;margin-left:8px;padding:1px 9px;border:1px solid rgba(201,168,76,.6);border-radius:999px;color:var(--gold);font-size:11.5px;font-weight:600;letter-spacing:0;white-space:nowrap;}
   .boot-banner-title{overflow-wrap:anywhere;}
+  .compare-pane-header{gap:6px;}
+  .compare-pane-header select.cmp-doc-select{flex:1;min-width:0;width:auto;font-size:12.5px;font-weight:600;color:var(--navy);padding:4px 26px 4px 8px;background-color:#fff;}
+  .cmp-nav{flex:none;width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:var(--r-sm);cursor:pointer;font-size:16px;line-height:1;color:var(--navy);padding:0;}
+  .cmp-nav:hover{border-color:var(--navy);}
+  .cmp-remove{flex:none;font-size:12px;}
+  .compare-add{flex:0 0 260px;min-width:220px;border-style:dashed;background:#FAFBFD;align-items:center;justify-content:center;}
+  .compare-add.compare-add-only{flex:1 1 0;}
+  .compare-add-inner{display:flex;flex-direction:column;gap:10px;align-items:stretch;width:85%;max-width:320px;text-align:center;}
+  .compare-add-title{font-size:14px;font-weight:700;color:var(--navy);}
+  .compare-add-hint{font-size:11.5px;color:var(--muted);}
+  .compare-add select{font-size:12.5px;}
 </style>
 </head>
 <body>
@@ -1371,7 +1382,10 @@ setTimeout(function () {
         <h3 id="modal-title"></h3>
         <div class="modal-meta" id="modal-meta"></div>
       </div>
-      <button class="secondary" onclick="closeDocModal()">ปิด</button>
+      <div style="display:flex;gap:8px;flex:none">
+        <button class="secondary" onclick="openCompareFromDoc()" title="เปิดฉบับนี้ไว้ช่องซ้าย แล้วเลือกเอกสารอื่นมาเทียบ">เปิดเทียบกับเอกสารอื่น</button>
+        <button class="secondary" onclick="closeDocModal()">ปิด</button>
+      </div>
     </div>
     <div class="doc-modal-preview" id="modal-preview-content">
       <span class="icon">📄</span>
@@ -3281,7 +3295,7 @@ function updateCompareBar() {
   }
   bar.classList.add('active');
   document.getElementById('compare-count').textContent = compareSelection.length;
-  document.getElementById('compare-open-btn').disabled = compareSelection.length < 2;
+  document.getElementById('compare-open-btn').disabled = compareSelection.length < 1;
 }
 function clearCompare() {
   compareSelection = [];
@@ -3291,41 +3305,158 @@ function clearCompare() {
   });
   if (sub) renderAllDocTables(sub);
 }
+// ---------- Compare window ----------
+// Panes are added, swapped and removed one at a time, never rebuilt together:
+// re-creating a pane reloads its PDF from page 1, so the document kept open on
+// the left (e.g. the guarantee contract) must not be touched when another pane
+// changes.
+var CMP_MARK = {'pass': ' ✓', 'needs-revision': ' (ต้องแก้ไข)', 'fail': ' (ไม่ผ่าน)'};
+function compareSub() {
+  return SUBMISSIONS.find(function (s) { return s.subId === currentSubId; });
+}
+function compareDocGroups(sub) {
+  // owner: short prefix so a closed dropdown still says whose document it is
+  var groups = [{label: 'เอกสารของผู้ทำสัญญา', owner: 'ผู้ทำสัญญา', docs: DOCS_CONTRACTOR},
+                {label: 'เอกสารของคู่สมรสผู้ทำสัญญา', owner: 'คู่สมรส', docs: DOCS_CONTRACTOR_SPOUSE}];
+  activeGuarantors(sub.personal.eduType).forEach(function (g) {
+    groups.push({label: 'ผู้ค้ำประกันคนที่ ' + g.n, owner: 'ผู้ค้ำ ' + g.n, docs: g.docs});
+    groups.push({label: 'คู่สมรสผู้ค้ำประกันคนที่ ' + g.n, owner: 'คู่สมรสผู้ค้ำ ' + g.n, docs: g.spouseDocs});
+  });
+  return groups.map(function (g) {
+    return {label: g.label, owner: g.owner, docs: g.docs.filter(function (d) {
+      var e = docEntry(sub, d.id);
+      return e.status === 'uploaded' && e.driveFileId;
+    })};
+  }).filter(function (g) { return g.docs.length; });
+}
+function compareDocOrder(sub) {
+  var ids = [];
+  compareDocGroups(sub).forEach(function (g) { g.docs.forEach(function (d) { ids.push(d.id); }); });
+  return ids;
+}
+function compareOptionsHtml(sub, currentId) {
+  return compareDocGroups(sub).map(function (g) {
+    return '<optgroup label="' + escapeHtml(g.label) + '">' + g.docs.map(function (d) {
+      var openElsewhere = d.id !== currentId && compareSelection.indexOf(d.id) > -1;
+      var mark = CMP_MARK[docEntry(sub, d.id).reviewStatus] || '';
+      return '<option value="' + d.id + '"' + (d.id === currentId ? ' selected' : '') + (openElsewhere ? ' disabled' : '') + '>' +
+        escapeHtml(g.owner + ' · ' + d.name) + mark + (openElsewhere ? ' — เปิดอยู่' : '') + '</option>';
+    }).join('') + '</optgroup>';
+  }).join('');
+}
+function comparePaneEl(docId) {
+  return document.querySelector('#compare-panes .compare-pane[data-doc-id="' + docId + '"]');
+}
+function buildComparePane(sub, docId) {
+  var entry = docEntry(sub, docId);
+  var pane = document.createElement('div');
+  pane.className = 'compare-pane';
+  pane.setAttribute('data-doc-id', docId);
+  pane.innerHTML = '<div class="compare-pane-header">' +
+      '<button class="cmp-nav" title="เอกสารก่อนหน้า" onclick="stepComparePane(\'' + docId + '\', -1)">‹</button>' +
+      '<select class="cmp-doc-select" title="เลือกเอกสารที่จะแสดงในช่องนี้" onchange="swapComparePane(\'' + docId + '\', this.value)">' + compareOptionsHtml(sub, docId) + '</select>' +
+      '<button class="cmp-nav" title="เอกสารถัดไป" onclick="stepComparePane(\'' + docId + '\', 1)">›</button>' +
+      '<button class="ghost cmp-remove" onclick="removeFromCompare(\'' + docId + '\')">นำออก</button>' +
+    '</div>' +
+    '<div class="compare-pane-body"></div>' +
+    '<div class="compare-pane-footer">' +
+      '<select onchange="setReview(\'' + docId + '\',\'' + sub.subId + '\',this.value);refreshCompareSelects()">' +
+        '<option value="pending"' + (entry.reviewStatus === 'pending' ? ' selected' : '') + '>รอตรวจ</option>' +
+        '<option value="pass"' + (entry.reviewStatus === 'pass' ? ' selected' : '') + '>ผ่าน</option>' +
+        '<option value="needs-revision"' + (entry.reviewStatus === 'needs-revision' ? ' selected' : '') + '>ต้องแก้ไข</option>' +
+        '<option value="fail"' + (entry.reviewStatus === 'fail' ? ' selected' : '') + '>ไม่ผ่าน</option>' +
+      '</select>' +
+      '<textarea placeholder="comment (ถ้ามี) — จำเป็นเมื่อเลือก \'ต้องแก้ไข\'" onchange="setComment(\'' + docId + '\',\'' + sub.subId + '\',this.value)">' + escapeHtml(entry.comment || '') + '</textarea>' +
+    '</div>';
+  loadPdfInto(pane.querySelector('.compare-pane-body'), sub, docId);
+  return pane;
+}
+// Refresh only the dropdown lists (open-elsewhere and review marks); PDFs stay.
+function refreshCompareSelects() {
+  var sub = compareSub();
+  document.querySelectorAll('#compare-panes .compare-pane[data-doc-id]').forEach(function (pane) {
+    pane.querySelector('.cmp-doc-select').innerHTML = compareOptionsHtml(sub, pane.getAttribute('data-doc-id'));
+  });
+  renderCompareAddSlot();
+}
+// Empty slot for adding another document while fewer than 3 are open.
+function renderCompareAddSlot() {
+  var box = document.getElementById('compare-panes');
+  var old = box.querySelector('.compare-add');
+  if (old) old.parentNode.removeChild(old);
+  if (compareSelection.length >= 3) return;
+  var slot = document.createElement('div');
+  slot.className = 'compare-pane compare-add' + (compareSelection.length ? '' : ' compare-add-only');
+  slot.innerHTML = '<div class="compare-add-inner"><div class="compare-add-title">+ เลือกเอกสารเข้ามาเทียบ</div>' +
+    '<select class="cmp-add-select" onchange="addToCompare(this.value)"><option value="">— เลือกเอกสาร —</option>' +
+    compareOptionsHtml(compareSub(), null) + '</select>' +
+    '<div class="compare-add-hint">เปิดได้พร้อมกันสูงสุด 3 ฉบับ</div></div>';
+  box.appendChild(slot);
+}
+function syncCompareOutside() {
+  updateCompareBar();
+  var sub = compareSub();
+  if (sub) renderAllDocTables(sub);
+}
 function openCompareModal() {
-  var sub = SUBMISSIONS.find(function (s) {
-    return s.subId === currentSubId;
-  });
-  var panesContainer = document.getElementById('compare-panes');
-  panesContainer.innerHTML = '';
-  compareSelection.forEach(function (docId) {
-    var meta = findDocMeta(docId);
-    var entry = docEntry(sub, docId);
-    var previewHtml = '';
-    var pane = document.createElement('div');
-    pane.className = 'compare-pane';
-    pane.innerHTML = "\n      <div class=\"compare-pane-header\"><span>".concat(meta.name, "</span><button class=\"ghost\" onclick=\"removeFromCompare('").concat(docId, "')\">\u0E19\u0E33\u0E2D\u0E2D\u0E01</button></div>\n      <div class=\"compare-pane-body\" id=\"compare-body-").concat(docId, "\"></div>\n      <div class=\"compare-pane-footer\">\n        <select onchange=\"setReview('").concat(docId, "','").concat(sub.subId, "',this.value)\">\n          <option value=\"pending\" ").concat(entry.reviewStatus === 'pending' ? 'selected' : '', ">\u0E23\u0E2D\u0E15\u0E23\u0E27\u0E08</option>\n          <option value=\"pass\" ").concat(entry.reviewStatus === 'pass' ? 'selected' : '', ">\u0E1C\u0E48\u0E32\u0E19</option>\n          <option value=\"needs-revision\" ").concat(entry.reviewStatus === 'needs-revision' ? 'selected' : '', ">\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02</option>\n          <option value=\"fail\" ").concat(entry.reviewStatus === 'fail' ? 'selected' : '', ">\u0E44\u0E21\u0E48\u0E1C\u0E48\u0E32\u0E19</option>\n        </select>\n        <textarea placeholder=\"comment (\u0E16\u0E49\u0E32\u0E21\u0E35) \u2014 \u0E08\u0E33\u0E40\u0E1B\u0E47\u0E19\u0E40\u0E21\u0E37\u0E48\u0E2D\u0E40\u0E25\u0E37\u0E2D\u0E01 '\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02'\" onchange=\"setComment('").concat(docId, "','").concat(sub.subId, "',this.value)\">").concat(entry.comment || '', "</textarea>\n      </div>\n    ");
-    panesContainer.appendChild(pane);
-    loadPdfInto(pane.querySelector('.compare-pane-body'), sub, docId);
-  });
+  var sub = compareSub();
+  var box = document.getElementById('compare-panes');
+  box.innerHTML = '';
+  compareSelection.forEach(function (docId) { box.appendChild(buildComparePane(sub, docId)); });
+  renderCompareAddSlot();
   document.getElementById('compare-modal').classList.add('active');
 }
+function addToCompare(docId) {
+  if (!docId || compareSelection.indexOf(docId) > -1 || compareSelection.length >= 3) return;
+  compareSelection.push(docId);
+  var box = document.getElementById('compare-panes');
+  box.insertBefore(buildComparePane(compareSub(), docId), box.querySelector('.compare-add'));
+  refreshCompareSelects();
+  syncCompareOutside();
+}
+function swapComparePane(oldId, newId) {
+  if (!newId || newId === oldId || compareSelection.indexOf(newId) > -1) return;
+  var pane = comparePaneEl(oldId);
+  if (!pane) return;
+  compareSelection[compareSelection.indexOf(oldId)] = newId;
+  pane.parentNode.replaceChild(buildComparePane(compareSub(), newId), pane);
+  refreshCompareSelects();
+  syncCompareOutside();
+}
+// Next / previous uploaded document in list order, skipping ones already open.
+function stepComparePane(docId, dir) {
+  var order = compareDocOrder(compareSub());
+  var i = order.indexOf(docId) + dir;
+  while (i >= 0 && i < order.length && compareSelection.indexOf(order[i]) > -1) i += dir;
+  if (i < 0 || i >= order.length) {
+    showToast(dir > 0 ? 'ไม่มีเอกสารถัดไปแล้ว' : 'นี่คือเอกสารแรกแล้ว', 'info', 2500);
+    return;
+  }
+  swapComparePane(docId, order[i]);
+}
 function removeFromCompare(docId) {
-  compareSelection = compareSelection.filter(function (id) {
-    return id !== docId;
-  });
-  updateCompareBar();
-  var sub = SUBMISSIONS.find(function (s) {
-    return s.subId === currentSubId;
-  });
-  if (sub) renderAllDocTables(sub);
-  if (compareSelection.length === 0) closeCompareModal();else openCompareModal();
+  compareSelection = compareSelection.filter(function (id) { return id !== docId; });
+  var pane = comparePaneEl(docId);
+  if (pane) pane.parentNode.removeChild(pane);
+  refreshCompareSelects();
+  syncCompareOutside();
 }
 function closeCompareModal() {
   document.getElementById('compare-modal').classList.remove('active');
-  var sub = SUBMISSIONS.find(function (s) {
-    return s.subId === currentSubId;
-  });
-  if (sub) renderAllDocTables(sub);
+  syncCompareOutside();
+}
+// From the single-document viewer: keep this document on the left and compare.
+function openCompareFromDoc() {
+  if (!docModalCurrent) return;
+  var docId = docModalCurrent.docId;
+  closeDocModal();
+  if (compareSelection.indexOf(docId) === -1) {
+    if (compareSelection.length >= 3) compareSelection.pop();
+    compareSelection.unshift(docId);
+  } else {
+    compareSelection = [docId].concat(compareSelection.filter(function (id) { return id !== docId; }));
+  }
+  openCompareModal();
 }
 function adminFileName(sub, entry) {
   return entry.fileNameCode ? sub.subId + '_' + entry.fileNameCode + '.pdf' : entry.originalFileName || '';
