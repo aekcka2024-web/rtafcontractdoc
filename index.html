@@ -808,6 +808,54 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .compare-add-title{font-size:14px;font-weight:700;color:var(--navy);}
   .compare-add-hint{font-size:11.5px;color:var(--muted);}
   .compare-add select{font-size:12.5px;}
+  /* ── Annotator ─────────────────────────────── */
+  .annot-overlay{position:fixed;inset:0;z-index:7000;background:#2A3346;display:none;flex-direction:column;font-family:'Sarabun',sans-serif;}
+  .annot-overlay.open{display:flex;}
+  .annot-top{background:#fff;border-bottom:1px solid var(--line);padding:10px 16px;flex:none;box-shadow:var(--sh-sm);}
+  .annot-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+  .annot-title-wrap{display:flex;flex-direction:column;min-width:0;}
+  .annot-title-wrap strong{color:var(--navy);font-size:15px;}
+  .annot-title-wrap span{font-size:12.5px;color:var(--steel);}
+  .annot-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .annot-count{font-size:12.5px;color:var(--steel);}
+  .annot-dl{display:inline-flex;align-items:center;text-decoration:none;border:1.5px solid #B0BCCE;border-radius:var(--r-sm);padding:8px 16px;font-size:14px;color:var(--navy);}
+  .annot-tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center;}
+  .annot-tools button{background:#fff;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:6px 12px;font-family:inherit;font-size:13px;color:var(--navy);cursor:pointer;min-height:36px;}
+  .annot-tools button:hover{border-color:var(--navy);}
+  .annot-tools button.active{background:#DC2626;border-color:#DC2626;color:#fff;}
+  .annot-sep{width:1px;height:24px;background:var(--line);margin:0 4px;}
+  .annot-banner{margin-top:8px;font-size:12.5px;color:#7A5712;background:#FFF6E5;border:1px solid #E8C57A;border-radius:var(--r-sm);padding:6px 10px;}
+  .annot-main{flex:1;display:flex;min-height:0;}
+  .annot-pages{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;align-items:center;gap:16px;}
+  .annot-page{position:relative;background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.35);flex:none;}
+  .annot-page canvas{position:absolute;inset:0;width:100%;height:100%;}
+  .annot-ov{cursor:crosshair;touch-action:none;}
+  .annot-hand .annot-ov,.annot-view .annot-ov{pointer-events:none;}
+  .annot-page-label{position:absolute;left:0;top:-2px;transform:translateY(-100%);font-size:11.5px;color:#C7CEDB;}
+  .annot-msg{color:#fff;padding:40px;font-size:14px;}
+  .annot-side{width:300px;flex:none;background:#fff;border-left:1px solid var(--line);overflow:auto;padding:14px 16px;}
+  .annot-side-title{font-weight:700;color:var(--navy);font-size:14px;margin-bottom:8px;}
+  .annot-notes{list-style:none;margin:0;padding:0;}
+  .annot-notes li{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #F0F3F8;font-size:13px;line-height:1.45;}
+  .annot-notes li .link-btn{font-size:12px;flex:none;}
+  .annot-note-n{color:#DC2626;font-weight:700;font-size:16px;line-height:1.2;flex:none;}
+  .annot-note-t{flex:1;min-width:0;overflow-wrap:anywhere;}
+  .annot-note-p{color:var(--muted);font-size:11.5px;}
+  .annot-notes li.annot-empty{color:var(--muted);font-size:12.5px;display:block;}
+  .annot-notes li.annot-note-view{display:block;color:#B91C1C;}
+  .annot-view .annot-edit-only{display:none !important;}
+  @media (max-width:760px){
+    .annot-main{flex-direction:column;}
+    .annot-side{width:auto;max-height:28vh;border-left:none;border-top:1px solid var(--line);order:2;}
+    .annot-pages{padding:12px 8px;}
+  }
+  .modal-annot-bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:4px;font-size:12.5px;}
+  .modal-annot-bar .link-btn{font-size:12.5px;}
+  .annot-flag{display:inline-block;font-size:11.5px;font-weight:600;color:#B91C1C;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:999px;padding:1px 8px;}
+  .cmp-annot{color:#DC2626;font-size:14px;}
+  .annot-view-btn{display:block;margin-top:5px;background:#FEF2F2;border:1px solid #FCA5A5;color:#B91C1C;border-radius:var(--r-sm);padding:5px 10px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;}
+  .annot-view-btn.old{background:#F4F6FA;border-color:var(--line);color:var(--steel);font-weight:500;}
+  @media print{ .annot-overlay{display:none !important;} }
 </style>
 </head>
 <body>
@@ -1381,8 +1429,10 @@ setTimeout(function () {
       <div>
         <h3 id="modal-title"></h3>
         <div class="modal-meta" id="modal-meta"></div>
+        <div class="modal-annot-bar" id="modal-annot-bar"></div>
       </div>
       <div style="display:flex;gap:8px;flex:none">
+        <button class="primary" onclick="openAnnotatorFromModal()" title="วาด ตีกรอบ หรือปักหมุดข้อความบนเอกสาร แล้วบันทึกเป็นไฟล์ตรวจแก้">✎ ทำเครื่องหมาย</button>
         <button class="secondary" onclick="openCompareFromDoc()" title="เปิดฉบับนี้ไว้ช่องซ้าย แล้วเลือกเอกสารอื่นมาเทียบ">เปิดเทียบกับเอกสารอื่น</button>
         <button class="secondary" onclick="closeDocModal()">ปิด</button>
       </div>
@@ -2083,6 +2133,15 @@ function renderDocList(containerId, docs) {
       note.className = 'doc-comment';
       note.textContent = 'หมายเหตุจากเจ้าหน้าที่: ' + entry.comment;
       nameEl.appendChild(note);
+    }
+    if (entry.annotatedFileId) {
+      var current = annotIsCurrent(entry);
+      var annBtn = document.createElement('button');
+      annBtn.type = 'button';
+      annBtn.className = 'annot-view-btn' + (current ? '' : ' old');
+      annBtn.textContent = current ? '🖍 ดูจุดที่ต้องแก้ไขบนเอกสาร' : '🖍 ดูจุดที่เคยต้องแก้ไข (ฉบับก่อน)';
+      annBtn.onclick = function () { openAnnotatedViewer(state.subId, doc.id); };
+      nameEl.appendChild(annBtn);
     }
     if (DOC_SUBMIT_NOTES[doc.id]) {
       var orig = document.createElement('div');
@@ -3236,7 +3295,7 @@ function renderDocTable(containerId, docs, sub) {
     var select = canReview ? "\n      <select onchange=\"setReview('".concat(doc.id, "','").concat(sub.subId, "',this.value)\">\n        <option value=\"pending\" ").concat(entry.reviewStatus === 'pending' ? 'selected' : '', ">\u0E23\u0E2D\u0E15\u0E23\u0E27\u0E08</option>\n        <option value=\"pass\" ").concat(entry.reviewStatus === 'pass' ? 'selected' : '', ">\u0E1C\u0E48\u0E32\u0E19</option>\n        <option value=\"needs-revision\" ").concat(entry.reviewStatus === 'needs-revision' ? 'selected' : '', ">\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02</option>\n        <option value=\"fail\" ").concat(entry.reviewStatus === 'fail' ? 'selected' : '', ">\u0E44\u0E21\u0E48\u0E1C\u0E48\u0E32\u0E19</option>\n      </select>") : '<span class="sub-cell">—</span>';
     var commentBox = canReview ? "\n      <textarea placeholder=\"comment (\u0E16\u0E49\u0E32\u0E21\u0E35) \u2014 \u0E08\u0E33\u0E40\u0E1B\u0E47\u0E19\u0E40\u0E21\u0E37\u0E48\u0E2D\u0E40\u0E25\u0E37\u0E2D\u0E01 '\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02'\" onchange=\"setComment('".concat(doc.id, "','").concat(sub.subId, "',this.value)\">").concat(entry.comment || '', "</textarea>") : '';
     var compareCell = entry.status === 'uploaded' ? "<input type=\"checkbox\" ".concat(compareSelection.includes(doc.id) ? 'checked' : '', " onchange=\"toggleCompare('").concat(doc.id, "', this)\">") : '';
-    tr.innerHTML = "\n      <td>".concat(compareCell, "</td>\n      <td>").concat(doc.name).concat(doc.optional ? ' <span class="sub-cell">(ถ้ามี)</span>' : '').concat(locked ? ' <span class="sub-cell">🔒 ล็อกแล้ว</span>' : '', "</td>\n      <td>").concat(fileBadge, "</td>\n      <td>").concat(select, "</td>\n      <td>").concat(commentBox, "</td>\n    ");
+    tr.innerHTML = "\n      <td>".concat(compareCell, "</td>\n      <td>").concat(doc.name).concat(doc.optional ? ' <span class="sub-cell">(ถ้ามี)</span>' : '').concat(locked ? ' <span class="sub-cell">🔒 ล็อกแล้ว</span>' : '').concat(annotIsCurrent(entry) ? ' <span class="annot-flag">🖍 มีไฟล์ตรวจแก้</span>' : '', "</td>\n      <td>").concat(fileBadge, "</td>\n      <td>").concat(select, "</td>\n      <td>").concat(commentBox, "</td>\n    ");
     tbody.appendChild(tr);
   });
 }
@@ -3356,6 +3415,7 @@ function buildComparePane(sub, docId) {
       '<button class="cmp-nav" title="เอกสารก่อนหน้า" onclick="stepComparePane(\'' + docId + '\', -1)">‹</button>' +
       '<select class="cmp-doc-select" title="เลือกเอกสารที่จะแสดงในช่องนี้" onchange="swapComparePane(\'' + docId + '\', this.value)">' + compareOptionsHtml(sub, docId) + '</select>' +
       '<button class="cmp-nav" title="เอกสารถัดไป" onclick="stepComparePane(\'' + docId + '\', 1)">›</button>' +
+      '<button class="cmp-nav cmp-annot" title="ทำเครื่องหมายบนเอกสารนี้" onclick="openAnnotator(currentSubId, \'' + docId + '\')">✎</button>' +
       '<button class="ghost cmp-remove" onclick="removeFromCompare(\'' + docId + '\')">นำออก</button>' +
     '</div>' +
     '<div class="compare-pane-body"></div>' +
@@ -3536,6 +3596,7 @@ function openDocModal(subId, docId) {
   document.getElementById('modal-meta').textContent = "".concat(sub.personal.title, " ").concat(sub.personal.first, " ").concat(sub.personal.last, " \xB7 \u0E44\u0E1F\u0E25\u0E4C: ").concat(adminFileName(sub, entry));
   var previewArea = document.getElementById('modal-preview-content');
   loadPdfInto(previewArea, sub, docId);
+  renderModalAnnotBar(sub, docId);
   document.getElementById('modal-review-select').value = entry.reviewStatus;
   document.getElementById('modal-comment-box').value = entry.comment || '';
   var ocrBlock = document.getElementById('doc-modal-ocr-block');
@@ -4679,6 +4740,468 @@ renderMaritalWarnings = function (sub) {
   renderGuarantorClaimWarnings(sub);
 };
 
+// ======================================================================
+// ไฟล์ตรวจแก้: เจ้าหน้าที่ทำเครื่องหมายบนเอกสาร แล้วบันทึกเป็น PDF ฉบับใหม่
+// (ไฟล์ต้นฉบับของผู้ทำสัญญาไม่ถูกแก้ไข) — ผู้ทำสัญญาเปิดดูได้จากหน้าส่งเอกสาร
+// ----------------------------------------------------------------------
+// Marks are kept as vectors in page-relative coordinates (0..1), drawn on a
+// transparent overlay per page. On save each marked page's overlay is rendered
+// to a PNG (the browser draws Thai text correctly, which PDF standard fonts
+// can't) and stamped onto the original page with pdf-lib; pin notes are also
+// listed on a summary page and copied into the review comment.
+// ======================================================================
+var PDFLIB_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+var ANNOT = null;
+var ANNOT_SAVED = {};   // pdfKey -> marks saved this session (re-open to add more)
+var ANNOT_BLOCK = 'จุดที่ต้องแก้ไข (ดูไฟล์ตรวจแก้):';
+var CIRCLED = '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
+function pinLabel(n) { return n <= 20 ? CIRCLED.charAt(n - 1) : '(' + n + ')'; }
+
+function annotEntryFor(subId, docId) {
+  if (typeof state !== 'undefined' && state && state.subId === subId) return (state.documents || {})[docId] || {};
+  var sub = SUBMISSIONS.find(function (s) { return s.subId === subId; });
+  return sub ? docEntry(sub, docId) : {};
+}
+function annotIsCurrent(entry) {
+  return !!(entry && entry.annotatedFileId && entry.annotatedForUploadedAt && entry.annotatedForUploadedAt === entry.uploadedAt);
+}
+function bytesToBase64(u8) {
+  var s = '', CH = 0x8000;
+  for (var i = 0; i < u8.length; i += CH) s += String.fromCharCode.apply(null, u8.subarray(i, i + CH));
+  return btoa(s);
+}
+function base64ToBytes(b64) {
+  var bin = atob(b64), u8 = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return u8;
+}
+
+// ---------- open ----------
+function openAnnotator(subId, docId) {
+  var sub = SUBMISSIONS.find(function (s) { return s.subId === subId; });
+  var entry = docEntry(sub, docId);
+  if (!entry.driveFileId) { showToast('เอกสารนี้ยังไม่มีไฟล์', 'error'); return; }
+  var key = pdfKey(sub, docId);
+  ANNOT = {mode: 'edit', subId: subId, docId: docId, key: key, pages: [], items: (ANNOT_SAVED[key] || []).map(function (it) { return JSON.parse(JSON.stringify(it)); }),
+           tool: 'pen', draft: null, dirty: false, bytes: null};
+  annotShell(findDocMeta(docId).name, sub.personal.title + ' ' + sub.personal.first + ' ' + sub.personal.last);
+  var banner = document.getElementById('annot-banner');
+  if (annotIsCurrent(entry) && !ANNOT_SAVED[key]) {
+    banner.innerHTML = 'เอกสารนี้มีไฟล์ตรวจแก้อยู่แล้ว — บันทึกครั้งนี้จะแทนที่ไฟล์เดิม ' +
+      '<button class="link-btn" onclick="openAnnotatedViewer(\'' + subId + '\',\'' + docId + '\')">ดูไฟล์เดิม</button>';
+    banner.style.display = '';
+  }
+  getPdfBytes(sub, docId).then(function (bytes) {
+    ANNOT.bytes = bytes;
+    return annotRenderPages(bytes);
+  }).catch(function (err) {
+    document.getElementById('annot-pages').innerHTML = '<div class="annot-msg">เปิดเอกสารไม่สำเร็จ: ' + escapeHtml(err.message || String(err)) + '</div>';
+  });
+  annotSetTool('pen');
+  annotRenderNotes();
+}
+function openAnnotatorFromModal() {
+  if (docModalCurrent) openAnnotator(docModalCurrent.subId, docModalCurrent.docId);
+}
+// Read-only view of a saved annotated file (officer or applicant)
+function openAnnotatedViewer(subId, docId) {
+  var entry = annotEntryFor(subId, docId);
+  ANNOT = {mode: 'view', subId: subId, docId: docId, pages: [], items: [], tool: 'hand'};
+  annotShell('ไฟล์ตรวจแก้ — ' + findDocMeta(docId).name, annotIsCurrent(entry) ? 'จุดที่เจ้าหน้าที่ทำเครื่องหมายไว้' : 'ไฟล์ตรวจแก้ของเอกสารฉบับก่อน (ท่านอัปโหลดฉบับใหม่แล้ว)');
+  var notes = String(entry.annotationNotes || '').split('\n').filter(function (l) { return l.trim(); });
+  document.getElementById('annot-notes').innerHTML = notes.length
+    ? notes.map(function (l) { return '<li class="annot-note-view">' + escapeHtml(l) + '</li>'; }).join('')
+    : '<li class="annot-empty">ดูเครื่องหมายบนเอกสาร</li>';
+  callApi('getAnnotatedFile', [SESSION, subId, docId]).then(function (file) {
+    var bytes = base64ToBytes(file.base64);
+    var dl = document.getElementById('annot-download');
+    dl.href = URL.createObjectURL(new Blob([bytes], {type: 'application/pdf'}));
+    dl.setAttribute('download', file.name || 'ไฟล์ตรวจแก้.pdf');
+    dl.style.display = '';
+    return annotRenderPages(bytes);
+  }).catch(function (err) {
+    document.getElementById('annot-pages').innerHTML = '<div class="annot-msg">เปิดไฟล์ตรวจแก้ไม่สำเร็จ: ' + escapeHtml(err.message || String(err)) + '</div>';
+  });
+}
+function annotShell(title, sub) {
+  var m = document.getElementById('annot-modal');
+  m.classList.toggle('annot-view', ANNOT.mode === 'view');
+  document.getElementById('annot-title').textContent = title;
+  document.getElementById('annot-sub').textContent = sub || '';
+  document.getElementById('annot-pages').innerHTML = '<div class="annot-msg">กำลังเปิดเอกสาร...</div>';
+  document.getElementById('annot-banner').style.display = 'none';
+  document.getElementById('annot-download').style.display = 'none';
+  document.getElementById('annot-save').disabled = false;
+  m.classList.add('open');
+}
+
+// ---------- pages ----------
+function annotRenderPages(bytes) {
+  return loadScriptOnce(PDFJS_URL, 'pdfjsLib').then(function () {
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+    return window.pdfjsLib.getDocument({data: bytes.slice()}).promise;
+  }).then(function (pdf) {
+    var box = document.getElementById('annot-pages');
+    box.innerHTML = '';
+    var cssW = Math.min(Math.max(box.clientWidth - 32, 320), 980);
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var chain = Promise.resolve();
+    for (var n = 1; n <= pdf.numPages; n++) (function (n) {
+      chain = chain.then(function () { return pdf.getPage(n); }).then(function (page) {
+        var vp1 = page.getViewport({scale: 1});
+        var scale = cssW / vp1.width;
+        var vp = page.getViewport({scale: scale * dpr});
+        var wrap = document.createElement('div');
+        wrap.className = 'annot-page';
+        wrap.style.width = cssW + 'px';
+        wrap.style.height = Math.round(vp1.height * scale) + 'px';
+        var img = document.createElement('canvas');
+        img.width = vp.width; img.height = vp.height; img.className = 'annot-img';
+        var ov = document.createElement('canvas');
+        ov.width = vp.width; ov.height = vp.height; ov.className = 'annot-ov';
+        var label = document.createElement('div');
+        label.className = 'annot-page-label'; label.textContent = 'หน้า ' + n + ' / ' + pdf.numPages;
+        wrap.appendChild(img); wrap.appendChild(ov); wrap.appendChild(label);
+        box.appendChild(wrap);
+        var pg = {n: n, vp1: vp1, ov: ov, wrap: wrap};
+        ANNOT.pages.push(pg);
+        if (ANNOT.mode === 'edit') annotBindOverlay(pg);
+        return page.render({canvasContext: img.getContext('2d'), viewport: vp}).promise.then(function () { annotRedraw(pg); });
+      });
+    })(n);
+    return chain;
+  });
+}
+
+// ---------- drawing ----------
+function annotSetTool(t) {
+  if (!ANNOT) return;
+  ANNOT.tool = t;
+  document.querySelectorAll('#annot-tools [data-tool]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tool') === t); });
+  document.getElementById('annot-modal').classList.toggle('annot-hand', t === 'hand');
+}
+function annotPoint(pg, e) {
+  var r = pg.ov.getBoundingClientRect();
+  return [Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1), Math.min(Math.max((e.clientY - r.top) / r.height, 0), 1)];
+}
+function annotBindOverlay(pg) {
+  var ov = pg.ov;
+  ov.addEventListener('pointerdown', function (e) {
+    if (!ANNOT || ANNOT.tool === 'hand') return;
+    e.preventDefault();
+    var p = annotPoint(pg, e);
+    if (ANNOT.tool === 'pin') { annotAddPin(pg.n, p); return; }
+    try { ov.setPointerCapture(e.pointerId); } catch (x) {}
+    ANNOT.draft = ANNOT.tool === 'pen' ? {type: 'pen', page: pg.n, pts: [p]} : {type: 'box', page: pg.n, x0: p[0], y0: p[1], x1: p[0], y1: p[1]};
+  });
+  ov.addEventListener('pointermove', function (e) {
+    var d = ANNOT && ANNOT.draft;
+    if (!d || d.page !== pg.n) return;
+    var p = annotPoint(pg, e);
+    if (d.type === 'pen') d.pts.push(p); else { d.x1 = p[0]; d.y1 = p[1]; }
+    annotRedraw(pg);
+  });
+  var finish = function () {
+    var d = ANNOT && ANNOT.draft;
+    if (!d || d.page !== pg.n) return;
+    ANNOT.draft = null;
+    if (d.type === 'pen' && d.pts.length > 1) annotPush({type: 'pen', page: d.page, pts: d.pts.map(function (q) { return [+q[0].toFixed(4), +q[1].toFixed(4)]; })});
+    if (d.type === 'box' && Math.abs(d.x1 - d.x0) > 0.01 && Math.abs(d.y1 - d.y0) > 0.005)
+      annotPush({type: 'box', page: d.page, x: Math.min(d.x0, d.x1), y: Math.min(d.y0, d.y1), w: Math.abs(d.x1 - d.x0), h: Math.abs(d.y1 - d.y0)});
+    annotRedraw(pg);
+  };
+  ov.addEventListener('pointerup', finish);
+  ov.addEventListener('pointercancel', finish);
+}
+function annotPush(item) {
+  ANNOT.items.push(item);
+  ANNOT.dirty = true;
+  annotRenumber();
+  annotRenderNotes();
+}
+function annotAddPin(page, p) {
+  var n = annotPins().length + 1;
+  showFormDialog('จุดที่ ' + n + ' (หน้า ' + page + ')', 'ระบุสิ่งที่ผู้ทำสัญญาต้องแก้ไขตรงจุดนี้',
+    [{id: 'text', label: 'สิ่งที่ต้องแก้ไข', type: 'textarea', required: true, placeholder: 'เช่น ลายเซ็นผู้ค้ำประกันไม่ครบ'}],
+    'เพิ่มจุด', function (v) {
+      annotPush({type: 'pin', page: page, x: +p[0].toFixed(4), y: +p[1].toFixed(4), text: v.text});
+      annotRedrawPage(page);
+    });
+}
+function annotPins() {
+  return ANNOT.items.filter(function (it) { return it.type === 'pin'; });
+}
+function annotRenumber() {
+  annotPins().forEach(function (p, i) { p.n = i + 1; });
+}
+function annotUndo() {
+  if (!ANNOT || !ANNOT.items.length) return;
+  var it = ANNOT.items.pop();
+  ANNOT.dirty = true;
+  annotRenumber(); annotRenderNotes();
+  annotRedrawAll();
+}
+function annotClearAll() {
+  if (!ANNOT || !ANNOT.items.length) return;
+  showConfirm('ล้างเครื่องหมายทั้งหมด?', 'เครื่องหมายทุกหน้าที่ยังไม่บันทึกจะหายไป', 'ล้างทั้งหมด', function () {
+    ANNOT.items = []; ANNOT.dirty = true;
+    annotRenderNotes(); annotRedrawAll();
+  }, true);
+}
+function annotEditPin(n) {
+  var pin = annotPins()[n - 1];
+  if (!pin) return;
+  showFormDialog('แก้ไขจุดที่ ' + n, 'หน้า ' + pin.page,
+    [{id: 'text', label: 'สิ่งที่ต้องแก้ไข', type: 'textarea', required: true, value: pin.text}],
+    'บันทึก', function (v) { pin.text = v.text; ANNOT.dirty = true; annotRenderNotes(); annotRedrawPage(pin.page); });
+}
+function annotDeletePin(n) {
+  var pin = annotPins()[n - 1];
+  if (!pin) return;
+  ANNOT.items.splice(ANNOT.items.indexOf(pin), 1);
+  ANNOT.dirty = true;
+  annotRenumber(); annotRenderNotes(); annotRedrawAll();
+}
+function annotRenderNotes() {
+  if (!ANNOT || ANNOT.mode !== 'edit') return;
+  var pins = annotPins();
+  document.getElementById('annot-notes').innerHTML = pins.length ? pins.map(function (p) {
+    return '<li><span class="annot-note-n">' + pinLabel(p.n) + '</span><span class="annot-note-t"><span class="annot-note-p">หน้า ' + p.page + '</span> ' + escapeHtml(p.text) + '</span>' +
+      '<button class="link-btn" onclick="annotEditPin(' + p.n + ')">แก้</button><button class="link-btn" onclick="annotDeletePin(' + p.n + ')">ลบ</button></li>';
+  }).join('') : '<li class="annot-empty">ใช้ "หมุดข้อความ" แตะตรงจุดบนเอกสาร แล้วพิมพ์สิ่งที่ต้องแก้ไข ข้อความจะถูกใส่ในหมายเหตุให้ผู้ทำสัญญาด้วย</li>';
+  document.getElementById('annot-count').textContent = ANNOT.items.length ? ANNOT.items.length + ' เครื่องหมาย' : '';
+}
+function annotRedrawPage(n) {
+  var pg = ANNOT.pages.filter(function (p) { return p.n === n; })[0];
+  if (pg) annotRedraw(pg);
+}
+function annotRedrawAll() { ANNOT.pages.forEach(annotRedraw); }
+function annotRedraw(pg) {
+  var ctx = pg.ov.getContext('2d');
+  ctx.clearRect(0, 0, pg.ov.width, pg.ov.height);
+  var list = ANNOT.items.filter(function (it) { return it.page === pg.n; });
+  if (ANNOT.draft && ANNOT.draft.page === pg.n) {
+    var d = ANNOT.draft;
+    list = list.concat([d.type === 'pen' ? d : {type: 'box', x: Math.min(d.x0, d.x1), y: Math.min(d.y0, d.y1), w: Math.abs(d.x1 - d.x0), h: Math.abs(d.y1 - d.y0)}]);
+  }
+  annotDrawItems(ctx, pg.ov.width, pg.ov.height, list);
+}
+// Shared by the screen overlay and the export image: sizes scale with page width.
+function annotDrawItems(ctx, W, H, items) {
+  var RED = '#DC2626';
+  items.forEach(function (it) {
+    ctx.save();
+    if (it.type === 'pen') {
+      ctx.strokeStyle = RED; ctx.lineWidth = Math.max(2, W * 0.0035); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath();
+      it.pts.forEach(function (q, i) { if (i) ctx.lineTo(q[0] * W, q[1] * H); else ctx.moveTo(q[0] * W, q[1] * H); });
+      ctx.stroke();
+    } else if (it.type === 'box') {
+      ctx.fillStyle = 'rgba(220,38,38,0.10)'; ctx.fillRect(it.x * W, it.y * H, it.w * W, it.h * H);
+      ctx.strokeStyle = RED; ctx.lineWidth = Math.max(2, W * 0.003); ctx.strokeRect(it.x * W, it.y * H, it.w * W, it.h * H);
+    } else if (it.type === 'pin') {
+      var r = W * 0.017, cx = it.x * W, cy = it.y * H;
+      ctx.fillStyle = RED; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+      ctx.lineWidth = Math.max(1.5, W * 0.002); ctx.strokeStyle = '#fff'; ctx.stroke();
+      ctx.fillStyle = '#fff'; ctx.font = 'bold ' + Math.round(r * 1.15) + 'px Sarabun, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(it.n || ''), cx, cy + r * 0.05);
+      if (it.text) {
+        var fs = Math.round(W * 0.0155), maxW = W * 0.34, pad = fs * 0.45;
+        ctx.font = fs + 'px Sarabun, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+        var lines = annotWrap(ctx, it.text, maxW);
+        var bw = Math.max.apply(null, lines.map(function (l) { return ctx.measureText(l).width; })) + pad * 2;
+        var bh = lines.length * fs * 1.35 + pad * 2;
+        var bx = cx + r * 1.4, by = cy - r;
+        if (bx + bw > W - 4) bx = cx - r * 1.4 - bw;
+        if (by + bh > H - 4) by = H - 4 - bh;
+        if (by < 4) by = 4;
+        ctx.fillStyle = 'rgba(255,255,255,0.93)'; ctx.fillRect(bx, by, bw, bh);
+        ctx.strokeStyle = RED; ctx.lineWidth = Math.max(1, W * 0.0015); ctx.strokeRect(bx, by, bw, bh);
+        ctx.fillStyle = '#B91C1C';
+        lines.forEach(function (l, i) { ctx.fillText(l, bx + pad, by + pad + i * fs * 1.35); });
+      }
+    }
+    ctx.restore();
+  });
+}
+// Thai has no spaces between words: split with the browser's Thai word
+// segmenter when available, otherwise by character.
+function annotWrap(ctx, text, maxW) {
+  var out = [];
+  String(text).split('\n').forEach(function (para) {
+    var parts;
+    try { parts = Array.from(new Intl.Segmenter('th', {granularity: 'word'}).segment(para), function (s) { return s.segment; }); }
+    catch (e) { parts = Array.from(para); }
+    var line = '';
+    parts.forEach(function (w) {
+      if (line && ctx.measureText(line + w).width > maxW) { out.push(line); line = w.replace(/^\s+/, ''); }
+      else line += w;
+    });
+    out.push(line);
+  });
+  return out;
+}
+
+// ---------- save ----------
+function annotNotesText() {
+  return annotPins().map(function (p) { return pinLabel(p.n) + ' หน้า ' + p.page + ': ' + p.text.replace(/\s*\n\s*/g, ' '); }).join('\n');
+}
+function saveAnnotations() {
+  if (!ANNOT || ANNOT.mode !== 'edit') return;
+  if (!ANNOT.items.length) { showToast('ยังไม่มีเครื่องหมายบนเอกสาร', 'warn'); return; }
+  if (!ANNOT.bytes) { showToast('เอกสารยังโหลดไม่เสร็จ', 'warn'); return; }
+  var btn = document.getElementById('annot-save');
+  btn.disabled = true;
+  showLoading('กำลังสร้างไฟล์ตรวจแก้...');
+  var a = ANNOT, notes = annotNotesText();
+  var fontReady = (document.fonts && document.fonts.load) ? document.fonts.load('32px Sarabun').catch(function () {}) : Promise.resolve();
+  fontReady.then(function () { return loadScriptOnce(PDFLIB_URL, 'PDFLib'); }).then(function () {
+    return PDFLib.PDFDocument.load(a.bytes, {ignoreEncryption: true});
+  }).then(function (doc) {
+    var pdfPages = doc.getPages();
+    var jobs = [];
+    a.pages.forEach(function (pg) {
+      var items = a.items.filter(function (it) { return it.page === pg.n; });
+      if (!items.length) return;
+      var W = 1600, H = Math.round(W * pg.vp1.height / pg.vp1.width);
+      var c = document.createElement('canvas'); c.width = W; c.height = H;
+      annotDrawItems(c.getContext('2d'), W, H, items);
+      jobs.push(doc.embedPng(c.toDataURL('image/png')).then(function (png) {
+        // place the overlay using pdf.js's own viewport mapping, so rotated
+        // or cropped pages line up exactly with what the officer saw
+        var bl = pg.vp1.convertToPdfPoint(0, pg.vp1.height), br = pg.vp1.convertToPdfPoint(pg.vp1.width, pg.vp1.height), tl = pg.vp1.convertToPdfPoint(0, 0);
+        var ang = Math.atan2(br[1] - bl[1], br[0] - bl[0]) * 180 / Math.PI;
+        pdfPages[pg.n - 1].drawImage(png, {x: bl[0], y: bl[1],
+          width: Math.hypot(br[0] - bl[0], br[1] - bl[1]), height: Math.hypot(tl[0] - bl[0], tl[1] - bl[1]),
+          rotate: PDFLib.degrees(ang)});
+      }));
+    });
+    return Promise.all(jobs).then(function () { return annotSummaryPages(doc, a, notes); }).then(function () { return doc.save(); });
+  }).then(function (out) {
+    if (out.length > 25 * 1024 * 1024) throw new Error('ไฟล์ตรวจแก้ใหญ่เกิน 25 MB');
+    return callApi('uploadAnnotatedFile', [SESSION, a.subId, a.docId, bytesToBase64(out), notes]);
+  }).then(function (patch) {
+    hideLoading();
+    var sub = SUBMISSIONS.find(function (s) { return s.subId === a.subId; });
+    var entry = sub.documents[a.docId];
+    Object.keys(patch).forEach(function (k) { entry[k] = patch[k]; });
+    // notes go into the review comment too; replace an earlier auto block
+    var own = String(entry.comment || '').split(ANNOT_BLOCK)[0].replace(/\s+$/, '');
+    entry.comment = notes ? (own ? own + '\n' : '') + ANNOT_BLOCK + '\n' + notes : own;
+    if (entry.reviewStatus !== 'needs-revision' && entry.reviewStatus !== 'fail') entry.reviewStatus = 'needs-revision';
+    persistDocumentReview_(sub, a.docId);
+    ANNOT_SAVED[a.key] = a.items.map(function (it) { return JSON.parse(JSON.stringify(it)); });
+    a.dirty = false;
+    annotSyncOutside(sub, a.docId);
+    closeAnnotator(true);
+    showToast('บันทึกไฟล์ตรวจแก้แล้ว — ผลตรวจเป็น "' + (entry.reviewStatus === 'fail' ? 'ไม่ผ่าน' : 'ต้องแก้ไข') + '" ผู้ทำสัญญาเปิดดูได้', 'success');
+  }).catch(function (err) {
+    hideLoading();
+    btn.disabled = false;
+    showToast('บันทึกไฟล์ตรวจแก้ไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
+  });
+}
+// Summary page(s) at the end: every pin note, in Thai, drawn by the browser.
+function annotSummaryPages(doc, a, notes) {
+  if (!notes) return Promise.resolve();
+  var sub = SUBMISSIONS.find(function (s) { return s.subId === a.subId; });
+  var W = 1240, H = 1754, M = 110;
+  var pages = [], c, ctx, y;
+  var newPage = function (first) {
+    c = document.createElement('canvas'); c.width = W; c.height = H; ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+    y = M;
+    if (first) {
+      ctx.fillStyle = '#B91C1C'; ctx.font = 'bold 46px Sarabun, sans-serif'; ctx.fillText('รายการจุดที่ต้องแก้ไข', M, y); y += 76;
+      ctx.fillStyle = '#1A2540'; ctx.font = '28px Sarabun, sans-serif';
+      [ 'เอกสาร: ' + findDocMeta(a.docId).name,
+        'ผู้ทำสัญญา: ' + sub.personal.title + ' ' + sub.personal.first + ' ' + sub.personal.last + '   เลขที่สัญญา ' + formatContractNumber(sub),
+        'ตรวจโดย: ' + ((currentUser && (currentUser.displayName || currentUser.email)) || '') + '   วันที่ ' + formatThaiDateTime(new Date().toISOString())
+      ].forEach(function (l) { ctx.fillText(l, M, y); y += 44; });
+      y += 16; ctx.fillStyle = '#DDE3EE'; ctx.fillRect(M, y, W - 2 * M, 3); y += 36;
+    }
+    pages.push(c);
+  };
+  newPage(true);
+  notes.split('\n').forEach(function (line) {
+    ctx.font = '30px Sarabun, sans-serif';
+    var lines = annotWrap(ctx, line, W - 2 * M - 30);
+    if (y + lines.length * 44 > H - M) newPage(false);
+    ctx.fillStyle = '#1A2540'; ctx.font = '30px Sarabun, sans-serif';
+    lines.forEach(function (l, i) { ctx.fillText(l, M + (i ? 30 : 0), y); y += 44; });
+    y += 14;
+  });
+  return pages.reduce(function (p, canvas) {
+    return p.then(function () { return doc.embedPng(canvas.toDataURL('image/png')); }).then(function (png) {
+      doc.addPage([595.28, 841.89]).drawImage(png, {x: 0, y: 0, width: 595.28, height: 841.89});
+    });
+  }, Promise.resolve());
+}
+// After saving: refresh what is open behind, without rebuilding PDFs
+function annotSyncOutside(sub, docId) {
+  var entry = sub.documents[docId];
+  renderAllDocTables(sub); renderStampArea(sub); renderList();
+  if (docModalCurrent && docModalCurrent.docId === docId) {
+    document.getElementById('modal-review-select').value = entry.reviewStatus;
+    document.getElementById('modal-comment-box').value = entry.comment || '';
+    renderModalAnnotBar(sub, docId);
+  }
+  var pane = document.querySelector('#compare-panes .compare-pane[data-doc-id="' + docId + '"]');
+  if (pane) {
+    pane.querySelector('.compare-pane-footer select').value = entry.reviewStatus;
+    pane.querySelector('.compare-pane-footer textarea').value = entry.comment || '';
+    refreshCompareSelects();
+  }
+}
+function closeAnnotator(force) {
+  if (!ANNOT) return;
+  if (!force && ANNOT.mode === 'edit' && ANNOT.dirty && ANNOT.items.length) {
+    showConfirm('ปิดโดยไม่บันทึก?', 'เครื่องหมายที่ยังไม่บันทึกจะหายไป', 'ปิดโดยไม่บันทึก', function () { closeAnnotator(true); }, true);
+    return;
+  }
+  document.getElementById('annot-modal').classList.remove('open');
+  document.getElementById('annot-pages').innerHTML = '';
+  ANNOT = null;
+}
+
+// ---------- doc viewer bar + manual upload (marked in Adobe etc.) ----------
+function renderModalAnnotBar(sub, docId) {
+  var bar = document.getElementById('modal-annot-bar');
+  if (!bar) return;
+  var entry = docEntry(sub, docId);
+  var html = '';
+  if (entry.annotatedFileId) {
+    html += '<span class="annot-flag">' + (annotIsCurrent(entry) ? '🖍 มีไฟล์ตรวจแก้' : '🖍 มีไฟล์ตรวจแก้ของฉบับก่อน') + '</span>' +
+      '<button class="link-btn" onclick="openAnnotatedViewer(\'' + sub.subId + '\',\'' + docId + '\')">ดูไฟล์ตรวจแก้</button>';
+  }
+  html += '<button class="link-btn" onclick="document.getElementById(\'annot-upload-input\').click()">อัปโหลดไฟล์ที่ทำเครื่องหมายเอง (เช่น จาก Adobe)</button>';
+  bar.innerHTML = entry.driveFileId ? html : '';
+}
+function onManualAnnotFile(input) {
+  var f = input.files && input.files[0];
+  input.value = '';
+  if (!f || !docModalCurrent) return;
+  var subId = docModalCurrent.subId, docId = docModalCurrent.docId;
+  if (f.size > 25 * 1024 * 1024) { showToast('ไฟล์ใหญ่เกิน 25 MB', 'error'); return; }
+  f.arrayBuffer().then(function (buf) {
+    var u8 = new Uint8Array(buf);
+    if (String.fromCharCode(u8[0], u8[1], u8[2], u8[3]) !== '%PDF') { showToast('กรุณาเลือกไฟล์ PDF', 'error'); return; }
+    showConfirm('อัปโหลดเป็นไฟล์ตรวจแก้?', f.name + ' จะเป็นไฟล์ที่ผู้ทำสัญญาเปิดดูจุดที่ต้องแก้ไข (แทนที่ไฟล์ตรวจแก้เดิม ถ้ามี) — อย่าลืมเขียนหมายเหตุอธิบายด้วย', 'อัปโหลด', function () {
+      showLoading('กำลังอัปโหลดไฟล์ตรวจแก้...');
+      callApi('uploadAnnotatedFile', [SESSION, subId, docId, bytesToBase64(u8), '']).then(function (patch) {
+        hideLoading();
+        var sub = SUBMISSIONS.find(function (s) { return s.subId === subId; });
+        var entry = sub.documents[docId];
+        Object.keys(patch).forEach(function (k) { entry[k] = patch[k]; });
+        if (entry.reviewStatus !== 'needs-revision' && entry.reviewStatus !== 'fail') { entry.reviewStatus = 'needs-revision'; persistDocumentReview_(sub, docId); }
+        annotSyncOutside(sub, docId);
+        showToast('อัปโหลดไฟล์ตรวจแก้แล้ว', 'success');
+      }).catch(function (err) { hideLoading(); showToast('อัปโหลดไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error'); });
+    });
+  });
+}
+
 boot();
 </script>
 
@@ -4704,5 +5227,36 @@ boot();
   <button class="secondary" id="sticky-back" onclick="stickyBack()">← ย้อนกลับ</button>
   <button class="primary" id="sticky-next" onclick="stickyNext()">ถัดไป</button>
 </div>
+<div class="annot-overlay" id="annot-modal">
+  <div class="annot-top">
+    <div class="annot-head">
+      <div class="annot-title-wrap"><strong id="annot-title"></strong><span id="annot-sub"></span></div>
+      <div class="annot-actions">
+        <span class="annot-count" id="annot-count"></span>
+        <a class="secondary annot-dl" id="annot-download" style="display:none">ดาวน์โหลดไฟล์</a>
+        <button class="secondary" onclick="closeAnnotator()">ปิด</button>
+        <button class="primary annot-edit-only" id="annot-save" onclick="saveAnnotations()">บันทึกไฟล์ตรวจแก้</button>
+      </div>
+    </div>
+    <div class="annot-tools annot-edit-only" id="annot-tools">
+      <button data-tool="pen" onclick="annotSetTool('pen')">✎ ปากกา</button>
+      <button data-tool="box" onclick="annotSetTool('box')">▭ กรอบ</button>
+      <button data-tool="pin" onclick="annotSetTool('pin')">① หมุดข้อความ</button>
+      <button data-tool="hand" onclick="annotSetTool('hand')">✋ เลื่อนหน้า</button>
+      <span class="annot-sep"></span>
+      <button onclick="annotUndo()">↶ ย้อนกลับ</button>
+      <button onclick="annotClearAll()">ล้างทั้งหมด</button>
+    </div>
+    <div class="annot-banner" id="annot-banner" style="display:none"></div>
+  </div>
+  <div class="annot-main">
+    <div class="annot-pages" id="annot-pages"></div>
+    <aside class="annot-side">
+      <div class="annot-side-title">จุดที่ต้องแก้ไข</div>
+      <ol class="annot-notes" id="annot-notes"></ol>
+    </aside>
+  </div>
+</div>
+<input type="file" id="annot-upload-input" accept="application/pdf" style="display:none" onchange="onManualAnnotFile(this)">
 </body>
 </html>
