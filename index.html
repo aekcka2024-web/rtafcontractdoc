@@ -891,6 +891,11 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
     .doc-item .doc-status{justify-content:flex-start;}
     .doc-item .upload-btn{width:auto;min-width:130px;min-height:40px;}
   }
+  .doc-fileline{display:flex;align-items:center;gap:8px;min-width:0;}
+  .doc-view-btn{flex:none;background:#EEF3FB;border:1px solid #C9D6EA;color:var(--navy);border-radius:999px;padding:2px 10px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;}
+  .doc-view-btn:hover{background:#E1EAF7;border-color:var(--navy);}
+  .doc-fileline .doc-filename{min-width:0;}
+  .annot-noside .annot-side{display:none;}
 </style>
 </head>
 <body>
@@ -2181,11 +2186,20 @@ function renderDocList(containerId, docs) {
       return;
     }
 
-    if (entry.status === 'uploaded' && entry.originalFileName) {
+    if (entry.status === 'uploaded' && entry.driveFileId) {
       var fileLine = document.createElement('div');
-      fileLine.className = 'doc-filename';
-      fileLine.title = entry.originalFileName;
-      fileLine.textContent = '📄 ' + entry.originalFileName;
+      fileLine.className = 'doc-fileline';
+      var viewBtn = document.createElement('button');
+      viewBtn.type = 'button';
+      viewBtn.className = 'doc-view-btn';
+      viewBtn.textContent = '👁 ดูไฟล์';
+      viewBtn.title = 'เปิดดูไฟล์ที่อัปโหลดไว้';
+      viewBtn.onclick = function () { openOwnFileViewer(state.subId, doc.id); };
+      var fname = document.createElement('span');
+      fname.className = 'doc-filename';
+      fname.title = entry.originalFileName || '';
+      fname.textContent = entry.originalFileName || 'ไฟล์ที่อัปโหลดแล้ว';
+      fileLine.appendChild(viewBtn); fileLine.appendChild(fname);
       main.appendChild(fileLine);
     }
     var spouseConsent = isSpouseConsentId(doc.id);
@@ -4886,6 +4900,7 @@ function openAnnotatedViewer(subId, docId) {
 }
 function annotShell(title, sub) {
   var m = document.getElementById('annot-modal');
+  m.classList.remove('annot-noside');
   m.classList.toggle('annot-view', ANNOT.mode === 'view');
   document.getElementById('annot-title').textContent = title;
   document.getElementById('annot-sub').textContent = sub || '';
@@ -4894,6 +4909,30 @@ function annotShell(title, sub) {
   document.getElementById('annot-download').style.display = 'none';
   document.getElementById('annot-save').disabled = false;
   m.classList.add('open');
+}
+
+var OWN_FILE_CACHE = {};
+function openOwnFileViewer(subId, docId) {
+  var entry = annotEntryFor(subId, docId);
+  ANNOT = {mode: 'view', subId: subId, docId: docId, pages: [], items: [], tool: 'hand'};
+  annotShell(findDocMeta(docId).name, 'ไฟล์ที่ท่านอัปโหลด' + (entry.originalFileName ? ' — ' + entry.originalFileName : ''));
+  document.getElementById('annot-modal').classList.add('annot-noside');
+  var key = subId + '|' + docId + '|' + (entry.uploadedAt || '');
+  var load = OWN_FILE_CACHE[key] ? Promise.resolve(OWN_FILE_CACHE[key])
+    : callApi('getDocumentFile', [SESSION, subId, docId]).then(function (file) {
+        OWN_FILE_CACHE[key] = {bytes: base64ToBytes(file.base64), name: file.name};
+        return OWN_FILE_CACHE[key];
+      });
+  load.then(function (f) {
+    if (!ANNOT || ANNOT.docId !== docId) return;
+    var dl = document.getElementById('annot-download');
+    dl.href = URL.createObjectURL(new Blob([f.bytes], {type: 'application/pdf'}));
+    dl.setAttribute('download', entry.originalFileName || f.name || 'เอกสาร.pdf');
+    dl.style.display = '';
+    return annotRenderPages(f.bytes);
+  }).catch(function (err) {
+    document.getElementById('annot-pages').innerHTML = '<div class="annot-msg">เปิดไฟล์ไม่สำเร็จ: ' + escapeHtml(err.message || String(err)) + '</div>';
+  });
 }
 
 // ---------- pages ----------
