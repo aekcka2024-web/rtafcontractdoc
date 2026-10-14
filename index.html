@@ -922,6 +922,10 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .fi-grid span{color:var(--steel);margin-right:6px;}
   .fi-extras{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;font-size:12.5px;}
   .fi-extras > span{color:var(--steel);}
+  .fi-all{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--navy);margin:4px 0 2px;cursor:pointer;}
+  .fi-pick{margin:0;width:16px;height:16px;cursor:pointer;}
+  .fi-pick-gap{display:inline-block;width:16px;}
+  .fi-pickable{cursor:default;}
 </style>
 </head>
 <body>
@@ -1916,6 +1920,8 @@ function toDate(v) {
 }
 function formatContractNumber(sub) {
   if (!sub.contractNumber) return 'ยังไม่มีเลขที่สัญญา';
+  // ชุด ศบ. (ศิษย์การบินที่นำเข้าจากระบบจัดทำสัญญา): ทอ. ศบ.001/2568
+  if (sub.contractSeries === 'SB') return 'ทอ. ศบ.' + String(sub.contractNumber).padStart(3, '0') + '/' + sub.contractYear;
   return "\u0E17\u0E2D. ".concat(String(sub.contractNumber).padStart(6, '0'), "/").concat(sub.contractYear);
 }
 var DOCS_CONTRACTOR = [{
@@ -2176,6 +2182,7 @@ function hydrateSubmission(result) {
     consentedAt: s.consentedAt,
     submittedAt: s.submittedAt,
     importSource: s.importSource || '',
+    contractSeries: s.contractSeries || '',
     formData: parseJsonSafe(s.formData, null),
     formExtraFiles: parseJsonSafe(s.formExtraFiles, [])
   };
@@ -3104,6 +3111,7 @@ function adaptFlatSubmission(row) {
     createdAt: row.createdAt,
     consentedAt: row.consentedAt,
     importSource: row.importSource || '',
+    contractSeries: row.contractSeries || '',
     formData: parseJsonSafe(row.formData, null),
     formExtraFiles: parseJsonSafe(row.formExtraFiles, [])
   };
@@ -3215,7 +3223,7 @@ function subMatchesSearch(sub,q){
   if(!q) return true;
   var ql=q.toLowerCase();
   var name=(sub.personal.title+' '+sub.personal.first+' '+sub.personal.last).toLowerCase();
-  return name.includes(ql)||(sub.personal.officialId||'').includes(ql)||(sub.subId||'').toLowerCase().includes(ql);
+  return name.includes(ql)||(sub.personal.officialId||'').includes(ql)||(sub.subId||'').toLowerCase().includes(ql)||formatContractNumber(sub).toLowerCase().includes(ql);
 }
 function subMatchesFilter(sub,f){
   if(listEduFilter && sub.personal.eduType !== listEduFilter) return false;
@@ -5487,28 +5495,55 @@ function renderFormImportPreview() {
   var chip = function (k, n) { return n ? '<span class="fi-chip ' + FI_LABEL[k].c + '">' + FI_LABEL[k].t + ' ' + n + '</span>' : ''; };
   var html = '<div class="fi-summary">' + chip('new', c['new']) + chip('pdf', c.pdf) + chip('changed', c.changed) + chip('partial', c.partial) +
     chip('exists', c.exists) + chip('invalid', c.invalid) + '<span class="fi-chip fi-muted">นำเข้าแล้ว ' + c.done + '</span></div>';
+  if (actionable) {
+    html += '<label class="fi-all"><input type="checkbox" id="fi-all" onchange="fiToggleAll(this.checked)"> เลือกทั้งหมดที่นำเข้าได้ (' + actionable + ')</label>';
+  }
   if (res.items.length) {
     html += '<div class="fi-list">' + res.items.map(function (it) {
       var lab = FI_LABEL[it.status] || {t: it.status, c: 'fi-muted'};
       var extra = it.status === 'new' && !it.hasContract ? 'ยังไม่มี PDF สัญญา (แนบให้เองเมื่อแอดมินสร้าง)' : it.note;
-      return '<div class="fi-row"><span class="fi-chip ' + lab.c + '">' + lab.t + '</span><span class="fi-name">' + escapeHtml(it.name) +
+      var can = it.status === 'new' || it.status === 'pdf';
+      var picked = FI_SELECTED.indexOf(it.email) > -1;
+      return '<div class="fi-row' + (can ? ' fi-pickable' : '') + '">' +
+        (can ? '<input type="checkbox" class="fi-pick" value="' + escapeHtml(it.email) + '"' + (picked ? ' checked' : '') + ' onchange="fiPickChanged()">' : '<span class="fi-pick-gap"></span>') +
+        '<span class="fi-chip ' + lab.c + '">' + lab.t + '</span><span class="fi-name">' + escapeHtml(it.name) +
         '</span><span class="fi-email">' + escapeHtml(it.email) + '</span>' + (extra ? '<div class="fi-note">' + escapeHtml(extra) + '</div>' : '') + '</div>';
     }).join('') + '</div>';
   }
   html += actionable
-    ? '<div class="hris-actions"><button class="primary" id="fi-run-btn" onclick="formImportRun()">นำเข้า ' + actionable + ' รายการ</button></div>'
+    ? '<div class="hris-actions"><button class="primary" id="fi-run-btn" onclick="formImportRun()" disabled>เลือกรายการที่จะนำเข้า</button></div>'
     : '<div class="fi-progress">ไม่มีรายการที่ต้องนำเข้า</div>';
   box.innerHTML = html;
+  fiPickChanged();
+}
+// ช่วงทดสอบ: นำเข้าเฉพาะที่เลือกได้ — เริ่มต้นไม่เลือกอะไร ต้องตั้งใจเลือกเอง
+var FI_SELECTED = [];
+function fiPickChanged() {
+  var boxes = [].slice.call(document.querySelectorAll('#fi-result .fi-pick'));
+  FI_SELECTED = boxes.filter(function (b) { return b.checked; }).map(function (b) { return b.value; });
+  var all = document.getElementById('fi-all');
+  if (all) { all.checked = boxes.length > 0 && FI_SELECTED.length === boxes.length; all.indeterminate = FI_SELECTED.length > 0 && FI_SELECTED.length < boxes.length; }
+  var btn = document.getElementById('fi-run-btn');
+  if (btn) {
+    btn.disabled = !FI_SELECTED.length;
+    btn.textContent = FI_SELECTED.length ? 'นำเข้าที่เลือก ' + FI_SELECTED.length + ' รายการ' : 'เลือกรายการที่จะนำเข้า';
+  }
+}
+function fiToggleAll(on) {
+  document.querySelectorAll('#fi-result .fi-pick').forEach(function (b) { b.checked = on; });
+  fiPickChanged();
 }
 function formImportRun() {
-  var total = FI_PREVIEW ? FI_PREVIEW.counts['new'] + FI_PREVIEW.counts.pdf : 0;
+  var selected = FI_SELECTED.slice();
+  var total = selected.length;
+  if (!total) return;
   showConfirm('นำเข้าจาก Google Form?', 'สร้างสัญญาศิษย์การบินและคัดลอกเอกสาร ' + total + ' รายการ ไฟล์ในระบบเดิมไม่ถูกแก้ไข อาจใช้เวลาหลายนาที — อย่าปิดหน้านี้ระหว่างนำเข้า',
     'เริ่มนำเข้า', function () {
       var done = [], errors = [];
       var box = document.getElementById('fi-result');
       var step = function () {
         box.innerHTML = '<div class="fi-progress"><span class="inline-spinner dark"></span> กำลังนำเข้า... เสร็จแล้ว ' + done.length + ' / ' + total + ' รายการ</div>';
-        callApi('runFormImport', [SESSION]).then(function (r) {
+        callApi('runFormImport', [SESSION, selected]).then(function (r) {
           done = done.concat(r.processed || []);
           errors = errors.concat(r.errors || []);
           if (r.remaining > 0 && (r.processed || []).length) { step(); return; }
@@ -5524,7 +5559,7 @@ function formImportRun() {
         showToast('นำเข้าสัญญาใหม่ ' + created + ' รายการ' + (attached ? ' · แนบ PDF สัญญา ' + attached + ' รายการ' : '') + (errors.length ? ' · ไม่สำเร็จ ' + errors.length : ''), errors.length ? 'warn' : 'success', 7000);
         refreshList();
         callApi('previewFormImport', [SESSION]).then(function (res) {
-          FI_PREVIEW = res; renderFormImportPreview();
+          FI_SELECTED = []; FI_PREVIEW = res; renderFormImportPreview();
           if (errors.length) box.insertAdjacentHTML('afterbegin', '<div class="fi-errors"><strong>นำเข้าไม่สำเร็จ:</strong>' +
             errors.map(function (e) { return '<div>' + escapeHtml((e.name ? e.name + ' — ' : '') + e.error) + '</div>'; }).join('') + '</div>');
         }).catch(function () {});
