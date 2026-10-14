@@ -926,6 +926,24 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .fi-pick{margin:0;width:16px;height:16px;cursor:pointer;}
   .fi-pick-gap{display:inline-block;width:16px;}
   .fi-pickable{cursor:default;}
+  /* ── Full-screen compare / review window ─────────── */
+  .modal-overlay.cmp-full{z-index:6000;background:#2A3346;}
+  .cmp-full .compare-modal-box{position:fixed;inset:0;width:100vw;height:100vh;max-width:none;margin:0;border-radius:0;padding:0;background:#2A3346;display:flex;flex-direction:column;}
+  .cmp-topbar{flex:none;display:flex;align-items:center;gap:14px;padding:8px 14px;background:#fff;border-bottom:1px solid var(--line);box-shadow:var(--sh-sm);}
+  .cmp-title{display:flex;flex-direction:column;min-width:0;flex:1;}
+  .cmp-title strong{font-size:14.5px;color:var(--navy);}
+  .cmp-title span{font-size:12px;color:var(--steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cmp-add-top select{width:auto;min-width:260px;max-width:420px;font-size:13px;font-weight:600;color:var(--navy);border:1.5px dashed #9DB3CF;background-color:#F5F8FD;}
+  .cmp-close{flex:none;}
+  .cmp-full .compare-panes{flex:1;min-height:0;gap:8px;padding:8px;overflow-x:auto;}
+  .cmp-full .compare-pane{background:#fff;border:none;border-radius:var(--r-sm);min-width:320px;overflow:hidden;}
+  .cmp-full .compare-pane-header{padding:6px 8px;}
+  .cmp-full .compare-pane-footer{flex-direction:row;align-items:flex-start;gap:8px;padding:6px 8px;}
+  .cmp-full .compare-pane-footer select{flex:none;width:130px;}
+  .cmp-full .compare-pane-footer textarea{flex:1;min-height:32px;height:32px;resize:vertical;}
+  .cmp-full .compare-pane-footer textarea:focus{height:64px;}
+  .compare-empty{flex:1;display:flex;align-items:center;justify-content:center;color:#C7CEDB;font-size:14px;text-align:center;padding:40px;}
+  @media (max-width:760px){ .cmp-topbar{flex-wrap:wrap;} .cmp-add-top{order:3;flex-basis:100%;} .cmp-add-top select{width:100%;max-width:none;} }
 </style>
 </head>
 <body>
@@ -1588,11 +1606,12 @@ setTimeout(function () {
 </div>
 
 <!-- Side-by-side comparison modal -->
-<div class="modal-overlay" id="compare-modal" style="padding:0">
-  <div class="modal-box compare-modal-box">
-    <div class="doc-modal-header">
-      <h3>เปรียบเทียบเอกสาร</h3>
-      <button class="secondary" onclick="closeCompareModal()">ปิด</button>
+<div class="modal-overlay cmp-full" id="compare-modal" style="padding:0">
+  <div class="compare-modal-box">
+    <div class="cmp-topbar">
+      <div class="cmp-title"><strong>ตรวจเอกสาร</strong><span id="cmp-subtitle"></span></div>
+      <div class="cmp-add-top" id="compare-add-top"></div>
+      <button class="secondary cmp-close" onclick="closeCompareModal()">ปิด</button>
     </div>
     <div class="compare-panes" id="compare-panes"></div>
   </div>
@@ -3278,7 +3297,7 @@ function renderList() {
     var progressCell = done===null
       ? '<span class="sub-cell">ยังไม่ได้ส่ง</span>'
       : '<div class="progress-bar-wrap"><span style="font-size:12px;color:var(--steel)">'+(done||0)+' / '+total+'</span><div class="progress-bar"><div class="progress-bar-fill '+barCls+'" style="width:'+pct+'%"></div></div></div>';
-    var eduLabel = {'domestic-rtaf':'ในประเทศ ทุน ทอ.','domestic-private':'ในประเทศ ทุนส่วนตัว','abroad':'ต่างประเทศ'}[sub.personal.eduType]||'–';
+    var eduLabel = EDU_TYPE_LABEL[sub.personal.eduType] || '–';
     var tr = document.createElement('tr');
     tr.className = 'data-row' + (hasFlagged && !sub.stamped ? ' row-flagged' : '');
     tr.onclick = function(){ showDetail(sub.subId); };
@@ -3648,7 +3667,7 @@ function buildComparePane(sub, docId) {
         '<option value="needs-revision"' + (entry.reviewStatus === 'needs-revision' ? ' selected' : '') + '>ต้องแก้ไข</option>' +
         '<option value="fail"' + (entry.reviewStatus === 'fail' ? ' selected' : '') + '>ไม่ผ่าน</option>' +
       '</select>' +
-      '<textarea placeholder="comment (ถ้ามี) — จำเป็นเมื่อเลือก \'ต้องแก้ไข\'" onchange="setComment(\'' + docId + '\',\'' + sub.subId + '\',this.value)">' + escapeHtml(entry.comment || '') + '</textarea>' +
+      '<textarea rows="1" placeholder="หมายเหตุ (ถ้ามี) — จำเป็นเมื่อเลือก \'ต้องแก้ไข\'" onchange="setComment(\'' + docId + '\',\'' + sub.subId + '\',this.value)">' + escapeHtml(entry.comment || '') + '</textarea>' +
     '</div>';
   loadPdfInto(pane.querySelector('.compare-pane-body'), sub, docId);
   return pane;
@@ -3661,19 +3680,26 @@ function refreshCompareSelects() {
   });
   renderCompareAddSlot();
 }
-// Empty slot for adding another document while fewer than 3 are open.
+// "+ เพิ่มเอกสาร" sits in the top bar so open documents get the full width;
+// with nothing open, the panes area shows a short prompt instead.
 function renderCompareAddSlot() {
+  var top = document.getElementById('compare-add-top');
   var box = document.getElementById('compare-panes');
-  var old = box.querySelector('.compare-add');
-  if (old) old.parentNode.removeChild(old);
-  if (compareSelection.length >= 3) return;
-  var slot = document.createElement('div');
-  slot.className = 'compare-pane compare-add' + (compareSelection.length ? '' : ' compare-add-only');
-  slot.innerHTML = '<div class="compare-add-inner"><div class="compare-add-title">+ เลือกเอกสารเข้ามาเทียบ</div>' +
-    '<select class="cmp-add-select" onchange="addToCompare(this.value)"><option value="">— เลือกเอกสาร —</option>' +
-    compareOptionsHtml(compareSub(), null) + '</select>' +
-    '<div class="compare-add-hint">เปิดได้พร้อมกันสูงสุด 3 ฉบับ</div></div>';
-  box.appendChild(slot);
+  var sub = compareSub();
+  if (compareSelection.length >= 3 || !sub) {
+    top.innerHTML = '';
+  } else {
+    top.innerHTML = '<select class="cmp-add-select compare-add" onchange="addToCompare(this.value)"><option value="">+ เพิ่มเอกสารเข้ามาเทียบ (' +
+      compareSelection.length + '/3)</option>' + compareOptionsHtml(sub, null) + '</select>';
+  }
+  var empty = box.querySelector('.compare-empty');
+  if (empty) empty.parentNode.removeChild(empty);
+  if (!compareSelection.length) {
+    var e = document.createElement('div');
+    e.className = 'compare-empty';
+    e.textContent = 'เลือกเอกสารจากเมนู "+ เพิ่มเอกสารเข้ามาเทียบ" ด้านบน (เปิดพร้อมกันได้สูงสุด 3 ฉบับ)';
+    box.appendChild(e);
+  }
 }
 function syncCompareOutside() {
   updateCompareBar();
@@ -3682,6 +3708,7 @@ function syncCompareOutside() {
 }
 function openCompareModal() {
   var sub = compareSub();
+  document.getElementById('cmp-subtitle').textContent = sub ? formatContractNumber(sub) + ' · ' + sub.personal.title + ' ' + sub.personal.first + ' ' + sub.personal.last : '';
   var box = document.getElementById('compare-panes');
   box.innerHTML = '';
   compareSelection.forEach(function (docId) { box.appendChild(buildComparePane(sub, docId)); });
@@ -3692,7 +3719,7 @@ function addToCompare(docId) {
   if (!docId || compareSelection.indexOf(docId) > -1 || compareSelection.length >= 3) return;
   compareSelection.push(docId);
   var box = document.getElementById('compare-panes');
-  box.insertBefore(buildComparePane(compareSub(), docId), box.querySelector('.compare-add'));
+  box.appendChild(buildComparePane(compareSub(), docId));
   refreshCompareSelects();
   syncCompareOutside();
 }
@@ -3723,6 +3750,13 @@ function removeFromCompare(docId) {
   refreshCompareSelects();
   syncCompareOutside();
 }
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  var m = document.getElementById('compare-modal');
+  var dlg = document.getElementById('app-dialog');
+  var ann = document.getElementById('annot-modal');
+  if (m && m.classList.contains('active') && !(dlg && dlg.classList.contains('open')) && !(ann && ann.classList.contains('open'))) closeCompareModal();
+});
 function closeCompareModal() {
   document.getElementById('compare-modal').classList.remove('active');
   syncCompareOutside();
@@ -3746,7 +3780,7 @@ function adminFileName(sub, entry) {
 var pdfUrlCache = {};
 var pdfBytesCache = {};
 function pdfFrameHtml(url) {
-  return '<iframe src="' + url + '" style="width:100%;height:100%;border:none;"></iframe>';
+  return '<iframe src="' + url + '#view=FitH" style="width:100%;height:100%;border:none;"></iframe>';
 }
 function pdfKey(sub, docId) {
   var entry = docEntry(sub, docId);
