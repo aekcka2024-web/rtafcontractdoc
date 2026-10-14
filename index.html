@@ -899,6 +899,29 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .pilot-nospouse{background:#F7F8FA;border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 12px;margin:6px 0 4px;}
   .pilot-nospouse label{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--navy);cursor:pointer;}
   .pilot-nospouse-hint{font-size:12px;color:var(--steel);margin-top:4px;padding-left:24px;}
+  .fi-desc{font-size:12.5px;color:var(--steel);margin:4px 0 8px;}
+  .fi-summary{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 6px;}
+  .fi-chip{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid transparent;white-space:nowrap;}
+  .fi-new{background:#EEF3FB;color:var(--navy);border-color:#C9D6EA;}
+  .fi-pdf{background:#ECFDF3;color:#166534;border-color:#A7E3BD;}
+  .fi-warn{background:#FFF6E5;color:#8A5A00;border-color:#E8C57A;}
+  .fi-muted{background:#F4F6FA;color:var(--steel);border-color:var(--line);}
+  .fi-list{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:var(--r-sm);margin:6px 0 10px;}
+  .fi-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:7px 10px;border-bottom:1px solid #F0F3F8;font-size:13px;}
+  .fi-row:last-child{border-bottom:none;}
+  .fi-name{font-weight:600;color:var(--text);}
+  .fi-email{color:var(--steel);font-size:12px;}
+  .fi-note{flex-basis:100%;font-size:12px;color:var(--steel);padding-left:2px;}
+  .fi-progress{font-size:13px;color:var(--steel);margin:8px 0;display:flex;align-items:center;gap:8px;}
+  .inline-spinner.dark{border-color:rgba(22,35,63,.2);border-top-color:var(--navy);}
+  .fi-errors{background:#FEF2F2;border:1px solid #FECACA;color:#7F1D1D;border-radius:var(--r-sm);padding:8px 10px;font-size:12.5px;margin:8px 0;}
+  .fi-tag{display:inline-block;font-size:11px;color:#1E40AF;background:#EEF3FB;border-radius:999px;padding:0 7px;}
+  .fi-data{margin-top:10px;border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 12px;background:#FAFBFD;}
+  .fi-data-title{font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+  .fi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 16px;font-size:12.5px;}
+  .fi-grid span{color:var(--steel);margin-right:6px;}
+  .fi-extras{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;font-size:12.5px;}
+  .fi-extras > span{color:var(--steel);}
 </style>
 </head>
 <body>
@@ -1032,6 +1055,10 @@ setTimeout(function () {
             <option>นาย</option><option>นาง</option><option>นางสาว</option>
             <optgroup label="ชั้นประทวน (ชาย)">
               <option>จ.อ.ต.</option><option>จ.อ.ท.</option><option>จ.อ.อ.</option>
+              <option>พ.อ.ต.</option><option>พ.อ.ท.</option><option>พ.อ.อ.</option>
+            </optgroup>
+            <optgroup label="ว่าที่ (ศิษย์การบิน)">
+              <option>ว่าที่ ร.ต.</option><option>ว่าที่ ร.ต.หญิง</option>
             </optgroup>
             <optgroup label="ชั้นสัญญาบัตร (ชาย)">
               <option>ร.ต.</option><option>ร.ท.</option><option>ร.อ.</option>
@@ -1040,6 +1067,7 @@ setTimeout(function () {
             </optgroup>
             <optgroup label="ชั้นประทวน (หญิง)">
               <option>จ.อ.ต.หญิง</option><option>จ.อ.ท.หญิง</option><option>จ.อ.อ.หญิง</option>
+              <option>พ.อ.ต.หญิง</option><option>พ.อ.ท.หญิง</option><option>พ.อ.อ.หญิง</option>
             </optgroup>
             <optgroup label="ชั้นสัญญาบัตร (หญิง)">
               <option>ร.ต.หญิง</option><option>ร.ท.หญิง</option><option>ร.อ.หญิง</option>
@@ -1304,6 +1332,12 @@ setTimeout(function () {
       <div class="hris-title">คำขอย้ายบัญชี Google (รอดำเนินการ <span id="transfer-count">0</span> รายการ)</div>
       <div id="transfer-list"></div>
     </div>
+    <div class="card fi-card">
+      <div class="hris-title">นำเข้าสัญญาศิษย์การบินจาก Google Form</div>
+      <div class="fi-desc">อ่านคำตอบจากระบบจัดทำสัญญาเดิม (อ่านอย่างเดียว) แล้วสร้างสัญญาพร้อมคัดลอกเอกสารให้อัตโนมัติ — กดซ้ำได้ ไม่สร้างซ้ำ</div>
+      <div class="hris-actions"><button class="secondary" onclick="formImportPreview()">ตรวจหาคำตอบใหม่</button></div>
+      <div id="fi-result"></div>
+    </div>
     <div class="card hris-card">
       <div class="hris-title">ข้อมูลสำหรับตรวจสอบรายชื่อ (HRIS)</div>
       <div id="hris-bar"></div>
@@ -1395,6 +1429,7 @@ setTimeout(function () {
             <button class="link-btn" onclick="officerChangeEmail()">เปลี่ยนบัญชี Google ของผู้ทำสัญญา</button>
             <button class="link-btn" onclick="officerChangeOfficialId()">แก้ไขเลขประจำตัว</button>
           </div>
+          <div id="d-form-data"></div>
         </div>
         <button class="primary" id="btn-match" onclick="runMatch()">ตรวจสอบรายชื่อกับระบบ</button>
       </div>
@@ -1990,11 +2025,14 @@ function activeGuarantors(eduType) {
 // "ผู้ค้ำไม่มีคู่สมรส" ตามกติกาเดิม (ติ๊กจากหัวกลุ่มแทน); เพิ่ม c8 หลักฐานวิทยฐานะต่างประเทศ (ถ้ามี)
 // ต้องตรงกับ requiredDocIds_ ฝั่งเซิร์ฟเวอร์
 var DOC_FOREIGN_DEGREE = {id: 'c8', name: 'หลักฐานแสดงวิทยฐานะ (ใบรับรองคุณวุฒิ) พร้อมคำแปลภาษาไทย สำหรับผู้สำเร็จการศึกษาจากต่างประเทศ', optional: true};
-var PILOT_HIDDEN_CONTRACTOR = ['c3', 'c7'];
+var PILOT_HIDDEN_CONTRACTOR = ['c2', 'c3', 'c7'];
+// ศิษย์การบิน: สัญญาเข้าเป็นศิษย์การบินและสัญญาค้ำประกันเป็นไฟล์ PDF เดียว จึงรวมเป็นช่องเดียว
+var PILOT_C1 = {id: 'c1', name: 'สัญญาเข้าเป็นศิษย์การบิน และสัญญาค้ำประกัน (ผนวก ฎ, ฏ)', optional: false};
 function isPilotEdu(eduType) { return eduType === 'pilot'; }
 function contractorDocsFor(eduType) {
   if (!isPilotEdu(eduType)) return DOCS_CONTRACTOR;
-  return DOCS_CONTRACTOR.filter(function (d) { return PILOT_HIDDEN_CONTRACTOR.indexOf(d.id) === -1; }).concat([DOC_FOREIGN_DEGREE]);
+  return DOCS_CONTRACTOR.filter(function (d) { return PILOT_HIDDEN_CONTRACTOR.indexOf(d.id) === -1; })
+    .map(function (d) { return d.id === 'c1' ? PILOT_C1 : d; }).concat([DOC_FOREIGN_DEGREE]);
 }
 function contractorSpouseDocsFor(eduType) { return isPilotEdu(eduType) ? [] : DOCS_CONTRACTOR_SPOUSE; }
 function guarantorSpouseDocsFor(g, eduType) {
@@ -2136,11 +2174,22 @@ function hydrateSubmission(result) {
     driveFolderUrl: s.driveFolderUrl || '',
     createdAt: s.createdAt,
     consentedAt: s.consentedAt,
-    submittedAt: s.submittedAt
+    submittedAt: s.submittedAt,
+    importSource: s.importSource || '',
+    formData: parseJsonSafe(s.formData, null),
+    formExtraFiles: parseJsonSafe(s.formExtraFiles, [])
   };
 }
 function fillFormFromState() {
-  document.getElementById('in-title').value = state.personal.title || '';
+  var titleSel = document.getElementById('in-title');
+  titleSel.value = state.personal.title || '';
+  // a title not in the list (e.g. imported from the Google Form) is kept, not silently dropped
+  if (state.personal.title && titleSel.value !== state.personal.title) {
+    var extraOpt = document.createElement('option');
+    extraOpt.textContent = state.personal.title;
+    titleSel.appendChild(extraOpt);
+    titleSel.value = state.personal.title;
+  }
   document.getElementById('in-first').value = state.personal.first || '';
   document.getElementById('in-last').value = state.personal.last || '';
   document.getElementById('in-id').value = state.personal.officialId || '';
@@ -2427,6 +2476,7 @@ var listSort = {key:'contractNumber', dir:-1};
 // Same rule as the server (officerStartedReview_): no name check, no guarantor
 // confirmed, no document reviewed yet.
 function applicantCanEditId() {
+  if (state.subId && !state.stamped && !savedOfficialId) return true; // no ID yet (e.g. imported): may always add it
   if (!state.subId || state.stamped || state.matchResult) return false;
   if (Object.keys(state.guarantorInfo || {}).length) return false;
   return !Object.keys(state.documents || {}).some(function (k) {
@@ -2534,7 +2584,7 @@ function validatePersonal() {
   if (!first) ok = false;
   toggleFieldError('f-last', !last);
   if (!last) ok = false;
-  var idValid = /^[0-9]{10}$/.test(idNum);
+  var idValid = /^[0-9]{10}$/.test(idNum) || (idNum === '' && eduType === 'pilot');
   toggleFieldError('f-id', !idValid);
   if (!idValid) ok = false;
   toggleFieldError('f-edutype', !eduType);
@@ -2660,6 +2710,18 @@ function confirmCreateSubmission() {
 }
 function finalizeSubmission() {
   pdpaMode = 'resubmit';
+  if (!state.consentedAt) {
+    // imported from the Google Form: consent has not been given in this system yet
+    document.getElementById('pdpa-title').textContent = 'ความยินยอมและยืนยันการส่งเอกสาร';
+    document.getElementById('pdpa-body').textContent = 'ข้าพเจ้ารับทราบและยินยอมให้กองทัพอากาศเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคลของข้าพเจ้า รวมถึงเอกสารที่แนบ เพื่อวัตถุประสงค์ในการพิจารณาการเข้ารับการศึกษา และการตรวจสอบความถูกต้องของข้อมูลกับหน่วยงานหรือฐานข้อมูลที่เกี่ยวข้อง ตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562';
+    document.getElementById('pdpa-check-row').style.display = 'flex';
+    document.getElementById('pdpa-checkbox').checked = false;
+    var cb0 = document.getElementById('pdpa-confirm-btn');
+    cb0.disabled = true;
+    cb0.textContent = 'ยินยอมและส่งเอกสาร';
+    document.getElementById('pdpa-modal').classList.add('active');
+    return;
+  }
   document.getElementById('pdpa-title').textContent = 'ยืนยันการส่งเอกสาร';
   document.getElementById('pdpa-body').textContent = 'ท่านได้ให้ความยินยอมตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 ไว้แล้วเมื่อ ' + formatThaiDateTime(state.consentedAt) + ' ระบบจะส่งเอกสารให้เจ้าหน้าที่ตรวจสอบ และบันทึกวันเวลาส่งล่าสุดให้อัตโนมัติ';
   document.getElementById('pdpa-check-row').style.display = 'none';
@@ -2675,6 +2737,7 @@ function doFinalizeSubmission() {
   btn.innerHTML = '<span class="inline-spinner"></span>กำลังส่ง...';
   gsRun().withSuccessHandler(function (result) {
     state.submittedAt = result.submittedAt;
+    if (result.consentedAt) state.consentedAt = result.consentedAt;
     document.querySelectorAll('#app-user .panel').forEach(function (p) {
       return p.classList.remove('active');
     });
@@ -2685,7 +2748,7 @@ function doFinalizeSubmission() {
     btn.disabled = false;
     btn.textContent = 'ส่งเอกสาร';
     showToast('ส่งไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
-  }).touchSubmission(SESSION, state.subId);
+  }).touchSubmission(SESSION, state.subId, true);
 }
 var myExistingContracts = [];
 function checkForExistingContracts() {
@@ -3039,7 +3102,10 @@ function adaptFlatSubmission(row) {
     driveFolderUrl: row.driveFolderUrl || '',
     submittedAt: row.submittedAt,
     createdAt: row.createdAt,
-    consentedAt: row.consentedAt
+    consentedAt: row.consentedAt,
+    importSource: row.importSource || '',
+    formData: parseJsonSafe(row.formData, null),
+    formExtraFiles: parseJsonSafe(row.formExtraFiles, [])
   };
 }
 function refreshList() {
@@ -3210,7 +3276,7 @@ function renderList() {
     tr.onclick = function(){ showDetail(sub.subId); };
     tr.innerHTML =
       '<td><div class="contract-id">'+escapeHtml(formatContractNumber(sub))+'</div><div class="sub-cell">'+escapeHtml(sub.personal.email||'')+'</div></td>'+
-      '<td><strong>'+escapeHtml(sub.personal.title+' '+sub.personal.first+' '+sub.personal.last)+'</strong><div class="sub-cell">ฉบับที่ '+(sub.personalSeq||1)+'</div></td>'+
+      '<td><strong>'+escapeHtml(sub.personal.title+' '+sub.personal.first+' '+sub.personal.last)+'</strong><div class="sub-cell">ฉบับที่ '+(sub.personalSeq||1)+(sub.importSource==='google-form'?' · <span class="fi-tag">จาก Google Form</span>':'')+'</div></td>'+
       '<td>'+escapeHtml(eduLabel)+'</td>'+
       '<td>'+escapeHtml(sub.submittedAt ? formatShortDate(sub.submittedAt) : '–')+'</td>'+
       '<td>'+progressCell+'</td>'+
@@ -3249,6 +3315,7 @@ function renderDetail(sub) {
   document.getElementById('d-contract-tag').textContent = "\u0E40\u0E25\u0E02\u0E17\u0E35\u0E48\u0E2A\u0E31\u0E0D\u0E0D\u0E32 ".concat(formatContractNumber(sub), " \u2014 \u0E09\u0E1A\u0E31\u0E1A\u0E17\u0E35\u0E48 ").concat(sub.personalSeq || 1, " \u0E02\u0E2D\u0E07\u0E1A\u0E38\u0E04\u0E04\u0E25\u0E19\u0E35\u0E49");
   document.getElementById('d-meta').textContent = "\u0E2A\u0E48\u0E07\u0E40\u0E2D\u0E01\u0E2A\u0E32\u0E23\u0E25\u0E48\u0E32\u0E2A\u0E38\u0E14\u0E40\u0E21\u0E37\u0E48\u0E2D: ".concat(formatThaiDateTime(sub.submittedAt), " \xB7 \u0E40\u0E25\u0E02\u0E1B\u0E23\u0E30\u0E08\u0E33\u0E15\u0E31\u0E27: ").concat(sub.personal.officialId || 'ไม่ได้กรอก', " \xB7 \u0E1B\u0E23\u0E30\u0E40\u0E20\u0E17\u0E01\u0E32\u0E23\u0E28\u0E36\u0E01\u0E29\u0E32: ").concat(EDU_TYPE_LABEL[sub.personal.eduType] || '-', " \xB7 \u0E42\u0E17\u0E23 ").concat(sub.personal.phone).concat(sub.personal.workPhone ? ' (ที่ทำงาน ' + sub.personal.workPhone + ')' : '', " \xB7 ").concat(sub.personal.email);
   renderSiblingContracts(sub);
+  renderFormDataBox(sub);
   compareSelection = [];
   updateCompareBar();
   renderMatchResult(sub);
@@ -3720,7 +3787,17 @@ function guarantorNumberFromIdDocId(docId) {
   var m = docId.match(/^g(\d)_1$/);
   return m ? m[1] : null;
 }
+// name shown in viewers/titles follows the education type of the contract on screen
+function currentEduForNames() {
+  var admin = document.getElementById('app-admin');
+  if (admin && admin.classList.contains('active') && typeof currentSubId !== 'undefined' && currentSubId) {
+    var sub = SUBMISSIONS.find(function (x) { return x.subId === currentSubId; });
+    return sub ? sub.personal.eduType : '';
+  }
+  return typeof state !== 'undefined' && state && state.personal ? state.personal.eduType : '';
+}
 function findDocMeta(docId) {
+  if (docId === 'c1' && isPilotEdu(currentEduForNames())) return PILOT_C1;
   var all = [].concat(DOCS_CONTRACTOR, [DOC_FOREIGN_DEGREE], DOCS_CONTRACTOR_SPOUSE, _toConsumableArray(GUARANTORS.flatMap(function (g) {
     return [].concat(_toConsumableArray(g.docs), _toConsumableArray(g.spouseDocs));
   })));
@@ -5379,6 +5456,126 @@ function onManualAnnotFile(input) {
       }).catch(function (err) { hideLoading(); showToast('อัปโหลดไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error'); });
     });
   });
+}
+
+// ======================================================================
+// นำเข้าสัญญาศิษย์การบินจาก Google Form (ระบบจัดทำสัญญาเดิม)
+// ======================================================================
+var FI_LABEL = {
+  'new': {t: 'คำตอบใหม่', c: 'fi-new'},
+  'pdf': {t: 'มีไฟล์สัญญาเพิ่ม', c: 'fi-pdf'},
+  'changed': {t: 'ผู้ใช้แก้คำตอบ', c: 'fi-warn'},
+  'partial': {t: 'นำเข้าไม่สมบูรณ์', c: 'fi-warn'},
+  'exists': {t: 'มีสัญญาในระบบแล้ว', c: 'fi-muted'},
+  'invalid': {t: 'ข้อมูลไม่ครบ', c: 'fi-muted'}
+};
+var FI_PREVIEW = null;
+function formImportPreview() {
+  var box = document.getElementById('fi-result');
+  box.innerHTML = '<div class="fi-progress">กำลังอ่านคำตอบจาก Google Form...</div>';
+  callApi('previewFormImport', [SESSION]).then(function (res) {
+    FI_PREVIEW = res;
+    renderFormImportPreview();
+  }).catch(function (err) {
+    box.innerHTML = '';
+    showToast('อ่านชีตคำตอบไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
+  });
+}
+function renderFormImportPreview() {
+  var res = FI_PREVIEW, c = res.counts, box = document.getElementById('fi-result');
+  var actionable = c['new'] + c.pdf;
+  var chip = function (k, n) { return n ? '<span class="fi-chip ' + FI_LABEL[k].c + '">' + FI_LABEL[k].t + ' ' + n + '</span>' : ''; };
+  var html = '<div class="fi-summary">' + chip('new', c['new']) + chip('pdf', c.pdf) + chip('changed', c.changed) + chip('partial', c.partial) +
+    chip('exists', c.exists) + chip('invalid', c.invalid) + '<span class="fi-chip fi-muted">นำเข้าแล้ว ' + c.done + '</span></div>';
+  if (res.items.length) {
+    html += '<div class="fi-list">' + res.items.map(function (it) {
+      var lab = FI_LABEL[it.status] || {t: it.status, c: 'fi-muted'};
+      var extra = it.status === 'new' && !it.hasContract ? 'ยังไม่มี PDF สัญญา (แนบให้เองเมื่อแอดมินสร้าง)' : it.note;
+      return '<div class="fi-row"><span class="fi-chip ' + lab.c + '">' + lab.t + '</span><span class="fi-name">' + escapeHtml(it.name) +
+        '</span><span class="fi-email">' + escapeHtml(it.email) + '</span>' + (extra ? '<div class="fi-note">' + escapeHtml(extra) + '</div>' : '') + '</div>';
+    }).join('') + '</div>';
+  }
+  html += actionable
+    ? '<div class="hris-actions"><button class="primary" id="fi-run-btn" onclick="formImportRun()">นำเข้า ' + actionable + ' รายการ</button></div>'
+    : '<div class="fi-progress">ไม่มีรายการที่ต้องนำเข้า</div>';
+  box.innerHTML = html;
+}
+function formImportRun() {
+  var total = FI_PREVIEW ? FI_PREVIEW.counts['new'] + FI_PREVIEW.counts.pdf : 0;
+  showConfirm('นำเข้าจาก Google Form?', 'สร้างสัญญาศิษย์การบินและคัดลอกเอกสาร ' + total + ' รายการ ไฟล์ในระบบเดิมไม่ถูกแก้ไข อาจใช้เวลาหลายนาที — อย่าปิดหน้านี้ระหว่างนำเข้า',
+    'เริ่มนำเข้า', function () {
+      var done = [], errors = [];
+      var box = document.getElementById('fi-result');
+      var step = function () {
+        box.innerHTML = '<div class="fi-progress"><span class="inline-spinner dark"></span> กำลังนำเข้า... เสร็จแล้ว ' + done.length + ' / ' + total + ' รายการ</div>';
+        callApi('runFormImport', [SESSION]).then(function (r) {
+          done = done.concat(r.processed || []);
+          errors = errors.concat(r.errors || []);
+          if (r.remaining > 0 && (r.processed || []).length) { step(); return; }
+          finish();
+        }).catch(function (err) {
+          errors.push({name: '', error: err && err.message ? err.message : String(err)});
+          finish();
+        });
+      };
+      var finish = function () {
+        var created = done.filter(function (d) { return d.action === 'imported'; }).length;
+        var attached = done.filter(function (d) { return d.action === 'contract-attached'; }).length;
+        showToast('นำเข้าสัญญาใหม่ ' + created + ' รายการ' + (attached ? ' · แนบ PDF สัญญา ' + attached + ' รายการ' : '') + (errors.length ? ' · ไม่สำเร็จ ' + errors.length : ''), errors.length ? 'warn' : 'success', 7000);
+        refreshList();
+        callApi('previewFormImport', [SESSION]).then(function (res) {
+          FI_PREVIEW = res; renderFormImportPreview();
+          if (errors.length) box.insertAdjacentHTML('afterbegin', '<div class="fi-errors"><strong>นำเข้าไม่สำเร็จ:</strong>' +
+            errors.map(function (e) { return '<div>' + escapeHtml((e.name ? e.name + ' — ' : '') + e.error) + '</div>'; }).join('') + '</div>');
+        }).catch(function () {});
+      };
+      step();
+    });
+}
+
+// ---------- officer detail: data that came from the form ----------
+function renderFormDataBox(sub) {
+  var box = document.getElementById('d-form-data');
+  if (!box) return;
+  var f = sub.formData;
+  if (!f) { box.innerHTML = ''; return; }
+  var row = function (k, v) { return v ? '<div><span>' + k + '</span>' + escapeHtml(v) + '</div>' : ''; };
+  var extras = sub.formExtraFiles || [];
+  box.innerHTML = '<div class="fi-data"><div class="fi-data-title">ข้อมูลจาก Google Form (ระบบจัดทำสัญญาเดิม)' +
+    (f.timestamp ? ' · ส่งเมื่อ ' + escapeHtml(formatThaiDateTime(f.timestamp)) : '') + '</div><div class="fi-grid">' +
+    row('เลขประจำตัวประชาชน', f.citizenId) + row('โทรศัพท์ผู้ปกครอง', f.parentPhone) +
+    row('ผู้ค้ำประกัน', f.guarantorName) + row('เลขประชาชนผู้ค้ำ', f.guarantorCitizenId) +
+    row('อายุ / อาชีพผู้ค้ำ', [f.guarantorAge, f.guarantorOccupation].filter(Boolean).join(' / ')) + row('หน่วยงานผู้ค้ำ', f.guarantorAgency && f.guarantorAgency !== '-' ? f.guarantorAgency : '') +
+    row('คู่สมรสผู้ค้ำ', f.guarantorSpouseName || 'ไม่มี (ไม่ได้กรอกในฟอร์ม)') + row('เลขประชาชนคู่สมรสผู้ค้ำ', f.guarantorSpouseCitizenId) +
+    '</div>' + (extras.length ? '<div class="fi-extras"><span>ไฟล์เพิ่มเติมจากฟอร์ม:</span>' + extras.map(function (x, i) {
+      return '<button class="doc-view-btn" onclick="openFormExtra(' + i + ')">👁 ' + escapeHtml(x.label) + '</button>';
+    }).join('') + '</div>' : '') + '</div>';
+}
+function openFormExtra(i) {
+  var sub = SUBMISSIONS.find(function (s) { return s.subId === currentSubId; });
+  var x = sub && (sub.formExtraFiles || [])[i];
+  if (!x) return;
+  ANNOT = {mode: 'view', subId: sub.subId, docId: '', pages: [], items: [], tool: 'hand'};
+  annotShell(x.label, 'ไฟล์เพิ่มเติมจาก Google Form — ' + (x.name || ''));
+  document.getElementById('annot-modal').classList.add('annot-noside');
+  callApi('getFormExtraFile', [SESSION, sub.subId, x.fileId]).then(function (f) {
+    var bytes = base64ToBytes(f.base64);
+    var dl = document.getElementById('annot-download');
+    dl.href = URL.createObjectURL(new Blob([bytes], {type: f.mime || 'application/octet-stream'}));
+    dl.setAttribute('download', f.name || 'ไฟล์.pdf');
+    dl.style.display = '';
+    if (f.mime !== 'application/pdf') {
+      document.getElementById('annot-pages').innerHTML = '<div class="annot-msg">ไฟล์นี้ไม่ใช่ PDF (' + escapeHtml(f.mime || '') + ') — กด "ดาวน์โหลดไฟล์" เพื่อเปิดดูในเครื่อง</div>';
+      return;
+    }
+    return annotRenderPages(bytes);
+  }).catch(function (err) {
+    document.getElementById('annot-pages').innerHTML = '<div class="annot-msg">เปิดไฟล์ไม่สำเร็จ: ' + escapeHtml(err.message || String(err)) + '</div>';
+  });
+}
+function parseJsonSafe(v, fallback) {
+  if (!v) return fallback;
+  try { return typeof v === 'string' ? JSON.parse(v) : v; } catch (e) { return fallback; }
 }
 
 boot();
