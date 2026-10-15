@@ -992,6 +992,12 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
     .rv-panel{width:auto;border-left:none;border-top:1px solid var(--line);overflow:visible;}
     .rv-seg button{padding:10px 2px;}
   }
+  .rv-title-line{display:flex;align-items:center;gap:8px;min-width:0;}
+  .rv-owner{flex:none;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap;}
+  .own-contractor{background:#16233F;color:#fff;}
+  .own-cspouse{background:#E2E8F0;color:#334155;}
+  .own-guarantor{background:#C9A84C;color:#1A2540;}
+  .own-gspouse{background:#F5ECD3;color:#7A5712;border:1px solid #E1CB8D;}
 </style>
 </head>
 <body>
@@ -1587,7 +1593,7 @@ setTimeout(function () {
         <button class="cmp-nav" id="rv-next" onclick="docModalStep(1)" title="เอกสารถัดไป (→)">›</button>
       </div>
       <div class="rv-title">
-        <h3 id="modal-title"></h3>
+        <div class="rv-title-line"><span class="rv-owner" id="rv-owner"></span><h3 id="modal-title"></h3></div>
         <div class="modal-meta" id="modal-meta"></div>
       </div>
       <div class="rv-actions">
@@ -1776,6 +1782,15 @@ function _openDialog(title, bodyText, fields, okLabel, danger, onOk, onCancel) {
     if(f.label){ var l=document.createElement('label'); l.textContent=f.label; wrap.appendChild(l); }
     var inp;
     if(f.type === 'textarea'){ inp=document.createElement('textarea'); inp.rows=3; }
+    else if(f.type === 'select'){
+      inp=document.createElement('select'); inp.innerHTML=f.optionsHtml||'';
+      inp.id='adlg-f-'+f.id; inp.value=f.value||'';
+      if(f.value && inp.value!==f.value){ var o=document.createElement('option'); o.textContent=f.value; inp.appendChild(o); inp.value=f.value; }
+      wrap.appendChild(inp);
+      if(f.note){ var n0=document.createElement('div'); n0.className='field-note'; n0.textContent=f.note; wrap.appendChild(n0); }
+      fb.appendChild(wrap);
+      return;
+    }
     else { inp=document.createElement('input'); inp.type=f.type||'text'; }
     inp.id='adlg-f-'+f.id; inp.placeholder=f.placeholder||''; inp.value=f.value||'';
     if(f.readonly) inp.readOnly=true;
@@ -3149,6 +3164,13 @@ function docEntry(sub, docId) {
 var SUBMISSIONS = [];
 var currentSubId = null;
 var compareSelection = [];
+// list rows arrive with a light per-document summary (no file ids) so progress,
+// "รอผู้ยื่นแก้ไข" and the filters are right before any contract is opened
+function docsFromSummary(list) {
+  var out = {};
+  (list || []).forEach(function (d) { out[d.docId] = {status: d.status, reviewStatus: d.reviewStatus || 'pending', comment: ''}; });
+  return out;
+}
 function adaptFlatSubmission(row) {
   var matchResult = null;
   if (row.matchStatus && row.matchStatus !== 'pending') {
@@ -3182,7 +3204,7 @@ function adaptFlatSubmission(row) {
       workPhone: row.workPhone,
       email: row.contactEmail
     },
-    documents: {},
+    documents: docsFromSummary(row.docSummary),
     guarantorInfo: {},
     matchResult: matchResult,
     stamped: row.stampedBy ? {
@@ -3674,6 +3696,14 @@ function clearCompare() {
 // the left (e.g. the guarantee contract) must not be touched when another pane
 // changes.
 var CMP_MARK = {'pass': ' ✓', 'needs-revision': ' (ต้องแก้ไข)', 'fail': ' (ไม่ผ่าน)'};
+// owner of a document, from its id: c* ผู้ทำสัญญา, cs* คู่สมรสผู้ทำสัญญา, g<n>_* ผู้ค้ำ n, gs<n>_* คู่สมรสผู้ค้ำ n
+function docOwner(docId) {
+  var m;
+  if (/^cs\d/.test(docId)) return {label: 'คู่สมรสผู้ทำสัญญา', cls: 'own-cspouse'};
+  if ((m = /^gs(\d)_/.exec(docId))) return {label: 'คู่สมรสผู้ค้ำประกันคนที่ ' + m[1], cls: 'own-gspouse'};
+  if ((m = /^g(\d)_/.exec(docId))) return {label: 'ผู้ค้ำประกันคนที่ ' + m[1], cls: 'own-guarantor'};
+  return {label: 'ผู้ทำสัญญา', cls: 'own-contractor'};
+}
 function compareSub() {
   return SUBMISSIONS.find(function (s) { return s.subId === currentSubId; });
 }
@@ -3923,7 +3953,11 @@ function openDocModal(subId, docId) {
   var entry = docEntry(sub, docId);
   var meta = findDocMeta(docId);
   document.getElementById('modal-title').textContent = meta.name;
-  document.getElementById('modal-meta').textContent = "".concat(sub.personal.title, " ").concat(sub.personal.first, " ").concat(sub.personal.last, " \xB7 \u0E44\u0E1F\u0E25\u0E4C: ").concat(adminFileName(sub, entry));
+  var owner = docOwner(docId);
+  var ownerEl = document.getElementById('rv-owner');
+  ownerEl.textContent = owner.label;
+  ownerEl.className = 'rv-owner ' + owner.cls;
+  document.getElementById('modal-meta').textContent = 'สัญญาของ ' + sub.personal.title + ' ' + sub.personal.first + ' ' + sub.personal.last + ' · ' + formatContractNumber(sub) + ' · ไฟล์: ' + adminFileName(sub, entry);
   var previewArea = document.getElementById('modal-preview-content');
   loadPdfInto(previewArea, sub, docId);
   renderModalAnnotBar(sub, docId);
@@ -5072,7 +5106,7 @@ function officerChangeName() {
   var p = sub.personal;
   showFormDialog('แก้ไขยศ ชื่อ-นามสกุล ผู้ทำสัญญา',
     'ปัจจุบัน: ' + [p.title, p.first, p.last].join(' ') + ' — ใช้กรณีผู้ทำสัญญาพิมพ์ผิด ระบบบันทึกประวัติการแก้ไขไว้',
-    [{id: 'title', label: 'คำนำหน้า/ยศ', value: p.title || '', placeholder: 'เช่น ร.ต., จ.ต., นาย'},
+    [{id: 'title', label: 'คำนำหน้า/ยศ', type: 'select', value: p.title || '', optionsHtml: document.getElementById('in-title').innerHTML},
      {id: 'first', label: 'ชื่อ', value: p.first || '', required: true},
      {id: 'last', label: 'นามสกุล', value: p.last || '', required: true},
      {id: 'reason', label: 'เหตุผลในการแก้ไข', required: true, placeholder: 'เช่น ผู้ทำสัญญาพิมพ์ชื่อผิด ตรวจกับบัตรแล้ว'}],
@@ -5204,7 +5238,7 @@ function openAnnotator(subId, docId) {
   var key = pdfKey(sub, docId);
   ANNOT = {mode: 'edit', subId: subId, docId: docId, key: key, pages: [], items: (ANNOT_SAVED[key] || []).map(function (it) { return JSON.parse(JSON.stringify(it)); }),
            tool: 'pen', draft: null, dirty: false, bytes: null};
-  annotShell(findDocMeta(docId).name, sub.personal.title + ' ' + sub.personal.first + ' ' + sub.personal.last);
+  annotShell(docOwner(docId).label + ' · ' + findDocMeta(docId).name, 'สัญญาของ ' + sub.personal.title + ' ' + sub.personal.first + ' ' + sub.personal.last);
   var banner = document.getElementById('annot-banner');
   if (annotIsCurrent(entry) && !ANNOT_SAVED[key]) {
     banner.innerHTML = 'เอกสารนี้มีไฟล์ตรวจแก้อยู่แล้ว — บันทึกครั้งนี้จะแทนที่ไฟล์เดิม ' +
