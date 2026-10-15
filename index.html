@@ -998,6 +998,19 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .own-cspouse{background:#E2E8F0;color:#334155;}
   .own-guarantor{background:#C9A84C;color:#1A2540;}
   .own-gspouse{background:#F5ECD3;color:#7A5712;border:1px solid #E1CB8D;}
+  .edu-cards{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px;max-width:760px;}
+  .edu-card{background:#F8FAFC;border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;color:var(--text);}
+  .edu-kind{font-size:12px;font-weight:700;color:#4F46E5;padding-bottom:8px;border-bottom:1px solid var(--line);}
+  .edu-course{font-size:14.5px;font-weight:700;margin:8px 0;padding-bottom:8px;border-bottom:1px solid var(--line);}
+  .edu-body{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
+  .edu-dates{font-size:13px;line-height:1.8;}
+  .edu-dates span{color:var(--steel);}
+  .edu-none{color:var(--muted) !important;font-style:italic;}
+  .edu-badges{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto;}
+  .edu-badge{font-size:12px;font-weight:600;color:#15803D;background:#ECFDF3;border:1px solid #A7E3BD;border-radius:var(--r-sm);padding:2px 8px;white-space:nowrap;}
+  .edu-badge.edu-ongoing{color:#1D4ED8;background:#EFF6FF;border-color:#BFDBFE;}
+  .rv-panel .edu-cards{grid-template-columns:1fr;}
+  .rv-panel .edu-badges{align-items:flex-start;}
 </style>
 </head>
 <body>
@@ -3513,19 +3526,53 @@ function selectCandidate(index) {
     showToast('บันทึกผลตรวจสอบไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).setMatchResult(SESSION, sub.subId, 'matched', record);
 }
+// years / months / days between two dates (same way as the HRIS site:
+// 13/07/2011 -> 30/06/2015 = 3 ปี 11 เดือน 17 วัน)
+// count whole months first (day clamped to the month's length, e.g. 31 ม.ค. + 1 เดือน = 28 ก.พ.),
+// then the remaining days — never negative, even from a long month into a short one
+function addMonthsClamped(a, months) {
+  var t = new Date(a.getFullYear(), a.getMonth() + months, 1);
+  t.setDate(Math.min(a.getDate(), new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate()));
+  return t;
+}
+function ymdBetween(a, b) {
+  var total = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
+  if (addMonthsClamped(a, total) > b) total--;
+  var d = Math.round((b - addMonthsClamped(a, total)) / 86400000);
+  return {y: Math.floor(total / 12), m: total % 12, d: d};
+}
+function ymdText(p) {
+  var parts = [];
+  if (p.y) parts.push(p.y + ' ปี');
+  if (p.m) parts.push(p.m + ' เดือน');
+  if (p.d || !parts.length) parts.push(p.d + ' วัน');
+  return parts.join(' ');
+}
+function hrisEduCard(kind, course, start, end) {
+  if (!course && !start && !end) return '';
+  var a = hrisToDate(start), b = hrisToDate(end), today = new Date();
+  today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  var badges = '';
+  if (a && b && b >= a) badges += '<span class="edu-badge">⏳ ระยะเวลาศึกษา ' + ymdText(ymdBetween(a, b)) + '</span>';
+  if (b && b <= today) badges += '<span class="edu-badge">🕓 สำเร็จมาแล้ว ' + ymdText(ymdBetween(b, today)) + '</span>';
+  else if (b && b > today) badges += '<span class="edu-badge edu-ongoing">กำลังศึกษา — จบในอีก ' + ymdText(ymdBetween(today, b)) + '</span>';
+  var date = function (v) { return v ? escapeHtml(hrisThaiDate(v)) : '<span class="edu-none">ไม่มีข้อมูล</span>'; };
+  return '<div class="edu-card">' +
+    '<div class="edu-kind">' + (kind === 'abr' ? '🌐 ศึกษาต่างประเทศล่าสุด' : '🏛 ศึกษาในประเทศล่าสุด') + '</div>' +
+    '<div class="edu-course">' + escapeHtml(course || '(ไม่ระบุหลักสูตร)') + '</div>' +
+    '<div class="edu-body"><div class="edu-dates"><div><span>วันที่เริ่มศึกษา:</span> ' + date(start) + '</div>' +
+    '<div><span>วันที่สำเร็จการศึกษา:</span> ' + date(end) + '</div></div>' +
+    '<div class="edu-badges">' + badges + '</div></div></div>';
+}
 function personDetailHtml(r) {
   var lines = [];
   if (r.unit || r.position) lines.push('สังกัด: ' + escapeHtml(r.unit || '-') + ' · ตำแหน่ง: ' + escapeHtml(r.position || '-'));
   if (r.marital) lines.push('สถานภาพ (HRIS): ' + escapeHtml(r.marital));
-  if (r.eduDom || r.eduAbr) {
-    if (r.eduDom) lines.push('การศึกษาในประเทศ: ' + escapeHtml(r.eduDom) + hrisYearRange(r.eduDomStart, r.eduDomEnd));
-    if (r.eduAbr) lines.push('การศึกษาต่างประเทศ: ' + escapeHtml(r.eduAbr) + hrisYearRange(r.eduAbrStart, r.eduAbrEnd) + (r.eduAbrEnd ? ' — สำเร็จเมื่อ ' + escapeHtml(hrisThaiDate(r.eduAbrEnd)) : ''));
-  } else if (r.education && r.education.length) {
-    lines.push('ประวัติการศึกษา: ' + escapeHtml(r.education.join(', ')));
-  }
-  return lines.map(function (l) {
-    return '<div>' + l + '</div>';
-  }).join('');
+  var html = lines.map(function (l) { return '<div>' + l + '</div>'; }).join('');
+  var cards = hrisEduCard('dom', r.eduDom, r.eduDomStart, r.eduDomEnd) + hrisEduCard('abr', r.eduAbr, r.eduAbrStart, r.eduAbrEnd);
+  if (cards) html += '<div class="edu-cards">' + cards + '</div>';
+  else if (r.education && r.education.length) html += '<div>ประวัติการศึกษา: ' + escapeHtml(r.education.join(', ')) + '</div>';
+  return html;
 }
 function matchResultHtml(matchResult, selectCallback) {
   if (!matchResult) {
@@ -4651,10 +4698,10 @@ var HRIS_FIELDS = [{
   re: /ดึงข้อมูล|วันที่ข้อมูล/
 }, {
   key: 'eduDom',
-  re: /(ศึกษา|วุฒิ).*ในประเทศ/
+  re: /(ศึกษา|วุฒิ|หลักสูตร).*ในประเทศ/
 }, {
   key: 'eduAbr',
-  re: /(ศึกษา|วุฒิ).*ต่างประเทศ/
+  re: /(ศึกษา|วุฒิ|หลักสูตร).*ต่างประเทศ/
 }, {
   key: 'officialId',
   re: /เลขประจำตัว(?!ประชาชน)|^official/i
@@ -4705,6 +4752,20 @@ function mapHrisHeaders(headerRow) {
         used[i] = true;
         break;
       }
+    }
+  });
+  // HRIS exports often label both date pairs just "วันที่เริ่มศึกษา" / "วันที่สำเร็จการศึกษา"
+  // under the course column: take the start/end columns that follow each course column
+  var courseCols = ['eduDom', 'eduAbr'].filter(function (k) { return map[k] !== undefined; })
+    .map(function (k) { return {k: k, i: map[k]}; }).sort(function (a, b) { return a.i - b.i; });
+  courseCols.forEach(function (c, n) {
+    var stop = n + 1 < courseCols.length ? courseCols[n + 1].i : headerRow.length;
+    var sKey = c.k + 'Start', eKey = c.k + 'End';
+    for (var i = c.i + 1; i < stop; i++) {
+      if (used[i]) continue;
+      var h = hrisClean(headerRow[i]);
+      if (map[sKey] === undefined && /เริ่ม/.test(h)) { map[sKey] = i; used[i] = true; }
+      else if (map[eKey] === undefined && /สำเร็จ|จบ/.test(h)) { map[eKey] = i; used[i] = true; }
     }
   });
   return map;
