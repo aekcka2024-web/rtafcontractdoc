@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ระบบบริหารจัดการสัญญาการศึกษาด้วยเทคโนโลยีดิจิทัล กองทัพอากาศ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   /* ─── Design Tokens ─────────────────────────────── */
   :root{
@@ -1011,6 +1011,163 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .edu-badge.edu-ongoing{color:#1D4ED8;background:#EFF6FF;border-color:#BFDBFE;}
   .rv-panel .edu-cards{grid-template-columns:1fr;}
   .rv-panel .edu-badges{align-items:flex-start;}
+  /* ══ Officer dashboard (new design) ═════════════════════════════════ */
+  #app-admin{font-family:'IBM Plex Sans Thai',Sarabun,sans-serif;font-variant-numeric:tabular-nums;--ink:#0F1B33;--ink2:#4A5772;--surf:#EEF1F6;}
+  #app-admin button,#app-admin input,#app-admin select,#app-admin textarea{font-family:inherit;}
+  #app-admin .wrap{max-width:1320px;padding-left:24px;padding-right:24px;box-sizing:border-box;}
+  .dash-top{background:#0F1B33;color:#fff;padding:0;}
+  .dash-top-inner{max-width:1320px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;box-sizing:border-box;}
+  .dash-brand{display:flex;align-items:center;gap:12px;flex:1 1 360px;min-width:0;}
+  .dash-mark{width:36px;height:36px;border-radius:10px;background:#C9A84C;display:flex;align-items:center;justify-content:center;flex:none;}
+  .dash-brand-text{min-width:0;}
+  .dash-brand-text h1{margin:0;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0;}
+  .dash-brand-text p{margin:2px 0 0;font-size:12px;color:#B9C3D6;}
+  .dash-actions{display:flex;align-items:center;gap:10px;}
+  .dash-import-btn{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;font-size:14px;font-weight:600;cursor:pointer;}
+  .dash-import-btn:hover{background:rgba(255,255,255,.12);}
+  .dash-badge{background:#C9A84C;color:#0F1B33;font-size:12px;font-weight:700;border-radius:999px;padding:1px 8px;line-height:1.5;}
+  .dash-avatar{width:38px;height:38px;border-radius:50%;background:#2B3A5C;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#E7ECF5;flex:none;}
+  .dash-top .logout-btn{min-height:40px;border-radius:10px;}
+  .dash-hero{display:none;padding-bottom:88px;}
+  .dash-mode .dash-hero{display:block;}
+  .dash-hero-inner{max-width:1320px;margin:0 auto;padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;box-sizing:border-box;}
+  .dash-date{font-size:13px;color:#B9C3D6;}
+  .dash-hello{margin:4px 0 0;font-size:28px;font-weight:700;color:#fff;}
+  .dash-summary{margin-top:6px;font-size:15px;color:#DCE3EF;}
+  .dash-summary strong{color:#E5C877;}
+  .dash-chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .dash-chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#DCE3EF;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:6px 12px;cursor:pointer;min-height:32px;}
+  .dash-chip:hover{background:rgba(255,255,255,.14);}
+  .dash-dot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .dash-mode .wrap{padding-top:0;}
+  .dash-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:16px;margin:-64px 0 20px;position:relative;}
+  .kpi::before,.type-btn::before{display:none !important;content:none !important;}
+  .kpi{background:#fff;border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(15,27,51,.06),0 8px 24px rgba(15,27,51,.08);cursor:pointer;border:2px solid transparent;color:var(--ink);transition:transform .15s ease,box-shadow .15s ease;}
+  .kpi:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(15,27,51,.08),0 12px 28px rgba(15,27,51,.12);}
+  .kpi.active{border-color:#C9A84C;}
+  .kpi-head{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;color:var(--ink2);gap:8px;}
+  .kpi-sub{font-size:12px;font-weight:500;}
+  .kpi .stat-num{font-size:40px;font-weight:700;line-height:1.15;margin:6px 0 10px;color:var(--ink);}
+  .kpi-bar{display:flex;height:8px;border-radius:999px;overflow:hidden;gap:2px;background:#E6EAF2;}
+  .kpi-bar span{display:block;}
+  .kpi-legend{display:flex;gap:12px;margin-top:10px;font-size:12px;color:var(--ink2);flex-wrap:wrap;}
+  .kpi-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;}
+  .kpi-dark{background:#16233F;color:#fff;box-shadow:0 8px 24px rgba(15,27,51,.22);}
+  .kpi-dark .kpi-head{color:#DCE3EF;}
+  .kpi-dark .stat-num{color:#fff;}
+  .kpi-tag{font-size:12px;color:#0F1B33;background:#E5C877;border-radius:999px;padding:2px 9px;font-weight:700;}
+  .kpi-note{font-size:13px;color:var(--ink2);}
+  .kpi-dark .kpi-note{color:#DCE3EF;}
+  .kpi-link{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 0;background:none;border:none;color:#E5C877;font-weight:600;font-size:14px;cursor:pointer;}
+  .kpi-link:hover{text-decoration:underline;}
+  .s-revision .stat-num{color:#B45309;}
+  .kpi-icon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+  .kpi-icon-amber{background:#FEF3E2;color:#B45309;}
+  .kpi-ring-card{display:flex;align-items:center;gap:16px;}
+  .kpi-ring{flex:none;}
+  .kpi-ring-num .stat-num{font-size:32px;color:#15803D;margin:4px 0 0;display:inline;}
+  .kpi-of{font-size:15px;color:var(--ink2);}
+  .dash-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:16px;margin-bottom:20px;}
+  .dash-row > *,.dash-kpis > *{min-width:0;}
+  .dash-card{box-sizing:border-box;background:#fff;border-radius:16px;padding:20px 22px;box-shadow:0 1px 2px rgba(15,27,51,.06);color:var(--ink);}
+  .dash-card-title{font-size:15px;font-weight:700;}
+  .dash-card-hint{font-size:12.5px;color:var(--ink2);margin-top:2px;}
+  .type-bar{display:flex;height:14px;border-radius:999px;overflow:hidden;gap:3px;margin:18px 0 16px;background:#E6EAF2;}
+  .type-bar span{display:block;}
+  .t-pilot{background:#C9A84C;} .t-domestic-private{background:#2F4FB8;} .t-abroad{background:#16233F;} .t-domestic-rtaf{background:#9AA9C4;} .t-none{background:#C9D2E3;}
+  .type-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  .type-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;min-height:44px;border-radius:10px;border:1.5px solid #DDE3EE;background:#fff;font-size:13.5px;color:var(--ink);cursor:pointer;text-align:left;}
+  .type-btn:hover{border-color:#16233F;}
+  .type-btn.active{border-color:#16233F;background:#F3F5FA;box-shadow:inset 0 0 0 1px #16233F;}
+  .type-btn .stat-num{font-size:15px;font-weight:700;margin:0;color:var(--ink);}
+  .type-name{display:flex;align-items:center;gap:8px;}
+  .type-dot{width:10px;height:10px;border-radius:3px;flex:none;}
+  .dash-queue{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+  .q-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:#F7F9FC;border:none;text-align:left;color:var(--ink);cursor:pointer;width:100%;}
+  .q-item:hover{background:#EEF2F9;}
+  .q-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .q-blue{background:#E8EDFB;color:#2F4FB8;} .q-amber{background:#FEF3E2;color:#B45309;} .q-gold{background:#FBF5E3;color:#8A6A12;}
+  .q-text{flex:1;min-width:0;}
+  .q-title{display:block;font-size:14px;font-weight:600;}
+  .q-sub{display:block;font-size:12.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .q-act{font-size:13px;font-weight:600;flex:none;}
+  .q-blue-t{color:#2F4FB8;} .q-amber-t{color:#B45309;} .q-gold-t{color:#8A6A12;}
+  .q-empty{padding:18px;text-align:center;color:var(--ink2);font-size:13.5px;background:#F7F9FC;border-radius:12px;}
+  #app-admin #transfer-card{border-radius:16px;margin-bottom:20px;}
+  .dash-table-card{padding:0;overflow:hidden;}
+  .dash-table-card .list-toolbar{padding:16px 22px;margin:0;border-bottom:1px solid #E6EAF2;display:flex;flex-wrap:wrap;gap:12px;align-items:center;}
+  .dash-table-title{font-size:16px;font-weight:700;flex:1 1 200px;}
+  .dash-table-title .list-count{font-size:13px;font-weight:500;color:var(--ink2);margin-left:4px;}
+  .dash-table-card .search-wrap{position:relative;flex:1 1 280px;max-width:420px;}
+  .dash-table-card .search-wrap input{height:42px;border-radius:10px;background:#F7F9FC;padding-left:36px;border:1px solid #DDE3EE;}
+  .dash-table-card .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);}
+  .filter-chips.seg{display:flex;gap:4px;padding:4px;background:var(--surf);border-radius:10px;}
+  .filter-chips.seg .chip{min-height:36px;padding:0 14px;border-radius:8px;border:none;background:transparent;color:var(--ink2);font-size:13.5px;cursor:pointer;}
+  .filter-chips.seg .chip.active{background:#fff;color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(15,27,51,.15);}
+  .dash-refresh{min-height:40px;border-radius:10px;}
+  .dash-table-scroll{overflow-x:auto;}
+  .dash-table-card .applicants{min-width:900px;font-size:14px;}
+  .dash-table-card .applicants th{padding:12px;font-size:12.5px;color:var(--ink2);border-bottom:none;background:#FAFBFD;}
+  .dash-table-card .applicants th:first-child,.dash-table-card .applicants td:first-child{padding-left:22px;}
+  .dash-table-card .applicants td{padding:13px 12px;border-bottom:1px solid #EEF1F6;}
+  .dash-table-card .applicants tr.data-row:hover td{background:#F7F9FC;}
+  .dash-table-card .applicants tr.row-flagged td{background:#FFFBF2;}
+  .row-person{display:flex;align-items:center;gap:12px;}
+  .row-avatar{width:38px;height:38px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+  .row-avatar.t-pilot,.type-pill.t-pilot{background:#FBF5E3;color:#7A5712;}
+  .row-avatar.t-domestic-private,.type-pill.t-domestic-private{background:#E8EDFB;color:#1E3A8A;}
+  .row-avatar.t-abroad,.type-pill.t-abroad{background:#E3E8F2;color:#16233F;}
+  .row-avatar.t-domestic-rtaf,.type-pill.t-domestic-rtaf{background:#EEF1F6;color:#3A4660;}
+  .row-avatar.t-none,.type-pill.t-none{background:#F1F3F7;color:#4A5772;}
+  .row-name{min-width:0;}
+  .row-name strong{display:block;font-weight:600;}
+  .row-name .sub-cell{display:block;margin-top:1px;}
+  .row-no{font-family:'IBM Plex Mono',monospace;font-size:13px;white-space:nowrap;}
+  .row-date{color:var(--ink2);white-space:nowrap;}
+  .type-pill{font-size:12.5px;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap;}
+  .dash-table-card .progress-bar-wrap{width:auto;min-width:130px;display:flex;align-items:center;gap:10px;flex-direction:row-reverse;justify-content:flex-end;}
+  .dash-table-card .progress-bar{flex:1;height:6px;margin:0;border-radius:999px;}
+  .dash-table-card .badge{padding:4px 10px;font-size:12.5px;}
+  /* import drawer */
+  .imp-drawer{position:fixed;inset:0;z-index:5000;display:none;}
+  .imp-drawer.open{display:flex;justify-content:flex-end;}
+  .imp-backdrop{position:absolute;inset:0;background:rgba(15,27,51,.45);}
+  .imp-panel{position:relative;width:min(480px,100%);height:100%;background:#fff;box-shadow:-12px 0 40px rgba(15,27,51,.25);display:flex;flex-direction:column;animation:impIn .2s ease;}
+  @keyframes impIn{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
+  .imp-head{padding:20px 22px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .imp-title{font-size:18px;font-weight:700;color:var(--ink);}
+  .imp-sub{font-size:13px;color:var(--ink2);margin-top:2px;}
+  .imp-close{width:40px;height:40px;border-radius:10px;border:1px solid #DDE3EE;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);}
+  .imp-tabs{display:flex;gap:4px;margin:16px 22px 0;padding:4px;background:var(--surf);border-radius:10px;}
+  .imp-tab{flex:1;min-height:40px;border-radius:8px;border:none;background:transparent;color:var(--ink2);font-size:14px;cursor:pointer;}
+  .imp-tab.active{background:#fff;color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(15,27,51,.15);}
+  .imp-body{flex:1;overflow-y:auto;padding:18px 22px;}
+  .imp-body .fi-card,.imp-body .hris-card{border:none;padding:0;margin:0;box-shadow:none;background:transparent;}
+  .imp-body .fi-list{max-height:none;}
+  .imp-fresh{margin-top:16px;}
+  .imp-fresh-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink2);margin-bottom:6px;gap:8px;flex-wrap:wrap;}
+  .imp-fresh-bar{height:8px;border-radius:999px;background:#E6EAF2;overflow:hidden;}
+  .imp-fresh-bar span{display:block;height:100%;}
+  .imp-note{font-size:13px;color:var(--ink2);line-height:1.6;margin:16px 0 0;}
+  @media (max-width:700px){
+    .dash-hello{font-size:22px;}
+    .dash-row{grid-template-columns:1fr;}
+    .type-grid{grid-template-columns:1fr;}
+    .dash-brand-text h1{white-space:normal;font-size:14px;}
+    .dash-top .logout-btn{padding:0 10px;font-size:12px;min-height:36px;}
+    .dash-top-inner,.dash-hero-inner{padding-left:16px;padding-right:16px;}
+    #app-admin .wrap{padding-left:12px;padding-right:12px;}
+    .dash-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+    .kpi{padding:14px;border-radius:14px;}
+    .kpi .stat-num{font-size:30px;margin:4px 0 6px;}
+    .kpi-ring-card{flex-direction:column;align-items:flex-start;gap:6px;}
+    .kpi-ring{width:56px;height:56px;}
+    .kpi-legend{gap:6px 10px;}
+    .dash-card{padding:16px;}
+    .dash-table-card{padding:0;}
+    .dash-table-card .list-toolbar{padding:14px 16px;}
+  }
+  @media print{ .dash-hero,.imp-drawer{display:none !important;} }
 </style>
 </head>
 <body>
@@ -1400,109 +1557,170 @@ setTimeout(function () {
 
 
 </div>
-<div class="app-view" id="app-admin">
+<div class="app-view dash-mode" id="app-admin">
 
-
-<header class="top">
-  <div class="top-inner">
-    <div class="top-text">
-      <div class="brand"><span class="mark"></span><h1>ระบบบริหารจัดการสัญญาการศึกษาด้วยเทคโนโลยีดิจิทัล <span class="role-tag">เจ้าหน้าที่</span></h1></div>
-      <p id="officer-header-sub">รายชื่อสัญญาทั้งหมดในระบบ</p>
+<header class="top dash-top">
+  <div class="dash-top-inner">
+    <div class="dash-brand">
+      <span class="dash-mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F1B33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M5 10.5V16c0 1.5 3.1 3 7 3s7-1.5 7-3v-5.5"></path></svg></span>
+      <div class="dash-brand-text">
+        <h1>ระบบบริหารจัดการสัญญาการศึกษาด้วยเทคโนโลยีดิจิทัล</h1>
+        <p id="officer-header-sub">กองทัพอากาศ · เจ้าหน้าที่</p>
+      </div>
     </div>
-    <button class="logout-btn no-print" onclick="logout()">ออกจากระบบ</button>
+    <div class="dash-actions">
+      <button type="button" class="dash-import-btn no-print" onclick="openImportDrawer()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 19h16"></path></svg>
+        นำเข้าข้อมูล <span class="dash-badge" id="dash-import-badge" style="display:none">0</span>
+      </button>
+      <span class="dash-avatar" id="dash-avatar" aria-hidden="true"></span>
+      <button class="logout-btn no-print" onclick="logout()">ออกจากระบบ</button>
+    </div>
+  </div>
+  <div class="dash-hero">
+    <div class="dash-hero-inner">
+      <div>
+        <div class="dash-date" id="dash-date"></div>
+        <h2 class="dash-hello" id="dash-hello">สวัสดี</h2>
+        <div class="dash-summary" id="dash-summary"></div>
+      </div>
+      <div class="dash-chips">
+        <button type="button" class="dash-chip" id="dash-chip-hris" onclick="openImportDrawer('hris')"></button>
+        <button type="button" class="dash-chip" id="dash-chip-form" onclick="openImportDrawer('form')"></button>
+      </div>
+    </div>
   </div>
 </header>
+
+<div class="imp-drawer" id="imp-drawer">
+  <div class="imp-backdrop" onclick="closeImportDrawer()"></div>
+  <aside class="imp-panel" role="dialog" aria-label="นำเข้าข้อมูล">
+    <div class="imp-head">
+      <div>
+        <div class="imp-title">นำเข้าข้อมูล</div>
+        <div class="imp-sub">ข้อมูลจากระบบภายนอก รวมไว้ที่เดียว</div>
+      </div>
+      <button type="button" class="imp-close" onclick="closeImportDrawer()" aria-label="ปิด"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+    <div class="imp-tabs" role="tablist">
+      <button type="button" role="tab" class="imp-tab active" id="imp-tab-form" onclick="impTab('form')">Google Form <span class="dash-badge" id="imp-tab-badge" style="display:none">0</span></button>
+      <button type="button" role="tab" class="imp-tab" id="imp-tab-hris" onclick="impTab('hris')">ข้อมูล HRIS</button>
+    </div>
+    <div class="imp-body" id="imp-body-form">
+      <div class="fi-card">
+        <div class="hris-title">นำเข้าสัญญาศิษย์การบินจาก Google Form</div>
+        <div class="fi-desc">อ่านคำตอบจากระบบจัดทำสัญญาเดิม (อ่านอย่างเดียว) แล้วสร้างสัญญาพร้อมคัดลอกเอกสารให้อัตโนมัติ — กดซ้ำได้ ไม่สร้างซ้ำ</div>
+        <div class="hris-actions"><button class="secondary" onclick="formImportPreview()">ตรวจหาคำตอบใหม่</button></div>
+        <div id="fi-result"></div>
+      </div>
+    </div>
+    <div class="imp-body" id="imp-body-hris" style="display:none">
+      <div class="hris-card">
+        <div class="hris-title">ข้อมูลสำหรับตรวจสอบรายชื่อ (HRIS)</div>
+        <div id="hris-bar"></div>
+        <input type="file" id="hris-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="onHrisFileChosen(this)">
+      </div>
+      <div class="imp-fresh" id="imp-fresh"></div>
+      <p class="imp-note">ข้อมูล HRIS เก็บในเครื่องนี้เท่านั้น ไม่ส่งขึ้นเซิร์ฟเวอร์ ใช้ตรวจชื่อ เลขประจำตัว สถานภาพสมรส และประวัติการศึกษา</p>
+    </div>
+  </aside>
+</div>
 
 <div class="wrap">
 
   <!-- LIST VIEW -->
   <div class="panel active" id="panel-list">
+    <div class="dash-kpis" id="stats-grid">
+      <div class="stat-card s-all active kpi" role="button" tabindex="0" onclick="setFilter('all')">
+        <div class="kpi-head"><span>สัญญาทั้งหมด</span><span class="kpi-sub" id="kpi-year"></span></div>
+        <div class="stat-num" id="stat-all">0</div>
+        <div class="kpi-bar" id="kpi-bar" aria-hidden="true"></div>
+        <div class="kpi-legend" id="kpi-legend"></div>
+      </div>
+      <div class="stat-card s-waiting kpi kpi-dark" role="button" tabindex="0" onclick="setFilter('waiting')">
+        <div class="kpi-head"><span>รอตรวจ</span><span class="kpi-tag">งานหลัก</span></div>
+        <div class="stat-num" id="stat-waiting">0</div>
+        <div class="kpi-note" id="kpi-oldest"></div>
+        <button type="button" class="kpi-link" id="kpi-next" onclick="event.stopPropagation(); startNextReview()">เริ่มตรวจฉบับถัดไป
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></button>
+      </div>
+      <div class="stat-card s-revision kpi" role="button" tabindex="0" onclick="setFilter('revision')">
+        <div class="kpi-head"><span>รอผู้ยื่นแก้ไข</span>
+          <span class="kpi-icon kpi-icon-amber" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg></span></div>
+        <div class="stat-num" id="stat-revision">0</div>
+        <div class="kpi-note">ส่งกลับให้แก้ไข · รอฉบับใหม่</div>
+      </div>
+      <div class="stat-card s-stamped kpi kpi-ring-card" role="button" tabindex="0" onclick="setFilter('stamped')">
+        <svg class="kpi-ring" width="84" height="84" viewBox="0 0 36 36" role="img" aria-label="สัดส่วนที่ประทับตราแล้ว">
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E6EAF2" stroke-width="3.6"></circle>
+          <circle id="kpi-ring-arc" cx="18" cy="18" r="15.9" fill="none" stroke="#15803D" stroke-width="3.6" stroke-linecap="round" stroke-dasharray="0 100" transform="rotate(-90 18 18)"></circle>
+          <text id="kpi-ring-text" x="18" y="21" text-anchor="middle" font-size="9" font-weight="700" fill="#0F1B33">0%</text>
+        </svg>
+        <div>
+          <div class="kpi-head"><span>ประทับตราแล้ว</span></div>
+          <div class="kpi-ring-num"><span class="stat-num" id="stat-stamped">0</span> <span class="kpi-of" id="kpi-of">/ 0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-row">
+      <div class="dash-card">
+        <div class="dash-card-title">สัญญาตามประเภทการศึกษา</div>
+        <div class="dash-card-hint">กดที่ประเภทเพื่อกรองตาราง กดซ้ำเพื่อยกเลิก</div>
+        <div class="type-bar" id="type-bar" aria-hidden="true"></div>
+        <div class="type-grid" id="stats-edu-grid">
+          <button type="button" class="stat-card s-edu type-btn" onclick="setEduFilter('pilot')"><span class="type-name"><span class="type-dot t-pilot"></span>ศิษย์การบิน</span><strong class="stat-num" id="stat-edu-pilot">0</strong></button>
+          <button type="button" class="stat-card s-edu type-btn" onclick="setEduFilter('domestic-private')"><span class="type-name"><span class="type-dot t-domestic-private"></span>ในประเทศ ทุนส่วนตัว</span><strong class="stat-num" id="stat-edu-domestic-private">0</strong></button>
+          <button type="button" class="stat-card s-edu type-btn" onclick="setEduFilter('abroad')"><span class="type-name"><span class="type-dot t-abroad"></span>ต่างประเทศ</span><strong class="stat-num" id="stat-edu-abroad">0</strong></button>
+          <button type="button" class="stat-card s-edu type-btn" onclick="setEduFilter('domestic-rtaf')"><span class="type-name"><span class="type-dot t-domestic-rtaf"></span>ในประเทศ ทุน ทอ.</span><strong class="stat-num" id="stat-edu-domestic-rtaf">0</strong></button>
+        </div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-title">ต้องดำเนินการ</div>
+        <div class="dash-card-hint">เรียงตามความเร่งด่วน</div>
+        <div class="dash-queue" id="dash-queue"></div>
+      </div>
+    </div>
+
     <div class="card" id="transfer-card" style="display:none">
       <div class="hris-title">คำขอย้ายบัญชี Google (รอดำเนินการ <span id="transfer-count">0</span> รายการ)</div>
       <div id="transfer-list"></div>
     </div>
-    <div class="card fi-card">
-      <div class="hris-title">นำเข้าสัญญาศิษย์การบินจาก Google Form</div>
-      <div class="fi-desc">อ่านคำตอบจากระบบจัดทำสัญญาเดิม (อ่านอย่างเดียว) แล้วสร้างสัญญาพร้อมคัดลอกเอกสารให้อัตโนมัติ — กดซ้ำได้ ไม่สร้างซ้ำ</div>
-      <div class="hris-actions"><button class="secondary" onclick="formImportPreview()">ตรวจหาคำตอบใหม่</button></div>
-      <div id="fi-result"></div>
-    </div>
-    <div class="card hris-card">
-      <div class="hris-title">ข้อมูลสำหรับตรวจสอบรายชื่อ (HRIS)</div>
-      <div id="hris-bar"></div>
-      <input type="file" id="hris-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="onHrisFileChosen(this)">
-    </div>
-    <div class="card">
-      <!-- Stats tiles -->
-      <div class="stats-grid" id="stats-grid">
-        <div class="stat-card s-all active" onclick="setFilter('all')">
-          <div class="stat-num" id="stat-all">0</div>
-          <div class="stat-label">สัญญาทั้งหมด</div>
-        </div>
-        <div class="stat-card s-waiting" onclick="setFilter('waiting')">
-          <div class="stat-num" id="stat-waiting">0</div>
-          <div class="stat-label">รอตรวจ</div>
-        </div>
-        <div class="stat-card s-revision" onclick="setFilter('revision')">
-          <div class="stat-num" id="stat-revision">0</div>
-          <div class="stat-label">รอผู้ยื่นแก้ไข</div>
-        </div>
-        <div class="stat-card s-stamped" onclick="setFilter('stamped')">
-          <div class="stat-num" id="stat-stamped">0</div>
-          <div class="stat-label">ประทับตราแล้ว</div>
-        </div>
-      </div>
-      <!-- แถว 2: ประเภทการศึกษา -->
-      <div class="stats-grid stats-edu" id="stats-edu-grid">
-        <div class="stat-card s-edu" onclick="setEduFilter('abroad')">
-          <div class="stat-num" id="stat-edu-abroad">0</div>
-          <div class="stat-label">ต่างประเทศ</div>
-        </div>
-        <div class="stat-card s-edu" onclick="setEduFilter('domestic-rtaf')">
-          <div class="stat-num" id="stat-edu-domestic-rtaf">0</div>
-          <div class="stat-label">ในประเทศ ทุน ทอ.</div>
-        </div>
-        <div class="stat-card s-edu" onclick="setEduFilter('domestic-private')">
-          <div class="stat-num" id="stat-edu-domestic-private">0</div>
-          <div class="stat-label">ในประเทศ ทุนส่วนตัว</div>
-        </div>
-        <div class="stat-card s-edu" onclick="setEduFilter('pilot')">
-          <div class="stat-num" id="stat-edu-pilot">0</div>
-          <div class="stat-label">ศิษย์การบิน</div>
-        </div>
-      </div>
-      <!-- Toolbar: search + chips + refresh -->
+
+    <div class="dash-card dash-table-card">
       <div class="list-toolbar">
+        <div class="dash-table-title">รายชื่อสัญญา <span class="list-count" id="list-count"></span></div>
         <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="list-search" placeholder="ค้นหาชื่อ เลขประจำตัว เลขที่สัญญา..." oninput="renderList()">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A5772" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <input type="text" id="list-search" aria-label="ค้นหา" placeholder="ค้นหาชื่อ เลขประจำตัว เลขที่สัญญา" oninput="renderList()">
         </div>
-        <div class="filter-chips">
-          <span class="chip chip-all active" id="chip-all" onclick="setFilter('all')">ทั้งหมด</span>
-          <span class="chip chip-waiting" id="chip-waiting" onclick="setFilter('waiting')">รอตรวจ</span>
-          <span class="chip chip-revision" id="chip-revision" onclick="setFilter('revision')">แก้ไข</span>
-          <span class="chip chip-stamped" id="chip-stamped" onclick="setFilter('stamped')">เสร็จแล้ว</span>
+        <div class="filter-chips seg" role="group" aria-label="กรองตามสถานะ">
+          <button type="button" class="chip chip-all active" id="chip-all" onclick="setFilter('all')">ทั้งหมด</button>
+          <button type="button" class="chip chip-waiting" id="chip-waiting" onclick="setFilter('waiting')">รอตรวจ</button>
+          <button type="button" class="chip chip-revision" id="chip-revision" onclick="setFilter('revision')">แก้ไข</button>
+          <button type="button" class="chip chip-stamped" id="chip-stamped" onclick="setFilter('stamped')">เสร็จแล้ว</button>
         </div>
-        <span class="list-count" id="list-count"></span>
-        <button class="secondary" onclick="refreshList()">รีเฟรช</button>
+        <button type="button" class="secondary dash-refresh" onclick="refreshList()" title="โหลดรายชื่อใหม่">รีเฟรช</button>
       </div>
-      <!-- Table -->
-      <table class="applicants">
-        <thead>
-          <tr>
-            <th onclick="sortList('contractNumber')">เลขที่สัญญา</th>
-            <th onclick="sortList('name')">ชื่อ-สกุล</th>
-            <th>ประเภทการศึกษา</th>
-            <th onclick="sortList('submittedAt')">ส่งล่าสุด</th>
-            <th>ความคืบหน้า</th>
-            <th>สถานะ</th>
-          </tr>
-        </thead>
-        <tbody id="applicant-rows"></tbody>
-      </table>
+      <div class="dash-table-scroll">
+        <table class="applicants">
+          <thead>
+            <tr>
+              <th onclick="sortList('name')">ผู้ทำสัญญา</th>
+              <th onclick="sortList('contractNumber')">เลขที่สัญญา</th>
+              <th>ประเภท</th>
+              <th onclick="sortList('submittedAt')">ส่งล่าสุด</th>
+              <th>ความคืบหน้า</th>
+              <th>สถานะ</th>
+            </tr>
+          </thead>
+          <tbody id="applicant-rows"></tbody>
+        </table>
+      </div>
       <div id="list-empty" class="no-results" style="display:none">ไม่พบสัญญาที่ตรงกับเงื่อนไขที่เลือก</div>
     </div>
   </div>
+
 
   <!-- DETAIL VIEW -->
   <div class="panel" id="panel-detail">
@@ -3397,20 +3615,26 @@ function renderList() {
       ? '<span class="sub-cell">ยังไม่ได้ส่ง</span>'
       : '<div class="progress-bar-wrap"><span style="font-size:12px;color:var(--steel)">'+(done||0)+' / '+total+'</span><div class="progress-bar"><div class="progress-bar-fill '+barCls+'" style="width:'+pct+'%"></div></div></div>';
     var eduLabel = EDU_TYPE_LABEL[sub.personal.eduType] || '–';
+    var ready = !sub.stamped && !hasFlagged && subReadiness(sub).ready;
+    if (ready) { overallLabel = 'พร้อมประทับตรา'; badgeCls = 'pass'; }
+    var tk = dashTypeKey(sub.personal.eduType);
     var tr = document.createElement('tr');
     tr.className = 'data-row' + (hasFlagged && !sub.stamped ? ' row-flagged' : '');
     tr.onclick = function(){ showDetail(sub.subId); };
     tr.innerHTML =
-      '<td><div class="contract-id">'+escapeHtml(formatContractNumber(sub))+'</div><div class="sub-cell">'+escapeHtml(sub.personal.email||'')+'</div></td>'+
-      '<td><strong>'+escapeHtml(sub.personal.title+' '+sub.personal.first+' '+sub.personal.last)+'</strong><div class="sub-cell">ฉบับที่ '+(sub.personalSeq||1)+(sub.importSource==='google-form'?' · <span class="fi-tag">จาก Google Form</span>':'')+'</div></td>'+
-      '<td>'+escapeHtml(eduLabel)+'</td>'+
-      '<td>'+escapeHtml(sub.submittedAt ? formatShortDate(sub.submittedAt) : '–')+'</td>'+
+      '<td><div class="row-person"><span class="row-avatar t-'+tk+'">'+escapeHtml(thaiInitial(sub.personal.first)+thaiInitial(sub.personal.last))+'</span>'+
+        '<span class="row-name"><strong>'+escapeHtml(sub.personal.title+' '+sub.personal.first+' '+sub.personal.last)+'</strong>'+
+        '<span class="sub-cell">'+[escapeHtml(sub.personal.email||''), 'ฉบับที่ '+(sub.personalSeq||1)].filter(Boolean).join(' · ')+(sub.importSource==='google-form'?' · <span class="fi-tag">จาก Google Form</span>':'')+'</span></span></div></td>'+
+      '<td class="row-no">'+escapeHtml(formatContractNumber(sub))+'</td>'+
+      '<td><span class="type-pill t-'+tk+'">'+escapeHtml(eduLabel)+'</span></td>'+
+      '<td class="row-date">'+escapeHtml(sub.submittedAt ? formatShortDate(sub.submittedAt) : '–')+'</td>'+
       '<td>'+progressCell+'</td>'+
       '<td><span class="badge '+badgeCls+'">'+overallLabel+'</span></td>';
     tbody.appendChild(tr);
   });
 }
 function showList() {
+  document.getElementById('app-admin').classList.add('dash-mode');
   tabSet(TAB_NAV_KEY, {view: 'admin'});
   document.getElementById('panel-list').classList.add('active');
   document.getElementById('panel-detail').classList.remove('active');
@@ -3436,6 +3660,7 @@ function showDetail(subId) {
   }).getSubmission(SESSION, subId);
 }
 function renderDetail(sub) {
+  document.getElementById('app-admin').classList.remove('dash-mode');
   tabSet(TAB_NAV_KEY, {view: 'admin', subId: sub.subId});
   document.getElementById('d-name').textContent = "".concat(sub.personal.title, " ").concat(sub.personal.first, " ").concat(sub.personal.last);
   document.getElementById('d-contract-tag').textContent = "\u0E40\u0E25\u0E02\u0E17\u0E35\u0E48\u0E2A\u0E31\u0E0D\u0E0D\u0E32 ".concat(formatContractNumber(sub), " \u2014 \u0E09\u0E1A\u0E31\u0E1A\u0E17\u0E35\u0E48 ").concat(sub.personalSeq || 1, " \u0E02\u0E2D\u0E07\u0E1A\u0E38\u0E04\u0E04\u0E25\u0E19\u0E35\u0E49");
@@ -5233,6 +5458,7 @@ function initAdminView() {
   if (nav && nav.view === 'admin' && nav.subId) pendingRestoreDetail = nav.subId; // opened once the list has loaded
   refreshList();
   loadHris();
+  dashAutoCheckForm();
 }
 function renderGuarantorClaimWarnings(sub) {
   var box = document.getElementById('rtaf-warnings');
@@ -5889,6 +6115,171 @@ function parseJsonSafe(v, fallback) {
   if (!v) return fallback;
   try { return typeof v === 'string' ? JSON.parse(v) : v; } catch (e) { return fallback; }
 }
+
+// ======================================================================
+// Officer dashboard: greeting, KPI cards, type distribution, action queue,
+// status chips and the slide-in "นำเข้าข้อมูล" drawer (Google Form / HRIS)
+// ======================================================================
+var FI_STATE = {checking: false, lastCheck: null, failed: false};
+function dashTypeKey(eduType) { return EDU_TYPE_LABEL[eduType] ? eduType : 'none'; }
+function thaiInitial(s) { s = String(s || '').trim().replace(/^[เแโใไ]/, ''); return s.charAt(0); }
+function subHasFlag(sub) {
+  return Object.values(sub.documents || {}).some(function (d) { return d.reviewStatus === 'needs-revision' || d.reviewStatus === 'fail'; });
+}
+function subReadiness(sub) {
+  var g = function (id) { return docEntry(sub, id); };
+  var req = docsForSub(sub).filter(function (d) { return isRequiredDoc(g, d); });
+  var pass = req.filter(function (d) { return docEntry(sub, d.id).reviewStatus === 'pass'; }).length;
+  return {required: req.length, pass: pass, ready: req.length > 0 && pass === req.length};
+}
+function daysSince(v) {
+  var d = v ? new Date(String(v).replace(' ', 'T')) : null;
+  return d && !isNaN(d) ? Math.max(0, Math.floor((Date.now() - d.getTime()) / 86400000)) : null;
+}
+function formPendingCount() {
+  return FI_PREVIEW ? FI_PREVIEW.counts['new'] + FI_PREVIEW.counts.pdf : 0;
+}
+function renderDashboard() {
+  var subs = SUBMISSIONS, total = subs.length;
+  var stamped = subs.filter(function (s) { return s.stamped; });
+  var flagged = subs.filter(function (s) { return !s.stamped && subHasFlag(s); });
+  var waiting = subs.filter(function (s) { return !s.stamped && !subHasFlag(s); });
+  var pct = function (n) { return total ? (100 * n / total) : 0; };
+  var bar = document.getElementById('kpi-bar');
+  if (!bar) return;
+  bar.innerHTML = total ? '<span style="flex:' + waiting.length + ';background:#2F4FB8"></span><span style="flex:' + flagged.length + ';background:#D97706"></span><span style="flex:' + stamped.length + ';background:#15803D"></span>' : '';
+  document.getElementById('kpi-legend').innerHTML = '<span><i style="background:#2F4FB8"></i>รอตรวจ ' + waiting.length + '</span><span><i style="background:#D97706"></i>แก้ไข ' + flagged.length + '</span><span><i style="background:#15803D"></i>ประทับตรา ' + stamped.length + '</span>';
+  var years = {};
+  subs.forEach(function (s) { if (s.contractYear) years[s.contractYear] = 1; });
+  var ys = Object.keys(years).sort();
+  document.getElementById('kpi-year').textContent = ys.length === 1 ? 'ปี ' + ys[0] : ys.length ? 'ปี ' + ys[0] + '–' + ys[ys.length - 1] : '';
+  // oldest contract still waiting for review
+  var oldest = waiting.filter(function (s) { return overallDocProgress(s).done; })
+    .sort(function (a, b) { return String(a.submittedAt || '').localeCompare(String(b.submittedAt || '')); })[0];
+  var od = oldest ? daysSince(oldest.submittedAt) : null;
+  document.getElementById('kpi-oldest').textContent = oldest ? (od ? 'เก่าสุดรอมาแล้ว ' + od + ' วัน' : 'เก่าสุดส่งมาวันนี้') : 'ไม่มีสัญญาค้างตรวจ';
+  document.getElementById('kpi-next').style.display = oldest ? '' : 'none';
+  var sp = Math.round(pct(stamped.length));
+  var arc = document.getElementById('kpi-ring-arc');
+  arc.setAttribute('stroke-dasharray', Math.max(sp, stamped.length ? 1 : 0) + ' 100');
+  arc.style.display = stamped.length ? '' : 'none';
+  document.getElementById('kpi-ring-text').textContent = sp + '%';
+  document.getElementById('kpi-of').textContent = '/ ' + total;
+  // type distribution
+  var TYPES = ['pilot', 'domestic-private', 'abroad', 'domestic-rtaf'];
+  var tc = {};
+  TYPES.forEach(function (k) { tc[k] = subs.filter(function (s) { return s.personal.eduType === k; }).length; });
+  document.getElementById('type-bar').innerHTML = TYPES.map(function (k) { return tc[k] ? '<span class="t-' + k + '" style="flex:' + tc[k] + '"></span>' : ''; }).join('');
+  // action queue
+  var q = [];
+  subs.filter(function (s) { return !s.stamped && subReadiness(s).ready; }).slice(0, 2).forEach(function (s) {
+    var r = subReadiness(s);
+    q.push({icon: 'check', tone: 'blue', title: 'เอกสารครบ พร้อมประทับตรา', sub: subName(s) + ' · ผ่าน ' + r.pass + ' / ' + r.required, act: 'ตรวจ', click: "showDetail('" + s.subId + "')"});
+  });
+  flagged.slice().sort(function (a, b) { return String(a.submittedAt || '').localeCompare(String(b.submittedAt || '')); }).slice(0, 2).forEach(function (s) {
+    q.push({icon: 'clock', tone: 'amber', title: 'รอผู้ยื่นแก้ไข', sub: subName(s) + (s.submittedAt ? ' · ส่งล่าสุด ' + formatShortDate(s.submittedAt) : ''), act: 'ดู', click: "showDetail('" + s.subId + "')"});
+  });
+  var fp = formPendingCount();
+  if (fp) q.push({icon: 'import', tone: 'gold', title: 'คำตอบใหม่จาก Google Form ' + fp + ' รายการ', sub: 'ศิษย์การบิน · รอนำเข้า', act: 'นำเข้า', click: "openImportDrawer('form')"});
+  if (q.length < 4 && oldest && !subReadiness(oldest).ready) {
+    q.push({icon: 'doc', tone: 'blue', title: 'รอตรวจนานที่สุด', sub: subName(oldest) + (od ? ' · รอ ' + od + ' วัน' : ''), act: 'ตรวจ', click: "showDetail('" + oldest.subId + "')"});
+  }
+  var ICON = {
+    check: '<path d="M9 11l3 3 8-8"></path><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9"></path>',
+    clock: '<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>',
+    import: '<path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 19h16"></path>',
+    doc: '<path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"></path><path d="M14 3v5h5"></path>'
+  };
+  document.getElementById('dash-queue').innerHTML = q.length ? q.slice(0, 4).map(function (it) {
+    return '<button type="button" class="q-item" onclick="' + it.click + '"><span class="q-icon q-' + it.tone + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[it.icon] + '</svg></span>' +
+      '<span class="q-text"><span class="q-title">' + escapeHtml(it.title) + '</span><span class="q-sub">' + escapeHtml(it.sub) + '</span></span><span class="q-act q-' + it.tone + '-t">' + it.act + '</span></button>';
+  }).join('') : '<div class="q-empty">ไม่มีงานค้างในขณะนี้</div>';
+  // greeting
+  var name = (currentUser && (currentUser.displayName || currentUser.email)) || '';
+  document.getElementById('dash-hello').textContent = 'สวัสดี ' + name;
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('th-TH', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
+  document.getElementById('dash-summary').innerHTML = 'วันนี้มี <strong>' + waiting.length + ' สัญญา</strong> รอตรวจ' +
+    (flagged.length ? ' · <strong>' + flagged.length + '</strong> รอผู้ยื่นแก้ไข' : '') + (fp ? ' และ <strong>' + fp + ' คำตอบใหม่</strong> จาก Google Form' : '');
+  var av = document.getElementById('dash-avatar');
+  var parts = name.replace(/^\S+\.\s*/, '').split(/\s+/);
+  av.textContent = (thaiInitial(parts[0]) + thaiInitial(parts[1] || '')) || '•';
+  updateDashChips();
+}
+function subName(s) { return [s.personal.title, s.personal.first, s.personal.last].join(' ').trim(); }
+function startNextReview() {
+  var w = SUBMISSIONS.filter(function (s) { return !s.stamped && !subHasFlag(s) && overallDocProgress(s).done; })
+    .sort(function (a, b) { return String(a.submittedAt || '').localeCompare(String(b.submittedAt || '')); })[0];
+  if (w) showDetail(w.subId);
+}
+function updateDashChips() {
+  var hc = document.getElementById('dash-chip-hris'), fc = document.getElementById('dash-chip-form');
+  if (!hc) return;
+  var dot = function (c) { return '<span class="dash-dot" style="background:' + c + '"></span>'; };
+  var fresh = document.getElementById('imp-fresh');
+  if (typeof HRIS === 'undefined' || !HRIS) {
+    hc.innerHTML = dot('#F87171') + 'ยังไม่ได้นำเข้า HRIS';
+    if (fresh) fresh.innerHTML = '';
+  } else {
+    var m = HRIS.meta, ex = m.extractedAt ? hrisToDate(m.extractedAt) : null;
+    var age = ex ? Math.floor((Date.now() - ex.getTime()) / 86400000) : null;
+    var stale = age !== null && age > HRIS_STALE_DAYS;
+    hc.innerHTML = dot(stale ? '#FBBF24' : '#4ADE80') + 'HRIS ' + Number(m.count).toLocaleString() + ' รายการ' + (ex ? ' · ข้อมูล ณ ' + escapeHtml(hrisThaiDate(m.extractedAt)) : '');
+    if (fresh && age !== null) {
+      var w = Math.min(100, Math.round(100 * age / HRIS_STALE_DAYS));
+      fresh.innerHTML = '<div class="imp-fresh-row"><span>ความใหม่ของข้อมูล</span><span>' + age + ' วัน · ควรอัปเดตภายใน ' + HRIS_STALE_DAYS + ' วัน</span></div>' +
+        '<div class="imp-fresh-bar"><span style="width:' + w + '%;background:' + (stale ? '#D97706' : '#16A34A') + '"></span></div>';
+    }
+  }
+  var fp = formPendingCount();
+  if (FI_STATE.checking) fc.innerHTML = dot('#93C5FD') + 'Google Form · กำลังตรวจ…';
+  else if (FI_STATE.failed) fc.innerHTML = dot('#F87171') + 'Google Form · ตรวจไม่สำเร็จ';
+  else if (FI_STATE.lastCheck) fc.innerHTML = dot(fp ? '#E5C877' : '#4ADE80') + 'Google Form · ' + (fp ? 'มีคำตอบใหม่ ' + fp : 'ไม่มีคำตอบใหม่') + ' · ตรวจเมื่อ ' + FI_STATE.lastCheck;
+  else fc.innerHTML = dot('#9AA9C4') + 'Google Form · ยังไม่ได้ตรวจ';
+  ['dash-import-badge', 'imp-tab-badge'].forEach(function (id) {
+    var b = document.getElementById(id);
+    if (b) { b.textContent = fp; b.style.display = fp ? '' : 'none'; }
+  });
+}
+// ---------- drawer ----------
+function openImportDrawer(tab) {
+  impTab(tab || (formPendingCount() || (typeof HRIS !== 'undefined' && HRIS) ? 'form' : 'hris'));
+  document.getElementById('imp-drawer').classList.add('open');
+}
+function closeImportDrawer() { document.getElementById('imp-drawer').classList.remove('open'); }
+function impTab(t) {
+  ['form', 'hris'].forEach(function (k) {
+    document.getElementById('imp-tab-' + k).classList.toggle('active', k === t);
+    document.getElementById('imp-body-' + k).style.display = k === t ? '' : 'none';
+  });
+}
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  var d = document.getElementById('imp-drawer'), dlg = document.getElementById('app-dialog');
+  if (d && d.classList.contains('open') && !(dlg && dlg.classList.contains('open'))) closeImportDrawer();
+});
+// check the Google Form in the background so the badge/queue are ready when the page opens
+function dashAutoCheckForm() {
+  FI_STATE.checking = true; FI_STATE.failed = false; updateDashChips();
+  callApi('previewFormImport', [SESSION]).then(function (res) {
+    FI_STATE.checking = false;
+    FI_PREVIEW = res;
+    renderFormImportPreview();
+  }).catch(function () {
+    FI_STATE.checking = false; FI_STATE.failed = true; updateDashChips();
+  });
+}
+// keep the dashboard in step with the existing renderers
+var _dashUpdateStats = updateStats;
+updateStats = function () { _dashUpdateStats(); renderDashboard(); };
+var _dashRenderHrisBar = renderHrisBar;
+renderHrisBar = function () { _dashRenderHrisBar(); updateDashChips(); };
+var _dashRenderFi = renderFormImportPreview;
+renderFormImportPreview = function () {
+  FI_STATE.checking = false; FI_STATE.failed = false;
+  FI_STATE.lastCheck = new Date().toLocaleTimeString('th-TH', {hour: '2-digit', minute: '2-digit'}) + ' น.';
+  _dashRenderFi();
+  if (document.getElementById('kpi-bar')) renderDashboard();
+};
 
 boot();
 </script>
