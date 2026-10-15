@@ -1168,6 +1168,141 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
     .dash-table-card .list-toolbar{padding:14px 16px;}
   }
   @media print{ .dash-hero,.imp-drawer{display:none !important;} }
+  /* officer document table: review result in colour (same palette as the applicant view) */
+  select.rv-sel{font-weight:700;border-width:1.5px;}
+  select.rv-sel.rv-pending{background-color:#F1F5F9;border-color:#CBD5E1;color:#334155;}
+  select.rv-sel.rv-pass{background-color:#ECFDF3;border-color:#86D3A3;color:#15803D;}
+  select.rv-sel.rv-needs-revision{background-color:#FFF7E8;border-color:#F0B65A;color:#B45309;}
+  select.rv-sel.rv-fail{background-color:#FEF2F2;border-color:#F3A3A3;color:#B91C1C;}
+  .doc-table tr.rv-row-pass td:nth-child(2){color:#166534;}
+  .doc-table tr.rv-row-pass td:nth-child(2)::before{content:'✓ ';font-weight:700;color:#15803D;}
+  .doc-table tr.rv-row-needs-revision td{background:#FFFBF2;}
+  .doc-table tr.rv-row-fail td{background:#FEF7F7;}
+  /* ══ Contract detail page (new design) ═════════════════════════════ */
+  .det-hero{display:none;}
+  .det-mode .det-hero{display:block;}
+  .det-inner{max-width:1320px;margin:0 auto;padding:4px 24px 96px;box-sizing:border-box;}
+  .det-crumb{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:#B9C3D6;font-size:13px;cursor:pointer;padding:6px 0;}
+  .det-crumb:hover{color:#fff;}
+  .det-crumb-sep{color:#6E7C99;}
+  .det-crumb-no{color:#fff;}
+  .det-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-top:10px;}
+  .det-id{display:flex;gap:16px;align-items:flex-start;min-width:0;flex:1 1 560px;}
+  .det-avatar{width:64px;height:64px;flex:none;border-radius:18px;background:#C9A84C;color:#0F1B33;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;}
+  .det-id-text{min-width:0;}
+  .det-id-text h2{margin:0;font-size:26px;font-weight:700;color:#fff;}
+  .det-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center;}
+  .det-chip{font-size:12.5px;color:#DCE3EF;border-radius:999px;padding:3px 10px;border:1px solid rgba(255,255,255,.2);}
+  .det-chip-no{font-family:'IBM Plex Mono',monospace;font-size:13px;background:rgba(255,255,255,.1);color:#fff;border-radius:8px;}
+  .det-chip-form{background:#E8EDFB;color:#1E3A8A;border-color:#E8EDFB;font-weight:600;}
+  .det-chip-ok{background:#ECFDF3;color:#15803D;border-color:#ECFDF3;font-weight:700;}
+  .det-meta{display:flex;gap:6px 18px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:#DCE3EF;}
+  .det-meta span{display:inline-flex;align-items:center;gap:6px;}
+  .det-meta-warn{color:#E5C877;}
+  .det-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .det-btn{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+  .det-btn:hover{background:rgba(255,255,255,.1);}
+  .det-actions #stamp-area .primary{min-height:44px;border-radius:10px;background:#C9A84C;color:#0F1B33;border:none;font-weight:700;padding:0 18px;}
+  .det-actions #stamp-area .primary:disabled{background:#3A4A6B;color:#AFBAD0;cursor:not-allowed;}
+  .det-actions #stamp-area .stamp{margin:0;}
+  .det-menu-wrap{position:relative;}
+  .det-menu{display:none;position:absolute;right:0;top:52px;width:280px;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(15,27,51,.28);padding:6px;z-index:20;flex-direction:column;}
+  .det-menu.open{display:flex;}
+  .det-menu .link-btn{width:100%;text-align:left;padding:10px 12px;min-height:44px;border-radius:8px;color:#0F1B33;text-decoration:none;font-size:14px;}
+  .det-menu .link-btn:hover{background:#F3F5FA;}
+  .det-mode .wrap{padding-top:0;}
+  #panel-detail{position:relative;}
+  .det-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:16px;margin:-64px 0 16px;align-items:start;}
+  .det-cards > *{min-width:0;}
+  .det-card{background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(15,27,51,.06),0 8px 24px rgba(15,27,51,.08);color:#0F1B33;box-sizing:border-box;}
+  .det-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+  .det-card-title{font-size:14px;font-weight:600;color:#4A5772;}
+  .det-progress{display:flex;gap:16px;align-items:center;}
+  .det-ring{flex:none;}
+  .det-progress-text{min-width:0;}
+  .det-counts{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 4px;font-size:12.5px;font-weight:600;}
+  .c-pass{color:#15803D;} .c-pending{color:#475569;} .c-rev{color:#B45309;}
+  .det-progress .progress-mini{font-size:12px;color:#4A5772;margin:0;}
+  .det-link{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 0;background:none;border:none;color:#2F4FB8;font-weight:600;font-size:14px;cursor:pointer;}
+  .det-small-btn{min-height:34px;padding:0 12px;font-size:12.5px;border-radius:8px;}
+  .det-hris #match-result{margin-top:10px;}
+  .det-hris .match-box{margin:0;font-size:12.5px;}
+  .det-hris .edu-cards{max-width:none;}
+  .det-g-row{padding-top:10px;margin-top:10px;border-top:1px solid #EEF1F6;}
+  .det-g-row:first-of-type{border-top:none;}
+  .det-g-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:14.5px;}
+  .det-g-sub{font-size:12.5px;color:#4A5772;margin-top:3px;}
+  .det-pill{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap;}
+  .det-pill-ok{background:#ECFDF3;color:#15803D;}
+  .det-pill-warn{background:#FFF7E8;color:#B45309;}
+  .det-mini-btn{margin-top:8px;min-height:34px;padding:0 12px;border-radius:8px;border:1px solid #DDE3EE;background:#fff;font-size:12.5px;color:#0F1B33;cursor:pointer;}
+  #panel-detail > #marital-warnings:not(:empty),#panel-detail > #rtaf-warnings:not(:empty),#panel-detail > #sibling-contracts:not(:empty){margin-bottom:16px;}
+  .det-body{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+  .det-docs{flex:999 1 640px;min-width:0;padding:0;overflow:hidden;}
+  .det-side{flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:16px;}
+  .det-docs-bar{padding:16px 22px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;border-bottom:1px solid #E6EAF2;}
+  .det-docs-title{flex:1 1 200px;font-size:16px;font-weight:700;}
+  .det-docs-title span{font-size:13px;font-weight:500;color:#4A5772;margin-left:4px;}
+  .det-compare-btn{min-height:40px;border-radius:10px;}
+  .dl-hint{font-size:12.5px;color:#4A5772;padding:10px 22px 0;}
+  .dl-group{padding-bottom:6px;}
+  .dl-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 22px 8px;}
+  .dl-head .badge{font-size:11.5px;}
+  .dl-head-note{font-size:12.5px;color:#4A5772;}
+  .dl-head-count{margin-left:auto;font-size:12.5px;color:#4A5772;}
+  .dl-row{display:grid;grid-template-columns:18px 26px minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 22px;border-top:1px solid #F0F3F8;}
+  .dl-row.dl-click{cursor:pointer;}
+  .dl-row.dl-click:hover{background:#F7F9FC;}
+  .dl-row.rv-row-needs-revision{background:#FFFBF2;}
+  .dl-row.rv-row-fail{background:#FEF7F7;}
+  .dl-cmp{width:16px;height:16px;margin:0;cursor:pointer;}
+  .dl-cmp-gap{width:16px;}
+  .dl-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+  .dl-main{min-width:0;}
+  .dl-name{font-size:14px;font-weight:600;color:#0F1B33;}
+  .rv-row-pass .dl-name{color:#14532D;}
+  .dl-tag{font-size:11.5px;font-weight:600;color:#4A5772;background:#EEF1F6;border-radius:999px;padding:1px 8px;margin-left:4px;}
+  .dl-sub{margin-top:3px;font-size:12.5px;}
+  .dl-sub .file-link{display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#2F4FB8;background:none;border:none;padding:0;cursor:pointer;text-align:left;word-break:break-all;}
+  .dl-reason{color:#4A5772;}
+  .dl-reason-warn{color:#B45309;font-weight:600;}
+  .dl-missing{color:#B91C1C;font-weight:600;}
+  .dl-comment{margin-top:4px;font-size:12.5px;color:#7F1D1D;white-space:pre-line;}
+  .dl-right{display:flex;align-items:center;}
+  .dl-result{min-width:92px;text-align:center;font-size:13px;font-weight:700;padding:6px 12px;border-radius:8px;border:1.5px solid transparent;}
+  .res-pass{background:#ECFDF3;color:#15803D;border-color:#86D3A3;}
+  .res-pending{background:#F1F5F9;color:#334155;border-color:#CBD5E1;}
+  .res-revision{background:#FFF7E8;color:#B45309;border-color:#F0B65A;}
+  .res-fail{background:#FEF2F2;color:#B91C1C;border-color:#F3A3A3;}
+  .res-none{background:#F4F6FA;color:#8392AD;border-color:#E1E6EF;}
+  .dl-icon.res-pass,.dl-icon.res-pending,.dl-icon.res-revision,.dl-icon.res-fail,.dl-icon.res-none{border:none;}
+  #panel-detail[data-filter="todo"] .dl-row:not(.is-todo),#panel-detail[data-filter="done"] .dl-row:not(.is-done){display:none;}
+  .det-side .fi-data{margin:0;background:#fff;border:none;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(15,27,51,.06);}
+  .det-side .fi-data-title{font-size:15px;color:#0F1B33;}
+  .det-side .fi-grid{grid-template-columns:auto minmax(0,1fr);gap:8px 14px;}
+  .det-side .fi-grid > div{display:contents;}
+  .det-side .fi-grid span{color:#4A5772;}
+  .det-activity{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:14px;}
+  .det-activity li{display:grid;grid-template-columns:12px minmax(0,1fr);gap:12px;font-size:13px;}
+  .det-activity li.act-muted,.det-activity li.act-more{display:block;color:#4A5772;}
+  .act-dot{width:10px;height:10px;border-radius:50%;margin-top:5px;}
+  .act-blue{background:#2F4FB8;} .act-green{background:#15803D;} .act-amber{background:#D97706;} .act-red{background:#B91C1C;} .act-grey{background:#94A3B8;} .act-gold{background:#C9A84C;}
+  .act-text strong{font-weight:600;display:block;}
+  .act-detail{display:block;color:#0F1B33;font-size:12.5px;word-break:break-word;}
+  .act-meta{display:block;color:#4A5772;font-size:12px;}
+  @media (max-width:700px){
+    .det-inner{padding-left:16px;padding-right:16px;}
+    .det-id-text h2{font-size:21px;}
+    .det-avatar{width:48px;height:48px;font-size:17px;border-radius:14px;}
+    .det-actions{width:100%;}
+    .det-actions .det-btn{flex:1;justify-content:center;}
+    .det-actions #stamp-area{flex-basis:100%;}
+    .det-actions #stamp-area .primary{width:100%;}
+    .dl-row{grid-template-columns:18px 22px minmax(0,1fr);padding:11px 14px;}
+    .dl-right{grid-column:3;}
+    .dl-head,.det-docs-bar{padding-left:14px;padding-right:14px;}
+  }
+  @media print{ .det-hero{display:none !important;} }
 </style>
 </head>
 <body>
@@ -1590,6 +1725,37 @@ setTimeout(function () {
       </div>
     </div>
   </div>
+  <div class="det-hero">
+    <div class="det-inner">
+      <button type="button" class="det-crumb no-print" onclick="showList()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+        รายชื่อสัญญา <span class="det-crumb-sep">/</span> <span class="det-crumb-no" id="det-crumb-no"></span>
+      </button>
+      <div class="det-top">
+        <div class="det-id">
+          <span class="det-avatar" id="det-avatar" aria-hidden="true"></span>
+          <div class="det-id-text">
+            <h2 id="d-name"></h2>
+            <div class="det-chips" id="d-contract-tag"></div>
+            <div class="det-meta" id="d-meta"></div>
+          </div>
+        </div>
+        <div class="det-actions no-print">
+          <div class="det-menu-wrap">
+            <button type="button" class="det-btn" id="det-menu-btn" aria-expanded="false" onclick="toggleDetMenu()">จัดการสัญญา
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+            <div class="det-menu acct-tools" id="det-menu">
+              <button class="link-btn" onclick="closeDetMenu(); officerChangeEmail()">เปลี่ยนบัญชี Google ของผู้ทำสัญญา</button>
+              <button class="link-btn" onclick="closeDetMenu(); officerChangeOfficialId()">แก้ไขเลขประจำตัว</button>
+              <button class="link-btn" onclick="closeDetMenu(); officerChangeName()">แก้ไขยศ ชื่อ-นามสกุล</button>
+            </div>
+          </div>
+          <button type="button" class="det-btn" onclick="openReport(currentSubId)">รายงาน</button>
+          <div id="stamp-area"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </header>
 
 <div class="imp-drawer" id="imp-drawer">
@@ -1724,59 +1890,62 @@ setTimeout(function () {
 
   <!-- DETAIL VIEW -->
   <div class="panel" id="panel-detail">
-    <button class="back-link" onclick="showList()">← กลับไปรายชื่อทั้งหมด</button>
+    <div class="det-cards">
+      <div class="det-card det-progress">
+        <svg class="det-ring" width="88" height="88" viewBox="0 0 36 36" role="img" aria-label="ความคืบหน้าการตรวจเอกสารบังคับ">
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E6EAF2" stroke-width="3.6"></circle>
+          <circle id="det-ring-arc" cx="18" cy="18" r="15.9" fill="none" stroke="#15803D" stroke-width="3.6" stroke-linecap="round" stroke-dasharray="0 100" transform="rotate(-90 18 18)"></circle>
+          <text id="det-ring-text" x="18" y="17.5" text-anchor="middle" font-size="7.5" font-weight="700" fill="#0F1B33">0/0</text>
+          <text x="18" y="24" text-anchor="middle" font-size="4" fill="#4A5772">ผ่านแล้ว</text>
+        </svg>
+        <div class="det-progress-text">
+          <div class="det-card-title">ความคืบหน้าการตรวจ</div>
+          <div class="det-counts" id="det-counts"></div>
+          <div class="progress-mini" id="stamp-progress"></div>
+          <button type="button" class="det-link" id="det-next" onclick="detReviewNext()">ตรวจฉบับที่เหลือ
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></button>
+        </div>
+      </div>
+      <div class="det-card det-hris">
+        <div class="det-card-head"><span class="det-card-title">ตรวจรายชื่อกับ HRIS</span>
+          <button class="primary det-small-btn" id="btn-match" onclick="runMatch()">ตรวจสอบรายชื่อกับระบบ</button></div>
+        <div id="match-result"></div>
+      </div>
+      <div class="det-card det-guar" id="det-guarantor-card"></div>
+    </div>
+    <div id="marital-warnings"></div>
+    <div id="rtaf-warnings"></div>
+    <div id="sibling-contracts"></div>
 
-    <div class="card">
-      <div class="applicant-header">
-        <div>
-          <h2 id="d-name"></h2>
-          <div class="contract-tag" id="d-contract-tag"></div>
-          <div class="meta" id="d-meta"></div>
-          <div class="acct-tools no-print">
-            <button class="link-btn" onclick="officerChangeEmail()">เปลี่ยนบัญชี Google ของผู้ทำสัญญา</button>
-            <button class="link-btn" onclick="officerChangeOfficialId()">แก้ไขเลขประจำตัว</button>
-            <button class="link-btn" onclick="officerChangeName()">แก้ไขยศ ชื่อ-นามสกุล</button>
+    <div class="det-body">
+      <section class="dash-card det-docs">
+        <div class="det-docs-bar">
+          <div class="det-docs-title">เอกสาร <span id="det-doc-count"></span></div>
+          <div class="filter-chips seg" role="group" aria-label="กรองเอกสาร">
+            <button type="button" class="chip active" id="det-f-all" onclick="setDetFilter('all')">ทั้งหมด</button>
+            <button type="button" class="chip" id="det-f-todo" onclick="setDetFilter('todo')">ยังไม่ตรวจ</button>
+            <button type="button" class="chip" id="det-f-done" onclick="setDetFilter('done')">ผ่านแล้ว</button>
           </div>
-          <div id="d-form-data"></div>
+          <button type="button" class="secondary det-compare-btn" id="det-compare-btn" onclick="if(compareSelection.length) openCompareModal()" disabled>เปิดเทียบที่เลือก (0)</button>
         </div>
-        <button class="primary" id="btn-match" onclick="runMatch()">ตรวจสอบรายชื่อกับระบบ</button>
-      </div>
-      <div id="match-result"></div>
-      <div id="marital-warnings"></div>
-      <div id="rtaf-warnings"></div>
-      <div id="sibling-contracts"></div>
-    </div>
-
-    <div class="card">
-      <div class="doc-group-title" style="margin-top:0;padding-top:0;border-top:none">เอกสารของผู้ทำสัญญา</div>
-      <table class="doc-table">
-        <thead><tr><th style="width:8%">เทียบ</th><th style="width:34%">รายการ</th><th style="width:14%">สถานะไฟล์</th><th style="width:14%">ผลตรวจ</th><th style="width:30%">หมายเหตุ/comment</th></tr></thead>
-        <tbody id="doc-rows-contractor"></tbody>
-      </table>
-
-      <div class="sec-contractor-spouse">
-      <div class="doc-group-title">เอกสารของคู่สมรสผู้ทำสัญญา</div>
-      <div class="doc-group-hint">กรณีผู้ทำสัญญาสมรสแล้ว</div>
-      <table class="doc-table">
-        <thead><tr><th style="width:8%">เทียบ</th><th style="width:34%">รายการ</th><th style="width:14%">สถานะไฟล์</th><th style="width:14%">ผลตรวจ</th><th style="width:30%">หมายเหตุ/comment</th></tr></thead>
-        <tbody id="doc-rows-contractor-spouse"></tbody>
-      </table>
-      </div>
-    </div>
-
-    <div class="card">
-      <p class="hint" style="margin:0">เอกสารบัตรของผู้ค้ำประกันและคู่สมรส สแกน OCR ได้จากในหน้าต่างตรวจเอกสาร (คลิกชื่อไฟล์)</p>
-      <div id="guarantor-tables"></div>
-    </div>
-
-    <div class="card">
-      <div class="stamp-section">
-        <div class="progress-mini" id="stamp-progress"></div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <button class="secondary" onclick="openReport(currentSubId)">ดูรายงานสรุปผลการตรวจสอบ</button>
-          <div id="stamp-area"></div>
+        <div class="dl-hint">คลิกเอกสารเพื่อเปิดหน้าต่างตรวจเต็มจอ · ติ๊กช่องหน้าเอกสารเพื่อเลือกเปิดเทียบ (สูงสุด 3)</div>
+        <div class="dl-group">
+          <div class="dl-head"><span class="rv-owner own-contractor">ผู้ทำสัญญา</span><span class="dl-head-count" id="doc-rows-contractor-head"></span></div>
+          <div class="dl-rows" id="doc-rows-contractor"></div>
         </div>
-      </div>
+        <div class="sec-contractor-spouse dl-group">
+          <div class="dl-head"><span class="rv-owner own-cspouse">คู่สมรสผู้ทำสัญญา</span><span class="dl-head-note">กรณีผู้ทำสัญญาสมรสแล้ว</span><span class="dl-head-count" id="doc-rows-contractor-spouse-head"></span></div>
+          <div class="dl-rows" id="doc-rows-contractor-spouse"></div>
+        </div>
+        <div id="guarantor-tables"></div>
+      </section>
+      <aside class="det-side">
+        <div id="d-form-data"></div>
+        <div class="dash-card det-activity-card">
+          <div class="dash-card-title">ความเคลื่อนไหว</div>
+          <ol class="det-activity" id="det-activity"></ol>
+        </div>
+      </aside>
     </div>
   </div>
 
@@ -3635,6 +3804,7 @@ function renderList() {
 }
 function showList() {
   document.getElementById('app-admin').classList.add('dash-mode');
+  document.getElementById('app-admin').classList.remove('det-mode');
   tabSet(TAB_NAV_KEY, {view: 'admin'});
   document.getElementById('panel-list').classList.add('active');
   document.getElementById('panel-detail').classList.remove('active');
@@ -3662,9 +3832,10 @@ function showDetail(subId) {
 function renderDetail(sub) {
   document.getElementById('app-admin').classList.remove('dash-mode');
   tabSet(TAB_NAV_KEY, {view: 'admin', subId: sub.subId});
-  document.getElementById('d-name').textContent = "".concat(sub.personal.title, " ").concat(sub.personal.first, " ").concat(sub.personal.last);
-  document.getElementById('d-contract-tag').textContent = "\u0E40\u0E25\u0E02\u0E17\u0E35\u0E48\u0E2A\u0E31\u0E0D\u0E0D\u0E32 ".concat(formatContractNumber(sub), " \u2014 \u0E09\u0E1A\u0E31\u0E1A\u0E17\u0E35\u0E48 ").concat(sub.personalSeq || 1, " \u0E02\u0E2D\u0E07\u0E1A\u0E38\u0E04\u0E04\u0E25\u0E19\u0E35\u0E49");
-  document.getElementById('d-meta').textContent = "\u0E2A\u0E48\u0E07\u0E40\u0E2D\u0E01\u0E2A\u0E32\u0E23\u0E25\u0E48\u0E32\u0E2A\u0E38\u0E14\u0E40\u0E21\u0E37\u0E48\u0E2D: ".concat(formatThaiDateTime(sub.submittedAt), " \xB7 \u0E40\u0E25\u0E02\u0E1B\u0E23\u0E30\u0E08\u0E33\u0E15\u0E31\u0E27: ").concat(sub.personal.officialId || 'ไม่ได้กรอก', " \xB7 \u0E1B\u0E23\u0E30\u0E40\u0E20\u0E17\u0E01\u0E32\u0E23\u0E28\u0E36\u0E01\u0E29\u0E32: ").concat(EDU_TYPE_LABEL[sub.personal.eduType] || '-', " \xB7 \u0E42\u0E17\u0E23 ").concat(sub.personal.phone).concat(sub.personal.workPhone ? ' (ที่ทำงาน ' + sub.personal.workPhone + ')' : '', " \xB7 ").concat(sub.personal.email);
+  document.getElementById('app-admin').classList.add('det-mode');
+  renderDetailHeader(sub);
+  setDetFilter('all');
+  closeDetMenu();
   renderSiblingContracts(sub);
   renderFormDataBox(sub);
   compareSelection = [];
@@ -3673,6 +3844,7 @@ function renderDetail(sub) {
   renderAllDocTables(sub);
   renderMaritalWarnings(sub);
   renderStampArea(sub);
+  loadActivity(sub);
   document.getElementById('panel-list').classList.remove('active');
   document.getElementById('panel-detail').classList.add('active');
   if (pendingAutoMatchSubId === sub.subId && HRIS) {
@@ -3846,56 +4018,83 @@ function renderMatchResult(sub) {
   document.getElementById('match-result').innerHTML = html;
 }
 function renderAllDocTables(sub) {
-  renderDocTable('doc-rows-contractor', contractorDocsFor(sub.personal.eduType), sub);
-  renderDocTable('doc-rows-contractor-spouse', contractorSpouseDocsFor(sub.personal.eduType), sub);
-  showContractorSpouseSection(sub.personal.eduType);
+  var e = sub.personal.eduType;
+  renderDocTable('doc-rows-contractor', contractorDocsFor(e), sub);
+  renderDocTable('doc-rows-contractor-spouse', contractorSpouseDocsFor(e), sub);
+  showContractorSpouseSection(e);
   var gContainer = document.getElementById('guarantor-tables');
   gContainer.innerHTML = '';
-  activeGuarantors(sub.personal.eduType).forEach(function (g) {
-    var h1 = document.createElement('div');
-    h1.className = 'guarantor-heading';
+  activeGuarantors(e).forEach(function (g) {
     var confirmed = sub.guarantorInfo && sub.guarantorInfo[g.n];
     var confirmedBadge = !confirmed ? '' : confirmed.source === 'manual'
-      ? ' <span class="badge revision">บันทึกข้อมูลแล้ว (ไม่พบใน HRIS): ' + escapeHtml(confirmed.title + ' ' + confirmed.first + ' ' + confirmed.last + ' · ' + (confirmed.position || '-') + ' · ' + (confirmed.unit || '-')) + '</span>'
-      : ' <span class="badge matched">ยืนยันตัวตนแล้ว (HRIS): ' + escapeHtml(confirmed.title + ' ' + confirmed.first + ' ' + confirmed.last + ' · ' + (confirmed.position || '-') + ' · ' + (confirmed.unit || '-')) + '</span>';
-    h1.innerHTML = "<span class=\"num-badge\">".concat(g.n, "</span> \u0E1C\u0E39\u0E49\u0E04\u0E49\u0E33\u0E1B\u0E23\u0E30\u0E01\u0E31\u0E19\u0E04\u0E19\u0E17\u0E35\u0E48 ").concat(g.n, " \u2014 \u0E40\u0E2D\u0E01\u0E2A\u0E32\u0E23\u0E02\u0E2D\u0E07\u0E1C\u0E39\u0E49\u0E04\u0E49\u0E33\u0E1B\u0E23\u0E30\u0E01\u0E31\u0E19").concat(confirmedBadge);
-    gContainer.appendChild(h1);
-    var t1 = document.createElement('table');
-    t1.className = 'doc-table';
-    t1.innerHTML = "<thead><tr><th style=\"width:8%\">\u0E40\u0E17\u0E35\u0E22\u0E1A</th><th style=\"width:34%\">\u0E23\u0E32\u0E22\u0E01\u0E32\u0E23</th><th style=\"width:14%\">\u0E2A\u0E16\u0E32\u0E19\u0E30\u0E44\u0E1F\u0E25\u0E4C</th><th style=\"width:14%\">\u0E1C\u0E25\u0E15\u0E23\u0E27\u0E08</th><th style=\"width:30%\">\u0E2B\u0E21\u0E32\u0E22\u0E40\u0E2B\u0E15\u0E38/comment</th></tr></thead><tbody id=\"doc-rows-g".concat(g.n, "\"></tbody>");
-    gContainer.appendChild(t1);
-    var h2 = document.createElement('div');
-    h2.className = 'doc-group-title';
-    h2.textContent = "\u0E1C\u0E39\u0E49\u0E04\u0E49\u0E33\u0E1B\u0E23\u0E30\u0E01\u0E31\u0E19\u0E04\u0E19\u0E17\u0E35\u0E48 ".concat(g.n, " \u2014 \u0E40\u0E2D\u0E01\u0E2A\u0E32\u0E23\u0E02\u0E2D\u0E07\u0E04\u0E39\u0E48\u0E2A\u0E21\u0E23\u0E2A\u0E1C\u0E39\u0E49\u0E04\u0E49\u0E33\u0E1B\u0E23\u0E30\u0E01\u0E31\u0E19");
-    gContainer.appendChild(h2);
-    var t2 = document.createElement('table');
-    t2.className = 'doc-table';
-    t2.innerHTML = "<thead><tr><th style=\"width:8%\">\u0E40\u0E17\u0E35\u0E22\u0E1A</th><th style=\"width:34%\">\u0E23\u0E32\u0E22\u0E01\u0E32\u0E23</th><th style=\"width:14%\">\u0E2A\u0E16\u0E32\u0E19\u0E30\u0E44\u0E1F\u0E25\u0E4C</th><th style=\"width:14%\">\u0E1C\u0E25\u0E15\u0E23\u0E27\u0E08</th><th style=\"width:30%\">\u0E2B\u0E21\u0E32\u0E22\u0E40\u0E2B\u0E15\u0E38/comment</th></tr></thead><tbody id=\"doc-rows-gs".concat(g.n, "\"></tbody>");
-    gContainer.appendChild(t2);
-    renderDocTable("doc-rows-g".concat(g.n), g.docs, sub);
-    renderDocTable("doc-rows-gs".concat(g.n), guarantorSpouseDocsFor(g, sub.personal.eduType), sub);
+      ? '<span class="badge revision">บันทึกข้อมูลแล้ว (ไม่พบใน HRIS): ' + escapeHtml(confirmed.title + ' ' + confirmed.first + ' ' + confirmed.last + ' · ' + (confirmed.position || '-') + ' · ' + (confirmed.unit || '-')) + '</span>'
+      : '<span class="badge matched">ยืนยันตัวตนแล้ว (HRIS): ' + escapeHtml(confirmed.title + ' ' + confirmed.first + ' ' + confirmed.last + ' · ' + (confirmed.position || '-') + ' · ' + (confirmed.unit || '-')) + '</span>';
+    var g1 = document.createElement('div');
+    g1.className = 'dl-group';
+    g1.innerHTML = '<div class="dl-head"><span class="rv-owner own-guarantor">ผู้ค้ำประกันคนที่ ' + g.n + '</span>' + confirmedBadge +
+      '<span class="dl-head-count" id="doc-rows-g' + g.n + '-head"></span></div><div class="dl-rows" id="doc-rows-g' + g.n + '"></div>';
+    gContainer.appendChild(g1);
+    var g2 = document.createElement('div');
+    g2.className = 'dl-group';
+    g2.innerHTML = '<div class="dl-head"><span class="rv-owner own-gspouse">คู่สมรสผู้ค้ำประกันคนที่ ' + g.n + '</span>' +
+      (isPilotEdu(e) ? '<span class="dl-head-note">หนังสือยินยอม (ผนวก ญ) อยู่ในไฟล์สัญญา</span>' : '<span class="dl-head-note">กรณีผู้ค้ำประกันสมรสแล้ว</span>') +
+      '<span class="dl-head-count" id="doc-rows-gs' + g.n + '-head"></span></div><div class="dl-rows" id="doc-rows-gs' + g.n + '"></div>';
+    gContainer.appendChild(g2);
+    renderDocTable('doc-rows-g' + g.n, g.docs, sub);
+    renderDocTable('doc-rows-gs' + g.n, guarantorSpouseDocsFor(g, e), sub);
   });
 }
+// one row per document: [compare] [status icon] name / file / note  [result]
+// results are shown, not edited, here — reviewing happens in the full-screen window
+// (except a "no spouse" declaration, which has no file to open, so it keeps its dropdown)
 function renderDocTable(containerId, docs, sub) {
-  var tbody = document.getElementById(containerId);
-  tbody.innerHTML = '';
+  var box = document.getElementById(containerId);
+  if (!box) return;
+  box.innerHTML = '';
+  var g = function (id) { return docEntry(sub, id); };
+  var req = 0, pass = 0;
   docs.forEach(function (doc) {
     var entry = docEntry(sub, doc.id);
-    var tr = document.createElement('tr');
     var locked = entry.reviewStatus === 'pass' || entry.reviewStatus === 'fail';
-    var g = function g(id) {
-      return docEntry(sub, id);
-    };
     var waived = isWaivedDoc(g, doc.id);
     var declaredNoSpouse = isSpouseConsentId(doc.id) && entry.status === 'skipped';
-    var fileBadge = waived ? '<span class="badge skipped">ไม่ต้องส่ง (ไม่มีคู่สมรส)</span>' : declaredNoSpouse ? '<span class="badge revision">ผู้ยื่นแจ้ง: ไม่มีคู่สมรส</span>' : isRtafExemptId(doc.id) && entry.status === 'skipped' ? '<span class="badge skipped">ผู้ยื่นแจ้ง: ผู้ค้ำเป็นข้าราชการ ทอ.</span>' : entry.status === 'uploaded' ? "<button class=\"file-link\" onclick=\"openDocModal('".concat(sub.subId, "','").concat(doc.id, "')\">\uD83D\uDCC4 ").concat(adminFileName(sub, entry), "</button>") : doc.optional ? '<span class="badge pending">ไม่มีเอกสารนี้</span>' : '<span class="badge fail">ยังไม่อัปโหลด</span>';
-    var canReview = entry.status === 'uploaded' || declaredNoSpouse;
-    var select = canReview ? "\n      <select onchange=\"setReview('".concat(doc.id, "','").concat(sub.subId, "',this.value)\">\n        <option value=\"pending\" ").concat(entry.reviewStatus === 'pending' ? 'selected' : '', ">\u0E23\u0E2D\u0E15\u0E23\u0E27\u0E08</option>\n        <option value=\"pass\" ").concat(entry.reviewStatus === 'pass' ? 'selected' : '', ">\u0E1C\u0E48\u0E32\u0E19</option>\n        <option value=\"needs-revision\" ").concat(entry.reviewStatus === 'needs-revision' ? 'selected' : '', ">\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02</option>\n        <option value=\"fail\" ").concat(entry.reviewStatus === 'fail' ? 'selected' : '', ">\u0E44\u0E21\u0E48\u0E1C\u0E48\u0E32\u0E19</option>\n      </select>") : '<span class="sub-cell">—</span>';
-    var commentBox = canReview ? "\n      <textarea placeholder=\"comment (\u0E16\u0E49\u0E32\u0E21\u0E35) \u2014 \u0E08\u0E33\u0E40\u0E1B\u0E47\u0E19\u0E40\u0E21\u0E37\u0E48\u0E2D\u0E40\u0E25\u0E37\u0E2D\u0E01 '\u0E15\u0E49\u0E2D\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02'\" onchange=\"setComment('".concat(doc.id, "','").concat(sub.subId, "',this.value)\">").concat(entry.comment || '', "</textarea>") : '';
-    var compareCell = entry.status === 'uploaded' ? "<input type=\"checkbox\" ".concat(compareSelection.includes(doc.id) ? 'checked' : '', " onchange=\"toggleCompare('").concat(doc.id, "', this)\">") : '';
-    tr.innerHTML = "\n      <td>".concat(compareCell, "</td>\n      <td>").concat(doc.name).concat(doc.optional ? ' <span class="sub-cell">(ถ้ามี)</span>' : '').concat(locked ? ' <span class="sub-cell">🔒 ล็อกแล้ว</span>' : '').concat(annotIsCurrent(entry) ? ' <span class="annot-flag">🖍 มีไฟล์ตรวจแก้</span>' : '', "</td>\n      <td>").concat(fileBadge, "</td>\n      <td>").concat(select, "</td>\n      <td>").concat(commentBox, "</td>\n    ");
-    tbody.appendChild(tr);
+    var rtafSkip = isRtafExemptId(doc.id) && entry.status === 'skipped';
+    var uploaded = entry.status === 'uploaded';
+    var canReview = uploaded || declaredNoSpouse;
+    if (isRequiredDoc(g, doc)) { req++; if (entry.reviewStatus === 'pass') pass++; }
+    var st = entry.reviewStatus || 'pending';
+    var ui = RESULT_UI[st] || RESULT_UI.pending;
+    var row = document.createElement('div');
+    row.className = 'dl-row' + (canReview ? ' rv-row-' + st + (st === 'pass' ? ' is-done' : ' is-todo') : ' dl-none') + (uploaded ? ' dl-click' : '');
+    row.setAttribute('data-doc-id', doc.id);
+    var cmp = uploaded
+      ? '<input type="checkbox" class="dl-cmp" aria-label="เลือกเอกสารนี้เพื่อเปิดเทียบ"' + (compareSelection.includes(doc.id) ? ' checked' : '') + ' onclick="event.stopPropagation()" onchange="toggleCompare(\'' + doc.id + '\', this)">'
+      : '<span class="dl-cmp-gap"></span>';
+    var icon = canReview ? '<span class="dl-icon ' + ui.cls + '" aria-hidden="true">' + ui.icon + '</span>' : '<span class="dl-icon res-none" aria-hidden="true">–</span>';
+    var second = uploaded
+      ? '<button class="file-link" onclick="event.stopPropagation(); openDocModal(\'' + sub.subId + '\',\'' + doc.id + '\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"></path><path d="M14 3v5h5"></path></svg>' + escapeHtml(adminFileName(sub, entry)) + '</button>'
+      : waived ? '<span class="dl-reason">ไม่ต้องส่ง (ไม่มีคู่สมรส)</span>'
+      : declaredNoSpouse ? '<span class="dl-reason dl-reason-warn">ผู้ยื่นแจ้ง: ไม่มีคู่สมรส — ยืนยันผลด้านขวา</span>'
+      : rtafSkip ? '<span class="dl-reason">ผู้ยื่นแจ้ง: ผู้ค้ำเป็นข้าราชการ ทอ.</span>'
+      : doc.optional ? '<span class="dl-reason">ไม่มีเอกสารนี้</span>'
+      : '<span class="dl-reason dl-missing">ยังไม่อัปโหลด</span>';
+    var result = uploaded
+      ? '<span class="dl-result ' + ui.cls + '">' + ui.label + '</span>'
+      : declaredNoSpouse
+      ? '<select class="rv-sel rv-' + st + '" aria-label="ผลตรวจ" onclick="event.stopPropagation()" onchange="this.className=\'rv-sel rv-\'+this.value; setReview(\'' + doc.id + '\',\'' + sub.subId + '\',this.value); renderAllDocTables(SUBMISSIONS.find(function(s){return s.subId===\'' + sub.subId + '\';}))">' +
+        ['pending', 'pass', 'needs-revision', 'fail'].map(function (v) { return '<option value="' + v + '"' + (st === v ? ' selected' : '') + '>' + RESULT_UI[v].label + '</option>'; }).join('') + '</select>'
+      : '<span class="dl-result res-none">—</span>';
+    row.innerHTML = cmp + icon +
+      '<div class="dl-main"><div class="dl-name">' + doc.name + (doc.optional ? ' <span class="sub-cell">(ถ้ามี)</span>' : '') +
+        (locked ? ' <span class="dl-tag">ล็อกแล้ว</span>' : '') + (annotIsCurrent(entry) ? ' <span class="annot-flag">มีไฟล์ตรวจแก้</span>' : '') + '</div>' +
+        '<div class="dl-sub">' + second + '</div>' +
+        (entry.comment && canReview ? '<div class="dl-comment">หมายเหตุ: ' + escapeHtml(entry.comment) + '</div>' : '') + '</div>' +
+      '<div class="dl-right">' + result + '</div>';
+    if (uploaded) row.onclick = function () { openDocModal(sub.subId, doc.id); };
+    box.appendChild(row);
   });
+  var head = document.getElementById(containerId + '-head');
+  if (head) head.textContent = req ? 'ผ่าน ' + pass + ' / ' + req : '';
 }
 function setReview(docId, subId, value) {
   var sub = SUBMISSIONS.find(function (s) {
@@ -6279,6 +6478,161 @@ renderFormImportPreview = function () {
   FI_STATE.lastCheck = new Date().toLocaleTimeString('th-TH', {hour: '2-digit', minute: '2-digit'}) + ' น.';
   _dashRenderFi();
   if (document.getElementById('kpi-bar')) renderDashboard();
+};
+
+// ======================================================================
+// Contract detail page (new design): header identity, summary cards,
+// grouped document list, activity feed
+// ======================================================================
+var RESULT_UI = {
+  'pass': {label: 'ผ่าน', icon: '✓', cls: 'res-pass'},
+  'pending': {label: 'รอตรวจ', icon: '•', cls: 'res-pending'},
+  'needs-revision': {label: 'ต้องแก้ไข', icon: '!', cls: 'res-revision'},
+  'fail': {label: 'ไม่ผ่าน', icon: '×', cls: 'res-fail'}
+};
+var detFilter = 'all';
+function setDetFilter(f) {
+  detFilter = f;
+  ['all', 'todo', 'done'].forEach(function (k) { document.getElementById('det-f-' + k).classList.toggle('active', k === f); });
+  document.getElementById('panel-detail').setAttribute('data-filter', f);
+}
+function toggleDetMenu() {
+  var m = document.getElementById('det-menu'), b = document.getElementById('det-menu-btn');
+  var open = !m.classList.contains('open');
+  m.classList.toggle('open', open);
+  b.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeDetMenu() {
+  document.getElementById('det-menu').classList.remove('open');
+  document.getElementById('det-menu-btn').setAttribute('aria-expanded', 'false');
+}
+document.addEventListener('click', function (e) {
+  var w = document.querySelector('.det-menu-wrap');
+  if (w && !w.contains(e.target)) { var m = document.getElementById('det-menu'); if (m) m.classList.remove('open'); }
+});
+function renderDetailHeader(sub) {
+  var p = sub.personal;
+  document.getElementById('d-name').textContent = p.title + ' ' + p.first + ' ' + p.last;
+  document.getElementById('det-avatar').textContent = thaiInitial(p.first) + thaiInitial(p.last);
+  document.getElementById('det-crumb-no').textContent = formatContractNumber(sub);
+  var tk = dashTypeKey(p.eduType);
+  document.getElementById('d-contract-tag').innerHTML =
+    '<span class="det-chip det-chip-no">' + escapeHtml(formatContractNumber(sub)) + '</span>' +
+    '<span class="type-pill t-' + tk + '">' + escapeHtml(EDU_TYPE_LABEL[p.eduType] || 'ยังไม่เลือกประเภท') + '</span>' +
+    '<span class="det-chip">ฉบับที่ ' + (sub.personalSeq || 1) + ' ของบุคคลนี้</span>' +
+    (sub.importSource === 'google-form' ? '<span class="det-chip det-chip-form">จาก Google Form</span>' : '') +
+    (sub.stamped ? '<span class="det-chip det-chip-ok">ประทับตราแล้ว</span>' : '');
+  var ico = function (path) { return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>'; };
+  var meta = [];
+  meta.push('<span>' + ico('<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>') + 'ส่งล่าสุด ' + escapeHtml(sub.submittedAt ? formatThaiDateTime(sub.submittedAt) : '—') + '</span>');
+  if (p.phone) meta.push('<span>' + ico('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"></path>') + escapeHtml(p.phone) + (p.workPhone ? ' (ที่ทำงาน ' + escapeHtml(p.workPhone) + ')' : '') + '</span>');
+  if (p.email) meta.push('<span>' + ico('<rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path>') + escapeHtml(p.email) + '</span>');
+  meta.push(p.officialId
+    ? '<span>' + ico('<rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M7 10h4M7 14h7"></path>') + 'เลขประจำตัว ' + escapeHtml(p.officialId) + '</span>'
+    : '<span class="det-meta-warn">' + ico('<path d="M12 9v4"></path><path d="M12 17h.01"></path><circle cx="12" cy="12" r="9"></circle>') + 'ยังไม่มีเลขประจำตัวข้าราชการ</span>');
+  document.getElementById('d-meta').innerHTML = meta.join('');
+}
+function renderDetailSummary(sub) {
+  if (!document.getElementById('det-ring-arc')) return;
+  var r = subReadiness(sub);
+  var uploaded = docsForSub(sub).map(function (d) { return docEntry(sub, d.id); }).filter(function (e) { return e.status === 'uploaded'; });
+  var c = {pass: 0, pending: 0, rev: 0};
+  uploaded.forEach(function (e) {
+    if (e.reviewStatus === 'pass') c.pass++;
+    else if (e.reviewStatus === 'needs-revision' || e.reviewStatus === 'fail') c.rev++;
+    else c.pending++;
+  });
+  var pct = r.required ? Math.round(100 * r.pass / r.required) : 0;
+  var arc = document.getElementById('det-ring-arc');
+  arc.setAttribute('stroke-dasharray', pct + ' 100');
+  arc.style.display = r.pass ? '' : 'none';
+  document.getElementById('det-ring-text').textContent = r.pass + '/' + r.required;
+  document.getElementById('det-counts').innerHTML = '<span class="c-pass">ผ่าน ' + c.pass + '</span><span class="c-pending">รอตรวจ ' + c.pending + '</span><span class="c-rev">แก้ไข ' + c.rev + '</span>';
+  document.getElementById('det-next').style.display = c.pending ? '' : 'none';
+  document.getElementById('det-doc-count').textContent = 'เอกสารบังคับผ่าน ' + r.pass + ' / ' + r.required;
+  // guarantors
+  var gc = document.getElementById('det-guarantor-card');
+  var gs = activeGuarantors(sub.personal.eduType);
+  gc.innerHTML = '<div class="det-card-head"><span class="det-card-title">ผู้ค้ำประกัน ' + gs.length + ' คน</span></div>' + gs.map(function (g) {
+    var info = sub.guarantorInfo && sub.guarantorInfo[g.n];
+    var formName = g.n === 1 && sub.formData && sub.formData.guarantorName;
+    var name = info ? [info.title, info.first, info.last].join(' ') : (formName || 'ผู้ค้ำประกันคนที่ ' + g.n);
+    var badge = !info ? '<span class="det-pill det-pill-warn">ยังไม่ยืนยันตัวตน</span>'
+      : info.source === 'manual' ? '<span class="det-pill det-pill-warn">บันทึกเอง (ไม่พบใน HRIS)</span>'
+      : '<span class="det-pill det-pill-ok">ยืนยันกับ HRIS แล้ว</span>';
+    var sub2 = info ? [info.position, info.unit].filter(Boolean).join(' · ') : (g.n === 1 && sub.formData ? [sub.formData.guarantorAge ? sub.formData.guarantorAge + ' ปี' : '', sub.formData.guarantorOccupation].filter(Boolean).join(' · ') : '');
+    var idDoc = 'g' + g.n + '_1', hasId = docEntry(sub, idDoc).status === 'uploaded';
+    return '<div class="det-g-row"><div class="det-g-top"><strong>' + escapeHtml(name) + '</strong>' + badge + '</div>' +
+      (sub2 ? '<div class="det-g-sub">' + escapeHtml(sub2) + '</div>' : '') +
+      (!info && hasId ? '<button type="button" class="det-mini-btn" onclick="openDocModal(\'' + sub.subId + '\',\'' + idDoc + '\')">เปิดบัตรผู้ค้ำเพื่อยืนยัน</button>' : '') + '</div>';
+  }).join('');
+}
+function detReviewNext() {
+  var sub = SUBMISSIONS.find(function (s) { return s.subId === currentSubId; });
+  if (!sub) return;
+  var next = docsForSub(sub).filter(function (d) { var e = docEntry(sub, d.id); return e.status === 'uploaded' && e.driveFileId && (e.reviewStatus || 'pending') === 'pending'; })[0];
+  if (next) openDocModal(sub.subId, next.id);
+}
+// ---------- activity ----------
+var ACTIVITY_LABEL = {
+  form_imported: 'นำเข้าจาก Google Form', form_contract_attached: 'แนบไฟล์สัญญาจาก Google Form',
+  submission_created: 'สร้างสัญญา', submission_resubmitted: 'ผู้ทำสัญญาส่งเอกสาร', document_uploaded: 'อัปโหลด',
+  document_skipped: 'แจ้งไม่มีเอกสาร', review_status_changed: 'ผลตรวจ', document_annotated: 'ทำเครื่องหมายบนเอกสาร',
+  match_result_set: 'ตรวจรายชื่อกับ HRIS', guarantor_confirmed: 'บันทึกข้อมูลผู้ค้ำประกัน', stamp_approved: 'ประทับตรา',
+  name_changed: 'แก้ไขยศ ชื่อ-นามสกุล', official_id_changed: 'แก้ไขเลขประจำตัว', owner_changed: 'เปลี่ยนบัญชี Google', personal_updated: 'แก้ไขข้อมูลส่วนตัว'
+};
+var detActivityAll = [], detActivityExpanded = false;
+function loadActivity(sub) {
+  var ol = document.getElementById('det-activity');
+  if (!ol) return;
+  detActivityExpanded = false;
+  ol.innerHTML = '<li class="act-muted">กำลังโหลด…</li>';
+  callApi('getSubmissionActivity', [SESSION, sub.subId, 50]).then(function (list) {
+    if (currentSubId !== sub.subId) return;
+    detActivityAll = list || [];
+    renderActivity();
+  }).catch(function () {
+    ol.innerHTML = '<li class="act-muted">ดูความเคลื่อนไหวไม่ได้ในขณะนี้</li>';
+  });
+}
+function renderActivity() {
+  var ol = document.getElementById('det-activity');
+  if (!detActivityAll.length) { ol.innerHTML = '<li class="act-muted">ยังไม่มีความเคลื่อนไหว</li>'; return; }
+  var list = detActivityExpanded ? detActivityAll : detActivityAll.slice(0, 8);
+  ol.innerHTML = list.map(function (a) {
+    var label = ACTIVITY_LABEL[a.action] || a.action, tone = 'act-blue';
+    var doc = a.docId ? docOwner(a.docId).label + ' · ' + findDocMeta(a.docId).name : '';
+    var detail = doc;
+    if (a.action === 'review_status_changed') {
+      var r = RESULT_UI[a.newValue] || {label: a.newValue};
+      label = 'ผลตรวจ: ' + r.label;
+      tone = a.newValue === 'pass' ? 'act-green' : a.newValue === 'pending' ? 'act-grey' : a.newValue === 'fail' ? 'act-red' : 'act-amber';
+      if (a.notes) detail += ' — ' + a.notes;
+    } else if (a.action === 'document_skipped') {
+      label = a.newValue === 'skipped' ? 'แจ้งไม่มีเอกสาร' : 'ยกเลิกการแจ้งไม่มีเอกสาร';
+      tone = 'act-grey';
+    } else if (a.action === 'stamp_approved') { tone = 'act-green'; }
+    else if (/form_/.test(a.action)) { tone = 'act-gold'; }
+    else if (a.action === 'document_annotated') { tone = 'act-amber'; }
+    else if (/name_changed|official_id_changed|owner_changed/.test(a.action)) {
+      detail = (a.oldValue || '—') + ' → ' + (a.newValue || '—') + (a.notes ? ' (' + a.notes + ')' : '');
+      tone = 'act-grey';
+    } else if (a.action === 'match_result_set') { detail = a.newValue === 'matched' ? 'ชื่อตรงกับ HRIS' : a.newValue || ''; }
+    var who = a.role === 'officer' ? 'เจ้าหน้าที่ ' + a.actor : a.role === 'applicant' ? 'ผู้ทำสัญญา' : (a.actor || '');
+    return '<li><span class="act-dot ' + tone + '"></span><span class="act-text"><strong>' + escapeHtml(label) + '</strong>' +
+      (detail ? '<span class="act-detail">' + escapeHtml(detail) + '</span>' : '') +
+      '<span class="act-meta">' + escapeHtml(formatThaiDateTime(a.at)) + (who ? ' · ' + escapeHtml(who) : '') + '</span></span></li>';
+  }).join('') + (detActivityAll.length > 8 ? '<li class="act-more"><button type="button" class="link-btn" onclick="detActivityExpanded=!detActivityExpanded;renderActivity()">' +
+    (detActivityExpanded ? 'ย่อ' : 'ดูทั้งหมด (' + detActivityAll.length + ')') + '</button></li>' : '');
+}
+// keep summary cards / compare button in step with existing renderers
+var _detRenderStamp = renderStampArea;
+renderStampArea = function (sub) { _detRenderStamp(sub); renderDetailSummary(sub); };
+var _detUpdateCompareBar = updateCompareBar;
+updateCompareBar = function () {
+  _detUpdateCompareBar();
+  var b = document.getElementById('det-compare-btn');
+  if (b) { b.textContent = 'เปิดเทียบที่เลือก (' + compareSelection.length + ')'; b.disabled = !compareSelection.length; }
 };
 
 boot();
