@@ -944,6 +944,54 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .cmp-full .compare-pane-footer textarea:focus{height:64px;}
   .compare-empty{flex:1;display:flex;align-items:center;justify-content:center;color:#C7CEDB;font-size:14px;text-align:center;padding:40px;}
   @media (max-width:760px){ .cmp-topbar{flex-wrap:wrap;} .cmp-add-top{order:3;flex-basis:100%;} .cmp-add-top select{width:100%;max-width:none;} }
+  /* ── Full-screen single-document review: document left, tools right ── */
+  .modal-overlay.rv-full{z-index:6000;background:#2A3346;}
+  .rv-box{position:fixed;inset:0;display:flex;flex-direction:column;background:#2A3346;}
+  .rv-topbar{flex:none;display:flex;align-items:center;gap:12px;padding:7px 12px;background:#fff;border-bottom:1px solid var(--line);box-shadow:var(--sh-sm);}
+  .rv-nav{display:flex;align-items:center;gap:6px;flex:none;}
+  .rv-nav .cmp-nav:disabled{opacity:.35;cursor:default;}
+  .rv-pos{font-size:12px;color:var(--steel);min-width:38px;text-align:center;}
+  .rv-title{flex:1;min-width:0;}
+  .rv-title h3{margin:0;font-size:14.5px;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rv-title .modal-meta{font-size:12px;color:var(--steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0;}
+  .rv-actions{display:flex;gap:8px;flex:none;}
+  .rv-actions button{padding:7px 14px;font-size:13px;}
+  .rv-main{flex:1;display:flex;min-height:0;}
+  .rv-doc{flex:1;min-width:0;height:auto;margin:0;border:none;border-radius:0;background:#525659;display:block;padding:0;overflow:hidden;}
+  .rv-doc > *{width:100%;height:100%;}
+  .rv-doc iframe{display:block;}
+  .rv-panel{width:380px;flex:none;background:#fff;border-left:1px solid var(--line);overflow-y:auto;}
+  .rv-collapsed .rv-panel{display:none;}
+  .rv-sec{padding:14px 16px;border-bottom:1px solid var(--line);}
+  .rv-sec-title{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--steel);margin-bottom:10px;}
+  .rv-seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:10px;}
+  .rv-seg button{border:1.5px solid var(--line);background:#fff;border-radius:var(--r-sm);padding:8px 2px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--steel);cursor:pointer;}
+  .rv-seg button:hover{border-color:var(--navy);color:var(--navy);}
+  .rv-seg button.active[data-v="pending"]{background:#F1F5F9;border-color:#94A3B8;color:#334155;}
+  .rv-seg button.active[data-v="pass"]{background:#15803D;border-color:#15803D;color:#fff;}
+  .rv-seg button.active[data-v="needs-revision"]{background:#B45309;border-color:#B45309;color:#fff;}
+  .rv-seg button.active[data-v="fail"]{background:#B91C1C;border-color:#B91C1C;color:#fff;}
+  .rv-panel textarea#modal-comment-box{width:100%;box-sizing:border-box;min-height:72px;resize:vertical;font-size:13px;}
+  .rv-panel .doc-modal-ocr{background:#FFFBF2;}
+  .rv-panel .ocr-card-type-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;font-size:13px;margin-bottom:10px;}
+  .rv-panel .ocr-fields-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+  .rv-panel .ocr-fields-row .field{margin:0;}
+  .rv-panel .ocr-fields-row .field label{font-size:12px;}
+  .rv-panel .ocr-fields-row input{padding:6px 8px;font-size:13px;}
+  .rv-panel .doc-modal-ocr > button.primary{width:100%;}
+  .rv-panel #ocr-save-row{flex-wrap:wrap;}
+  .rv-panel #ocr-save-row button{width:100%;}
+  .rv-panel .match-box{font-size:12.5px;}
+  .rv-panel .modal-annot-bar{flex-direction:column;align-items:flex-start;gap:8px;margin:0;}
+  @media (max-width:860px){
+    .rv-topbar{flex-wrap:wrap;}
+    .rv-title{order:3;flex-basis:100%;}
+    .rv-actions{margin-left:auto;}
+    .rv-main{flex-direction:column;overflow-y:auto;}
+    .rv-doc{flex:none;height:62vh;}
+    .rv-panel{width:auto;border-left:none;border-top:1px solid var(--line);overflow:visible;}
+    .rv-seg button{padding:10px 2px;}
+  }
 </style>
 </head>
 <body>
@@ -1076,7 +1124,7 @@ setTimeout(function () {
             <option value="">เลือก</option>
             <option>นาย</option><option>นาง</option><option>นางสาว</option>
             <optgroup label="ชั้นประทวน (ชาย)">
-              <option>จ.อ.ต.</option><option>จ.อ.ท.</option><option>จ.อ.อ.</option>
+              <option>จ.ต.</option><option>จ.ท.</option><option>จ.อ.</option>
               <option>พ.อ.ต.</option><option>พ.อ.ท.</option><option>พ.อ.อ.</option>
             </optgroup>
             <optgroup label="ว่าที่ (ศิษย์การบิน)">
@@ -1088,7 +1136,7 @@ setTimeout(function () {
               <option>พล.อ.ต.</option><option>พล.อ.ท.</option><option>พล.อ.อ.</option>
             </optgroup>
             <optgroup label="ชั้นประทวน (หญิง)">
-              <option>จ.อ.ต.หญิง</option><option>จ.อ.ท.หญิง</option><option>จ.อ.อ.หญิง</option>
+              <option>จ.ต.หญิง</option><option>จ.ท.หญิง</option><option>จ.อ.หญิง</option>
               <option>พ.อ.ต.หญิง</option><option>พ.อ.ท.หญิง</option><option>พ.อ.อ.หญิง</option>
             </optgroup>
             <optgroup label="ชั้นสัญญาบัตร (หญิง)">
@@ -1450,6 +1498,7 @@ setTimeout(function () {
           <div class="acct-tools no-print">
             <button class="link-btn" onclick="officerChangeEmail()">เปลี่ยนบัญชี Google ของผู้ทำสัญญา</button>
             <button class="link-btn" onclick="officerChangeOfficialId()">แก้ไขเลขประจำตัว</button>
+            <button class="link-btn" onclick="officerChangeName()">แก้ไขยศ ชื่อ-นามสกุล</button>
           </div>
           <div id="d-form-data"></div>
         </div>
@@ -1529,26 +1578,46 @@ setTimeout(function () {
 </div>
 
 <!-- Document preview modal -->
-<div class="modal-overlay" id="doc-modal" style="padding:0">
-  <div class="modal-box doc-modal-box">
-    <div class="doc-modal-header">
-      <div>
+<div class="modal-overlay rv-full" id="doc-modal" style="padding:0">
+  <div class="rv-box">
+    <div class="rv-topbar">
+      <div class="rv-nav">
+        <button class="cmp-nav" id="rv-prev" onclick="docModalStep(-1)" title="เอกสารก่อนหน้า (←)">‹</button>
+        <span class="rv-pos" id="rv-pos"></span>
+        <button class="cmp-nav" id="rv-next" onclick="docModalStep(1)" title="เอกสารถัดไป (→)">›</button>
+      </div>
+      <div class="rv-title">
         <h3 id="modal-title"></h3>
         <div class="modal-meta" id="modal-meta"></div>
-        <div class="modal-annot-bar" id="modal-annot-bar"></div>
       </div>
-      <div style="display:flex;gap:8px;flex:none">
+      <div class="rv-actions">
         <button class="primary" onclick="openAnnotatorFromModal()" title="วาด ตีกรอบ หรือปักหมุดข้อความบนเอกสาร แล้วบันทึกเป็นไฟล์ตรวจแก้">✎ ทำเครื่องหมาย</button>
-        <button class="secondary" onclick="openCompareFromDoc()" title="เปิดฉบับนี้ไว้ช่องซ้าย แล้วเลือกเอกสารอื่นมาเทียบ">เปิดเทียบกับเอกสารอื่น</button>
+        <button class="secondary" onclick="openCompareFromDoc()" title="เปิดฉบับนี้ไว้ช่องซ้าย แล้วเลือกเอกสารอื่นมาเทียบ">เปิดเทียบ</button>
+        <button class="secondary" id="rv-toggle" onclick="toggleReviewPanel()" title="ซ่อน/แสดงแผงเครื่องมือ เพื่อดูเอกสารเต็มจอ">ซ่อนแผง ⇥</button>
         <button class="secondary" onclick="closeDocModal()">ปิด</button>
       </div>
     </div>
-    <div class="doc-modal-preview" id="modal-preview-content">
-      <span class="icon">📄</span>
-      <span>ตัวอย่างเอกสาร (mock)</span>
-    </div>
-    <div class="doc-modal-bottom">
-      <div class="doc-modal-ocr" id="doc-modal-ocr-block" style="display:none">
+    <div class="rv-main">
+      <div class="rv-doc doc-modal-preview" id="modal-preview-content"></div>
+      <aside class="rv-panel" id="rv-panel">
+        <section class="rv-sec">
+          <div class="rv-sec-title">ผลตรวจ</div>
+          <div class="rv-seg" id="rv-seg">
+            <button type="button" data-v="pending" onclick="rvSetReview('pending')">รอตรวจ</button>
+            <button type="button" data-v="pass" onclick="rvSetReview('pass')">ผ่าน</button>
+            <button type="button" data-v="needs-revision" onclick="rvSetReview('needs-revision')">ต้องแก้ไข</button>
+            <button type="button" data-v="fail" onclick="rvSetReview('fail')">ไม่ผ่าน</button>
+          </div>
+          <select id="modal-review-select" onchange="modalSetReview(this.value)" style="display:none" aria-hidden="true">
+            <option value="pending">รอตรวจ</option>
+            <option value="pass">ผ่าน</option>
+            <option value="needs-revision">ต้องแก้ไข</option>
+            <option value="fail">ไม่ผ่าน</option>
+          </select>
+          <textarea id="modal-comment-box" rows="3" placeholder="หมายเหตุถึงผู้ทำสัญญา (จำเป็นเมื่อเลือก 'ต้องแก้ไข')" onchange="modalSetComment(this.value)"></textarea>
+        </section>
+        <section class="rv-sec doc-modal-ocr" id="doc-modal-ocr-block" style="display:none">
+        <div class="rv-sec-title">ตรวจตัวตนจากบัตร</div>
         <div class="ocr-card-type-row">
           <label><input type="radio" name="ocr-card-type" value="civil" checked onchange="updateOcrIdLabel()"> บัตรข้าราชการ</label>
           <label><input type="radio" name="ocr-card-type" value="citizen" onchange="updateOcrIdLabel()"> บัตรประชาชน</label>
@@ -1579,19 +1648,12 @@ setTimeout(function () {
           <span id="ocr-manual-status" class="ocr-status"></span>
         </div>
         <p class="field-note" id="ocr-spouse-note" style="display:none;margin-top:10px">ข้อมูลคู่สมรสของผู้ค้ำประกันไม่ต้องบันทึกแยก — เมื่อตั้งผลตรวจเอกสารนี้เป็น "ผ่าน" ด้านล่าง ถือว่าตรวจสอบแล้วเสร็จสมบูรณ์</p>
-      </div>
-      <div class="doc-modal-review">
-        <div class="doc-modal-review-row">
-          <label>ผลตรวจ:</label>
-          <select id="modal-review-select" onchange="modalSetReview(this.value)">
-            <option value="pending">รอตรวจ</option>
-            <option value="pass">ผ่าน</option>
-            <option value="needs-revision">ต้องแก้ไข</option>
-            <option value="fail">ไม่ผ่าน</option>
-          </select>
-        </div>
-        <textarea id="modal-comment-box" placeholder="comment (ถ้ามี) — จำเป็นเมื่อเลือก 'ต้องแก้ไข'" onchange="modalSetComment(this.value)"></textarea>
-      </div>
+      </section>
+        <section class="rv-sec">
+          <div class="rv-sec-title">ไฟล์ตรวจแก้</div>
+          <div class="modal-annot-bar" id="modal-annot-bar"></div>
+        </section>
+      </aside>
     </div>
   </div>
 </div>
@@ -1736,16 +1798,16 @@ function _openDialog(title, bodyText, fields, okLabel, danger, onOk, onCancel) {
 }
 function _dlgOk() {
   if(!_dlgCallback) return;
-  var vals={};
-  _dlgCallback.fields.forEach(function(f){
-    var el=document.getElementById('adlg-f-'+f.id);
-    if(el) vals[f.id]=el.value.trim();
-    if(f.required && el && !el.value.trim()){ el.focus(); showToast('กรุณากรอก'+f.label,'error'); throw new Error('required'); }
-    if(f.validate && el){
-      var err=f.validate(el.value.trim());
-      if(err){ el.focus(); showToast(err,'error'); throw new Error('validate'); }
-    }
-  });
+  var vals={}, fields=_dlgCallback.fields;
+  // stop at the first missing/invalid field: focus it and explain (no exception thrown)
+  for (var i = 0; i < fields.length; i++) {
+    var f = fields[i], el = document.getElementById('adlg-f-'+f.id);
+    if (!el) continue;
+    var v = el.value.trim();
+    vals[f.id] = v;
+    if (f.required && !v) { el.focus(); showToast('กรุณากรอก'+f.label,'error'); return; }
+    if (f.validate) { var err = f.validate(v); if (err) { el.focus(); showToast(err,'error'); return; } }
+  }
   var _cb = _dlgCallback;
   closeAppDialog();
   if(_cb && _cb.onOk) _cb.onOk(vals);
@@ -1769,7 +1831,7 @@ function showFormDialog(title, body, fields, okLabel, onOk, danger) {
   _openDialog(title, body, fields, okLabel||'บันทึก', danger||false, onOk, null);
 }
 
-var API_METHODS = ['getPublicConfig', 'login', 'resumeSession', 'logout', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval', 'requestAccountTransfer', 'listTransferRequests', 'decideTransferRequest', 'transferSubmissionOwner', 'updateOfficialId'];
+var API_METHODS = ['getPublicConfig', 'login', 'resumeSession', 'logout', 'listMySubmissions', 'listAllSubmissions', 'createSubmission', 'touchSubmission', 'updateSubmissionPersonal', 'setDocumentSkipped', 'getSubmission', 'uploadDocumentFile', 'getDocumentFile', 'setDocumentReview', 'setMatchResult', 'saveGuarantorInfo', 'stampApproval', 'requestAccountTransfer', 'updateSubmissionName', 'listTransferRequests', 'decideTransferRequest', 'transferSubmissionOwner', 'updateOfficialId'];
 var TAB_SESSION_KEY = 'rtaf.session';
 var TAB_NAV_KEY = 'rtaf.nav';
 function tabGet(key) {
@@ -2208,6 +2270,8 @@ function hydrateSubmission(result) {
 }
 function fillFormFromState() {
   var titleSel = document.getElementById('in-title');
+  var LEGACY_RANK = {'จ.อ.ต.': 'จ.ต.', 'จ.อ.ท.': 'จ.ท.', 'จ.อ.อ.': 'จ.อ.', 'จ.อ.ต.หญิง': 'จ.ต.หญิง', 'จ.อ.ท.หญิง': 'จ.ท.หญิง', 'จ.อ.อ.หญิง': 'จ.อ.หญิง'};
+  if (LEGACY_RANK[state.personal.title]) state.personal.title = LEGACY_RANK[state.personal.title];
   titleSel.value = state.personal.title || '';
   // a title not in the list (e.g. imported from the Google Form) is kept, not silently dropped
   if (state.personal.title && titleSel.value !== state.personal.title) {
@@ -3914,7 +3978,65 @@ function openDocModal(subId, docId) {
     if (isManual) document.getElementById('ocr-save-btn').disabled = true;
   }
   document.getElementById('doc-modal').classList.add('active');
+  rvSyncSeg();
+  rvUpdateNav();
 }
+// ---- review window: one-click result buttons, prev/next, collapsible panel ----
+function rvEntry() {
+  if (!docModalCurrent) return null;
+  var sub = SUBMISSIONS.find(function (x) { return x.subId === docModalCurrent.subId; });
+  return sub ? docEntry(sub, docModalCurrent.docId) : null;
+}
+function rvSyncSeg() {
+  var e = rvEntry(), v = e ? e.reviewStatus || 'pending' : 'pending';
+  document.querySelectorAll('#rv-seg button').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-v') === v); });
+}
+function rvSetReview(v) {
+  document.getElementById('modal-review-select').value = v;
+  modalSetReview(v);
+  rvSyncSeg();
+  if (v === 'needs-revision' && !document.getElementById('modal-comment-box').value.trim()) {
+    document.getElementById('modal-comment-box').focus();
+    showToast('ระบุหมายเหตุให้ผู้ทำสัญญาทราบว่าต้องแก้ไขอะไร', 'info', 3500);
+  }
+}
+// documents of this contract that have a file, in list order
+function rvDocOrder() {
+  var sub = SUBMISSIONS.find(function (x) { return docModalCurrent && x.subId === docModalCurrent.subId; });
+  if (!sub) return [];
+  return docsForSub(sub).filter(function (d) { var e = docEntry(sub, d.id); return e.status === 'uploaded' && e.driveFileId; }).map(function (d) { return d.id; });
+}
+function rvUpdateNav() {
+  var order = rvDocOrder(), i = docModalCurrent ? order.indexOf(docModalCurrent.docId) : -1;
+  document.getElementById('rv-pos').textContent = i > -1 ? (i + 1) + ' / ' + order.length : '';
+  document.getElementById('rv-prev').disabled = i <= 0;
+  document.getElementById('rv-next').disabled = i === -1 || i >= order.length - 1;
+}
+function docModalStep(dir) {
+  if (!docModalCurrent) return;
+  var order = rvDocOrder(), i = order.indexOf(docModalCurrent.docId) + dir;
+  if (i < 0 || i >= order.length) return;
+  // a comment typed but not yet committed (no blur yet) is saved before moving on
+  var box = document.getElementById('modal-comment-box'), e = rvEntry();
+  if (e && box.value !== (e.comment || '')) modalSetComment(box.value);
+  openDocModal(docModalCurrent.subId, order[i]);
+}
+var rvPanelHidden = false;
+function toggleReviewPanel() {
+  rvPanelHidden = !rvPanelHidden;
+  document.getElementById('doc-modal').classList.toggle('rv-collapsed', rvPanelHidden);
+  document.getElementById('rv-toggle').textContent = rvPanelHidden ? '⇤ แสดงแผง' : 'ซ่อนแผง ⇥';
+}
+document.addEventListener('keydown', function (e) {
+  var m = document.getElementById('doc-modal');
+  if (!m || !m.classList.contains('active')) return;
+  var dlg = document.getElementById('app-dialog'), ann = document.getElementById('annot-modal');
+  if ((dlg && dlg.classList.contains('open')) || (ann && ann.classList.contains('open'))) return;
+  var typing = /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || '');
+  if (e.key === 'Escape') closeDocModal();
+  else if (!typing && e.key === 'ArrowRight') docModalStep(1);
+  else if (!typing && e.key === 'ArrowLeft') docModalStep(-1);
+});
 function modalSetReview(value) {
   if (!docModalCurrent) return;
   setReview(docModalCurrent.docId, docModalCurrent.subId, value);
@@ -4004,8 +4126,8 @@ function getOcrWorker() {
 function setOcrStatus(text) {
   document.getElementById('ocr-status').textContent = text;
 }
-var RANK_FULL_TO_ABBR = [['พันจ่าอากาศเอก', 'พ.อ.อ.'], ['พันจ่าอากาศโท', 'พ.อ.ท.'], ['พันจ่าอากาศตรี', 'พ.อ.ต.'], ['พลอากาศเอก', 'พล.อ.อ.'], ['พลอากาศโท', 'พล.อ.ท.'], ['พลอากาศตรี', 'พล.อ.ต.'], ['นาวาอากาศเอก', 'น.อ.'], ['นาวาอากาศโท', 'น.ท.'], ['นาวาอากาศตรี', 'น.ต.'], ['เรืออากาศเอก', 'ร.อ.'], ['เรืออากาศโท', 'ร.ท.'], ['เรืออากาศตรี', 'ร.ต.'], ['จ่าอากาศเอก', 'จ.อ.อ.'], ['จ่าอากาศโท', 'จ.อ.ท.'], ['จ่าอากาศตรี', 'จ.อ.ต.']];
-var RANK_ABBRS = ['พล.อ.อ.', 'พล.อ.ท.', 'พล.อ.ต.', 'พ.อ.อ.', 'พ.อ.ท.', 'พ.อ.ต.', 'จ.อ.อ.', 'จ.อ.ท.', 'จ.อ.ต.', 'น.อ.', 'น.ท.', 'น.ต.', 'ร.อ.', 'ร.ท.', 'ร.ต.'];
+var RANK_FULL_TO_ABBR = [['พันจ่าอากาศเอก', 'พ.อ.อ.'], ['พันจ่าอากาศโท', 'พ.อ.ท.'], ['พันจ่าอากาศตรี', 'พ.อ.ต.'], ['พลอากาศเอก', 'พล.อ.อ.'], ['พลอากาศโท', 'พล.อ.ท.'], ['พลอากาศตรี', 'พล.อ.ต.'], ['นาวาอากาศเอก', 'น.อ.'], ['นาวาอากาศโท', 'น.ท.'], ['นาวาอากาศตรี', 'น.ต.'], ['เรืออากาศเอก', 'ร.อ.'], ['เรืออากาศโท', 'ร.ท.'], ['เรืออากาศตรี', 'ร.ต.'], ['จ่าอากาศเอก', 'จ.อ.'], ['จ่าอากาศโท', 'จ.ท.'], ['จ่าอากาศตรี', 'จ.ต.']];
+var RANK_ABBRS = ['พล.อ.อ.', 'พล.อ.ท.', 'พล.อ.ต.', 'พ.อ.อ.', 'พ.อ.ท.', 'พ.อ.ต.', 'จ.อ.', 'จ.ท.', 'จ.ต.', 'น.อ.', 'น.ท.', 'น.ต.', 'ร.อ.', 'ร.ท.', 'ร.ต.'];
 var CIVIL_TITLES = ['นางสาว', 'นาง', 'นาย'];
 function escapeRe(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -4945,6 +5067,31 @@ function officerSetOfficialId(subId, newId, reason) {
     showToast('แก้ไขไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
   }).updateOfficialId(SESSION, subId, newId, reason);
 }
+function officerChangeName() {
+  var sub = SUBMISSIONS.find(function (ss) { return ss.subId === currentSubId; });
+  var p = sub.personal;
+  showFormDialog('แก้ไขยศ ชื่อ-นามสกุล ผู้ทำสัญญา',
+    'ปัจจุบัน: ' + [p.title, p.first, p.last].join(' ') + ' — ใช้กรณีผู้ทำสัญญาพิมพ์ผิด ระบบบันทึกประวัติการแก้ไขไว้',
+    [{id: 'title', label: 'คำนำหน้า/ยศ', value: p.title || '', placeholder: 'เช่น ร.ต., จ.ต., นาย'},
+     {id: 'first', label: 'ชื่อ', value: p.first || '', required: true},
+     {id: 'last', label: 'นามสกุล', value: p.last || '', required: true},
+     {id: 'reason', label: 'เหตุผลในการแก้ไข', required: true, placeholder: 'เช่น ผู้ทำสัญญาพิมพ์ชื่อผิด ตรวจกับบัตรแล้ว'}],
+    'บันทึกการแก้ไข',
+    function (vals) {
+      showLoading('กำลังบันทึก...');
+      gsRun().withSuccessHandler(function (res) {
+        hideLoading();
+        p.title = res.title; p.first = res.firstName; p.last = res.lastName;
+        if (res.matchReset) sub.matchResult = null;
+        showToast(res.matchReset ? 'แก้ไขชื่อแล้ว — กรุณาตรวจสอบรายชื่อกับ HRIS อีกครั้ง' : 'แก้ไขแล้ว', 'success');
+        refreshList();
+        showDetail(sub.subId);
+      }).withFailureHandler(function (err) {
+        hideLoading();
+        showToast('แก้ไขไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
+      }).updateSubmissionName(SESSION, sub.subId, vals.title, vals.first, vals.last, vals.reason);
+    });
+}
 function officerChangeOfficialId() {
   var sub = SUBMISSIONS.find(function (ss) { return ss.subId === currentSubId; });
   showFormDialog('แก้ไขเลขประจำตัวข้าราชการ',
@@ -5444,6 +5591,7 @@ function annotSyncOutside(sub, docId) {
     document.getElementById('modal-review-select').value = entry.reviewStatus;
     document.getElementById('modal-comment-box').value = entry.comment || '';
     renderModalAnnotBar(sub, docId);
+    rvSyncSeg();
   }
   var pane = document.querySelector('#compare-panes .compare-pane[data-doc-id="' + docId + '"]');
   if (pane) {
