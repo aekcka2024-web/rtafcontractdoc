@@ -1512,6 +1512,15 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .u-picker-foot{padding:14px 22px 18px;border-top:1px solid #EEF1F6;display:flex;justify-content:flex-end;}
   .u-picker-foot .secondary{min-height:42px;border-radius:10px;}
   @media (max-width:560px){ .u-pick{flex-wrap:wrap;} .u-pick .primary{width:100%;} }
+  /* printable report & document checklist: no progress card / revision alert / greeting */
+  .u-doc-mode .u-stepcard,.u-doc-mode #u-alert{display:none !important;}
+  .u-doc-mode .u-hero{padding-bottom:28px;}
+  #panel-user-report .report-meta{width:100%;box-sizing:border-box;}
+  @media print{
+    #app-user .u-hero,#app-user .u-stepcard,#app-user #u-alert{display:none !important;}
+    #panel-user-report .report-meta{width:100% !important;}
+    #app-user{background:#fff !important;}
+  }
 </style>
 </head>
 <body>
@@ -3686,9 +3695,11 @@ function openDocChecklist() {
   docChecklistReturnPanel = active && active.id !== 'panel-doclist' ? active.id : 'panel-1';
   document.querySelectorAll('#app-user .panel').forEach(function (el) { el.classList.remove('active'); });
   document.getElementById('panel-doclist').classList.add('active');
+  document.getElementById('app-user').classList.add('u-doc-mode');
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
 function closeDocChecklist() {
+  document.getElementById('app-user').classList.remove('u-doc-mode');
   document.getElementById('panel-doclist').classList.remove('active');
   document.getElementById(docChecklistReturnPanel || 'panel-1').classList.add('active');
   window.scrollTo({top: 0, behavior: 'smooth'});
@@ -3773,8 +3784,10 @@ function openUserReport() {
     top: 0,
     behavior: 'smooth'
   });
+  document.getElementById('app-user').classList.add('u-doc-mode');
 }
 function closeUserReport() {
+  document.getElementById('app-user').classList.remove('u-doc-mode');
   document.getElementById('panel-user-report').classList.remove('active');
   showStep(4);
 }
@@ -6993,7 +7006,7 @@ function renderGuarantorStep() {
   });
 }
 var _uShowStep = showStep;
-showStep = function (n) { _uShowStep(n); renderUserProgress(); };
+showStep = function (n) { document.getElementById('app-user').classList.remove('u-doc-mode'); _uShowStep(n); renderUserProgress(); };
 
 function renderSummary() {
   var p = state.personal;
