@@ -1521,6 +1521,31 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
     #panel-user-report .report-meta{width:100% !important;}
     #app-user{background:#fff !important;}
   }
+  /* previous version: split view, points to tick, compare panes */
+  .rv-split-btn.on{background:#EEF3FB;border-color:#2846A8;color:#1E3A8A;}
+  .rv-split{display:grid;grid-template-columns:1fr 1fr;gap:6px;height:100%;background:#2A3346;padding:6px;box-sizing:border-box;}
+  .rv-sp{display:flex;flex-direction:column;min-width:0;min-height:0;background:#525659;border-radius:8px;overflow:hidden;}
+  .rv-sp-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 10px;background:#fff;font-size:12.5px;}
+  .rv-sp-tag{font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;white-space:nowrap;}
+  .rv-sp-old{background:#FFF7E8;color:#B45309;}
+  .rv-sp-new{background:#EEF3FB;color:#1E3A8A;}
+  .rv-sp-meta{color:#4A5772;min-width:0;}
+  .rv-sp-switch{margin-left:auto;display:inline-flex;gap:2px;background:#EEF1F6;border-radius:8px;padding:2px;}
+  .rv-sp-switch button{border:none;background:transparent;border-radius:6px;padding:3px 8px;font-size:12px;cursor:pointer;color:#4A5772;}
+  .rv-sp-switch button.on{background:#fff;color:#0F1B33;font-weight:700;box-shadow:0 1px 2px rgba(15,27,51,.15);}
+  .rv-sp-body{flex:1;min-height:0;}
+  .rv-pts-count{float:right;font-weight:700;color:#2846A8;}
+  .rv-pts-hint{font-size:12px;color:#4A5772;margin:-4px 0 8px;}
+  .rv-pt{display:flex;gap:8px;align-items:flex-start;padding:7px 8px;border-radius:8px;font-size:13px;color:#0F1B33;cursor:pointer;}
+  .rv-pt:hover{background:#F5F7FB;}
+  .rv-pt input{margin-top:2px;width:16px;height:16px;flex:none;}
+  .rv-pt.done span{color:#15803D;text-decoration:line-through;}
+  .rv-pts-ok{margin-top:8px;font-size:12.5px;font-weight:700;color:#15803D;background:#ECFDF3;border-radius:8px;padding:6px 10px;}
+  .rv-seg button.rv-suggest{box-shadow:0 0 0 3px rgba(21,128,61,.35);border-color:#15803D;color:#15803D;}
+  .dl-tag-fixed{background:#EEF3FB !important;color:#1E3A8A !important;}
+  .compare-pane-prev .compare-pane-header{background:#FFF7E8;}
+  .cmp-prev-foot{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#4A5772;}
+  @media (max-width:860px){ .rv-split{grid-template-columns:1fr;grid-template-rows:1fr 1fr;} }
 </style>
 </head>
 <body>
@@ -2332,6 +2357,7 @@ setTimeout(function () {
       </div>
       <div class="rv-actions">
         <button class="primary" onclick="openAnnotatorFromModal()" title="วาด ตีกรอบ หรือปักหมุดข้อความบนเอกสาร แล้วบันทึกเป็นไฟล์ตรวจแก้">✎ ทำเครื่องหมาย</button>
+        <button class="secondary rv-split-btn" id="rv-split-btn" style="display:none" onclick="toggleRvSplit()" title="แบ่งจอ ฉบับก่อน (ซ้าย) กับฉบับใหม่ (ขวา)">เทียบกับฉบับก่อน</button>
         <button class="secondary" onclick="openCompareFromDoc()" title="เปิดฉบับนี้ไว้ช่องซ้าย แล้วเลือกเอกสารอื่นมาเทียบ">เปิดเทียบ</button>
         <button class="secondary" id="rv-toggle" onclick="toggleReviewPanel()" title="ซ่อน/แสดงแผงเครื่องมือ เพื่อดูเอกสารเต็มจอ">ซ่อนแผง ⇥</button>
         <button class="secondary" onclick="closeDocModal()">ปิด</button>
@@ -2356,6 +2382,7 @@ setTimeout(function () {
           </select>
           <textarea id="modal-comment-box" rows="3" placeholder="หมายเหตุถึงผู้ทำสัญญา (จำเป็นเมื่อเลือก 'ต้องแก้ไข')" onchange="modalSetComment(this.value)"></textarea>
         </section>
+        <section class="rv-sec rv-prevpts" id="rv-prevpts" style="display:none"></section>
         <section class="rv-sec doc-modal-ocr" id="doc-modal-ocr-block" style="display:none">
         <div class="rv-sec-title">ตรวจตัวตนจากบัตร</div>
         <div class="ocr-card-type-row">
@@ -4378,7 +4405,8 @@ function renderDocTable(containerId, docs, sub) {
       : '<span class="dl-result res-none">—</span>';
     row.innerHTML = cmp + icon +
       '<div class="dl-main"><div class="dl-name">' + doc.name + (doc.optional ? ' <span class="sub-cell">(ถ้ามี)</span>' : '') +
-        (locked ? ' <span class="dl-tag">ล็อกแล้ว</span>' : '') + (annotIsCurrent(entry) ? ' <span class="annot-flag">มีไฟล์ตรวจแก้</span>' : '') + '</div>' +
+        (locked ? ' <span class="dl-tag">ล็อกแล้ว</span>' : '') + (annotIsCurrent(entry) ? ' <span class="annot-flag">มีไฟล์ตรวจแก้</span>' : '') +
+        (uploaded && st === 'pending' && hasPrevVersion(entry) ? ' <span class="dl-tag dl-tag-fixed">ส่งฉบับแก้ไขแล้ว · เทียบได้</span>' : '') + '</div>' +
         '<div class="dl-sub">' + second + '</div>' +
         (entry.comment && canReview ? '<div class="dl-comment">หมายเหตุ: ' + escapeHtml(entry.comment) + '</div>' : '') + '</div>' +
       '<div class="dl-right">' + result + '</div>';
@@ -4497,7 +4525,12 @@ function compareOptionsHtml(sub, currentId) {
       var openElsewhere = d.id !== currentId && compareSelection.indexOf(d.id) > -1;
       var mark = CMP_MARK[docEntry(sub, d.id).reviewStatus] || '';
       return '<option value="' + d.id + '"' + (d.id === currentId ? ' selected' : '') + (openElsewhere ? ' disabled' : '') + '>' +
-        escapeHtml(g.owner + ' · ' + d.name) + mark + (openElsewhere ? ' — เปิดอยู่' : '') + '</option>';
+        escapeHtml(g.owner + ' · ' + d.name) + mark + (openElsewhere ? ' — เปิดอยู่' : '') + '</option>' +
+        (hasPrevVersion(docEntry(sub, d.id)) ? (function () {
+          var pid = d.id + '@prev', pOpen = pid !== currentId && compareSelection.indexOf(pid) > -1;
+          return '<option value="' + pid + '"' + (pid === currentId ? ' selected' : '') + (pOpen ? ' disabled' : '') + '>' +
+            escapeHtml(g.owner + ' · ' + d.name + ' (ฉบับก่อน)') + (pOpen ? ' — เปิดอยู่' : '') + '</option>';
+        })() : '');
     }).join('') + '</optgroup>';
   }).join('');
 }
@@ -4505,6 +4538,7 @@ function comparePaneEl(docId) {
   return document.querySelector('#compare-panes .compare-pane[data-doc-id="' + docId + '"]');
 }
 function buildComparePane(sub, docId) {
+  if (/@prev$/.test(docId)) return buildPrevComparePane(sub, docId);
   var entry = docEntry(sub, docId);
   var pane = document.createElement('div');
   pane.className = 'compare-pane';
@@ -4590,7 +4624,31 @@ function swapComparePane(oldId, newId) {
   syncCompareOutside();
 }
 // Next / previous uploaded document in list order, skipping ones already open.
+function buildPrevComparePane(sub, pid) {
+  var base = pid.replace(/@prev$/, ''), entry = docEntry(sub, base), kind = prevKinds(entry)[0] || 'prev';
+  var pane = document.createElement('div');
+  pane.className = 'compare-pane compare-pane-prev';
+  pane.setAttribute('data-doc-id', pid);
+  pane.innerHTML = '<div class="compare-pane-header">' +
+      '<button class="cmp-nav" title="ฉบับก่อนของเอกสารก่อนหน้า" onclick="stepComparePane(\'' + pid + '\', -1)">‹</button>' +
+      '<select class="cmp-doc-select" onchange="swapComparePane(\'' + pid + '\', this.value)">' + compareOptionsHtml(sub, pid) + '</select>' +
+      '<button class="cmp-nav" title="ฉบับก่อนของเอกสารถัดไป" onclick="stepComparePane(\'' + pid + '\', 1)">›</button>' +
+      '<button class="ghost cmp-remove" onclick="removeFromCompare(\'' + pid + '\')">นำออก</button>' +
+    '</div><div class="compare-pane-body"></div>' +
+    '<div class="compare-pane-footer cmp-prev-foot"><span class="rv-sp-tag rv-sp-old">ฉบับก่อน</span><span>' + escapeHtml(prevMetaText(entry, kind)) + ' · ดูอย่างเดียว</span></div>';
+  loadPrevInto(pane.querySelector('.compare-pane-body'), sub, base, kind);
+  return pane;
+}
 function stepComparePane(docId, dir) {
+  if (/@prev$/.test(docId)) {
+    var sub0 = compareSub();
+    var porder = compareDocOrder(sub0).filter(function (id) { return hasPrevVersion(docEntry(sub0, id)); }).map(function (id) { return id + '@prev'; });
+    var pi = porder.indexOf(docId) + dir;
+    while (pi >= 0 && pi < porder.length && compareSelection.indexOf(porder[pi]) > -1) pi += dir;
+    if (pi < 0 || pi >= porder.length) { showToast('ไม่มีฉบับก่อนของเอกสาร' + (dir > 0 ? 'ถัดไป' : 'ก่อนหน้า') + 'แล้ว', 'info', 2500); return; }
+    swapComparePane(docId, porder[pi]);
+    return;
+  }
   var order = compareDocOrder(compareSub());
   var i = order.indexOf(docId) + dir;
   while (i >= 0 && i < order.length && compareSelection.indexOf(order[i]) > -1) i += dir;
@@ -4643,16 +4701,19 @@ function pdfKey(sub, docId) {
   var entry = docEntry(sub, docId);
   return sub.subId + '/' + docId + '/' + (entry.uploadedAt || entry.driveFileId);
 }
+var pdfInflight = {};
 function getPdfBytes(sub, docId) {
   var key = pdfKey(sub, docId);
   if (pdfBytesCache[key]) return Promise.resolve(pdfBytesCache[key]);
-  return callApi('getDocumentFile', [SESSION, sub.subId, docId]).then(function (file) {
+  if (pdfInflight[key]) return pdfInflight[key];
+  return pdfInflight[key] = callApi('getDocumentFile', [SESSION, sub.subId, docId]).then(function (file) {
+    delete pdfInflight[key];
     var bin = atob(file.base64);
     var bytes = new Uint8Array(bin.length);
     for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
     pdfBytesCache[key] = bytes;
     return bytes;
-  });
+  }, function (err) { delete pdfInflight[key]; throw err; });
 }
 function loadPdfInto(container, sub, docId) {
   var entry = docEntry(sub, docId);
@@ -4696,6 +4757,7 @@ function currentEduForNames() {
   return typeof state !== 'undefined' && state && state.personal ? state.personal.eduType : '';
 }
 function findDocMeta(docId) {
+  docId = String(docId).replace(/@prev$/, '');
   if (docId === 'c1' && isPilotEdu(currentEduForNames())) return PILOT_C1;
   var all = [].concat(DOCS_CONTRACTOR, [DOC_FOREIGN_DEGREE], DOCS_CONTRACTOR_SPOUSE, _toConsumableArray(GUARANTORS.flatMap(function (g) {
     return [].concat(_toConsumableArray(g.docs), _toConsumableArray(g.spouseDocs));
@@ -4777,6 +4839,8 @@ function openDocModal(subId, docId) {
   document.getElementById('doc-modal').classList.add('active');
   rvSyncSeg();
   rvUpdateNav();
+  rvRenderPreview();
+  rvRenderPoints();
 }
 // ---- review window: one-click result buttons, prev/next, collapsible panel ----
 function rvEntry() {
@@ -7063,6 +7127,127 @@ function renderDocSummary(listId, docs) {
     li.innerHTML = '<span class="u-doc-icon ' + k[1] + '" aria-hidden="true">' + k[0] + '</span><span class="u-sum-name">' + d.name + '</span><span class="badge ' + k[2] + '">' + k[3] + '</span>';
     list.appendChild(li);
   });
+}
+
+// ======================================================================
+// Previous version of a re-uploaded document: open it, compare side by side,
+// and tick off the points that were asked to be fixed
+// ======================================================================
+// what to show as "before": the marked copy if the marks belong to an earlier upload,
+// otherwise the stored previous file
+function prevKinds(entry) {
+  var k = [];
+  if (entry && entry.annotatedFileId && !annotIsCurrent(entry)) k.push('annot');
+  if (entry && entry.prevFileId) k.push('prev');
+  return k;
+}
+function hasPrevVersion(entry) { return prevKinds(entry).length > 0; }
+var prevBytesCache = {};
+function getPrevBytes(sub, docId, kind) {
+  var e = docEntry(sub, docId);
+  var key = [sub.subId, docId, kind, e.uploadedAt, kind === 'annot' ? e.annotatedFileId : e.prevFileId].join('|');
+  if (!prevBytesCache[key]) {
+    prevBytesCache[key] = callApi(kind === 'annot' ? 'getAnnotatedFile' : 'getPreviousFile', [SESSION, sub.subId, docId]).then(function (f) {
+      return base64ToBytes(f.base64);
+    });
+    prevBytesCache[key].catch(function () { delete prevBytesCache[key]; });
+  }
+  return prevBytesCache[key];
+}
+function loadPrevInto(container, sub, docId, kind) {
+  var token = String(Math.random());
+  container.dataset.prevToken = token;
+  container.innerHTML = '<div class="modal-preview" style="height:100%;margin:0;border:none"><span class="icon">⏳</span><span>กำลังโหลดฉบับก่อน...</span></div>';
+  getPrevBytes(sub, docId, kind).then(function (bytes) {
+    if (container.dataset.prevToken !== token) return;
+    container.innerHTML = pdfFrameHtml(URL.createObjectURL(new Blob([bytes], {type: 'application/pdf'})));
+  }, function (err) {
+    if (container.dataset.prevToken !== token) return;
+    container.innerHTML = '<div class="modal-preview" style="height:100%;margin:0;border:none"><span class="icon">⚠️</span><span></span></div>';
+    container.querySelector('span:last-child').textContent = 'โหลดฉบับก่อนไม่สำเร็จ: ' + (err && err.message ? err.message : err);
+  });
+}
+var RESULT_TH = {'pass': 'ผ่าน', 'pending': 'รอตรวจ', 'needs-revision': 'ต้องแก้ไข', 'fail': 'ไม่ผ่าน'};
+function prevMetaText(entry, kind) {
+  var bits = [];
+  if (kind === 'annot') bits.push('ฉบับที่ทำเครื่องหมายไว้' + (entry.annotatedAt ? ' ' + formatThaiDateTime(entry.annotatedAt) : ''));
+  else bits.push(entry.prevUploadedAt ? 'ส่งเมื่อ ' + formatThaiDateTime(entry.prevUploadedAt) : 'ฉบับก่อน');
+  if (entry.prevReviewStatus) bits.push('ผลครั้งก่อน: ' + (RESULT_TH[entry.prevReviewStatus] || entry.prevReviewStatus));
+  return bits.join(' · ');
+}
+// ---------- review window: split view ----------
+var rvSplitPref = null, rvPrevKind = null;
+function rvSplitWanted(entry) {
+  if (!hasPrevVersion(entry)) return false;
+  if (rvSplitPref !== null) return rvSplitPref;
+  return (entry.reviewStatus || 'pending') === 'pending';   // a fixed version waiting for review: compare by default
+}
+function rvRenderPreview() {
+  if (!docModalCurrent) return;
+  var sub = SUBMISSIONS.find(function (x) { return x.subId === docModalCurrent.subId; });
+  var docId = docModalCurrent.docId, entry = docEntry(sub, docId), box = document.getElementById('modal-preview-content');
+  var kinds = prevKinds(entry), btn = document.getElementById('rv-split-btn');
+  btn.style.display = kinds.length ? '' : 'none';
+  var on = rvSplitWanted(entry);
+  btn.classList.toggle('on', on);
+  btn.textContent = on ? 'ดูฉบับใหม่อย่างเดียว' : 'เทียบกับฉบับก่อน';
+  if (!on) {
+    if (box.querySelector('.rv-split') || !box.dataset.pdfKey) loadPdfInto(box, sub, docId);
+    return;
+  }
+  if (kinds.indexOf(rvPrevKind) === -1) rvPrevKind = kinds[0];
+  box.dataset.pdfKey = '';   // a single-view load still in flight must not overwrite the split view
+  var switcher = kinds.length > 1 ? '<span class="rv-sp-switch">' + kinds.map(function (k) {
+    return '<button type="button" class="' + (k === rvPrevKind ? 'on' : '') + '" onclick="rvPrevKind=\'' + k + '\';rvRenderPreview()">' + (k === 'annot' ? 'มีเครื่องหมาย' : 'ไฟล์เดิม') + '</button>';
+  }).join('') + '</span>' : '';
+  box.innerHTML = '<div class="rv-split">' +
+    '<div class="rv-sp"><div class="rv-sp-head"><span class="rv-sp-tag rv-sp-old">ฉบับก่อน</span><span class="rv-sp-meta">' + escapeHtml(prevMetaText(entry, rvPrevKind)) + '</span>' + switcher + '</div><div class="rv-sp-body" id="rv-prev-body"></div></div>' +
+    '<div class="rv-sp"><div class="rv-sp-head"><span class="rv-sp-tag rv-sp-new">ฉบับใหม่</span><span class="rv-sp-meta">' + escapeHtml(entry.uploadedAt ? 'ส่งเมื่อ ' + formatThaiDateTime(entry.uploadedAt) : '') + '</span></div><div class="rv-sp-body" id="rv-cur-body"></div></div></div>';
+  loadPrevInto(document.getElementById('rv-prev-body'), sub, docId, rvPrevKind);
+  loadPdfInto(document.getElementById('rv-cur-body'), sub, docId);
+}
+function toggleRvSplit() {
+  var sub = SUBMISSIONS.find(function (x) { return x.subId === docModalCurrent.subId; });
+  rvSplitPref = !rvSplitWanted(docEntry(sub, docModalCurrent.docId));
+  rvRenderPreview();
+}
+// ---------- points asked to be fixed last time ----------
+var rvTicks = {};
+function prevPoints(entry) {
+  var lines = [];
+  var add = function (txt) {
+    String(txt || '').split('\n').forEach(function (l) {
+      l = l.trim();
+      if (!l || /^จุดที่ต้องแก้ไข/.test(l)) return;
+      if (lines.indexOf(l) === -1) lines.push(l);
+    });
+  };
+  add(entry.prevComment);
+  if (entry.annotatedFileId && !annotIsCurrent(entry)) add(entry.annotationNotes);
+  return lines;
+}
+function rvRenderPoints() {
+  var sec = document.getElementById('rv-prevpts');
+  if (!sec || !docModalCurrent) return;
+  var sub = SUBMISSIONS.find(function (x) { return x.subId === docModalCurrent.subId; });
+  var entry = docEntry(sub, docModalCurrent.docId), pts = prevPoints(entry);
+  if (!pts.length) { sec.style.display = 'none'; return; }
+  var key = sub.subId + '|' + docModalCurrent.docId + '|' + (entry.uploadedAt || '');
+  var ticks = rvTicks[key] || (rvTicks[key] = {});
+  var done = pts.filter(function (p, i) { return ticks[i]; }).length;
+  sec.style.display = '';
+  sec.innerHTML = '<div class="rv-sec-title">จุดที่ขอให้แก้ไขครั้งก่อน <span class="rv-pts-count">' + done + ' / ' + pts.length + '</span></div>' +
+    '<div class="rv-pts-hint">ตรวจในฉบับใหม่ทีละจุด แล้วติ๊กเมื่อแก้แล้ว</div>' +
+    pts.map(function (p, i) {
+      return '<label class="rv-pt' + (ticks[i] ? ' done' : '') + '"><input type="checkbox"' + (ticks[i] ? ' checked' : '') + ' onchange="rvTick(\'' + key.replace(/'/g, '') + '\',' + i + ',this.checked)"><span>' + escapeHtml(p) + '</span></label>';
+    }).join('') +
+    (done === pts.length ? '<div class="rv-pts-ok">✓ แก้ครบทุกจุดแล้ว — ตั้งผลเป็น "ผ่าน" ได้</div>' : '');
+  var passBtn = document.querySelector('#rv-seg button[data-v="pass"]');
+  if (passBtn) passBtn.classList.toggle('rv-suggest', done === pts.length && (entry.reviewStatus || 'pending') === 'pending');
+}
+function rvTick(key, i, on) {
+  (rvTicks[key] = rvTicks[key] || {})[i] = on;
+  rvRenderPoints();
 }
 
 boot();
