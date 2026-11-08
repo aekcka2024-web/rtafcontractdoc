@@ -1546,6 +1546,61 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .compare-pane-prev .compare-pane-header{background:#FFF7E8;}
   .cmp-prev-foot{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#4A5772;}
   @media (max-width:860px){ .rv-split{grid-template-columns:1fr;grid-template-rows:1fr 1fr;} }
+  /* admin: delete + trash */
+  .det-menu .det-danger{color:#B91C1C;border-top:1px solid #EEF1F6;margin-top:4px;padding-top:12px;}
+  .trash-row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #EEF1F6;}
+  .trash-main{flex:1;min-width:0;}
+  .trash-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;}
+  .trash-sub{font-size:12.5px;color:#4A5772;margin-top:3px;}
+  .trash-actions{display:flex;flex-direction:column;gap:6px;flex:none;}
+  .trash-actions button{min-height:36px;border-radius:8px;padding:0 12px;font-size:13px;}
+  .trash-empty{padding:24px;text-align:center;color:#4A5772;background:#F7F9FC;border-radius:12px;}
+  .trash-note{font-size:12.5px;color:#4A5772;margin:0 0 10px;}
+  /* export pilot contracts */
+  #panel-export{padding-top:20px;}
+  .exp-back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:#2F4FB8;font-size:14px;cursor:pointer;padding:6px 0;margin-bottom:10px;}
+  .exp-card{padding:0;overflow:hidden;}
+  .exp-head{padding:18px 22px;border-bottom:1px solid #E6EAF2;}
+  .exp-title{font-size:18px;font-weight:700;}
+  .exp-filters{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:14px 22px;border-bottom:1px solid #E6EAF2;}
+  .exp-filters select,.exp-filters input[type=text]{min-height:40px;border-radius:10px;border:1px solid #DDE3EE;padding:0 10px;font-size:14px;}
+  .exp-filters input[type=text]{flex:1 1 220px;max-width:340px;}
+  .exp-filters select{width:auto;min-width:140px;flex:none;}
+  .exp-check{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;min-height:40px;}
+  .exp-table{min-width:720px;}
+  .exp-table th:first-child,.exp-table td:first-child{width:44px;padding-left:22px;}
+  .exp-table input[type=checkbox]{width:17px;height:17px;}
+  .exp-table tr.exp-off td{color:#8392AD;}
+  .exp-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 22px;border-top:1px solid #E6EAF2;background:#FAFBFD;position:sticky;bottom:0;}
+  .exp-count{flex:1;font-size:14px;font-weight:600;}
+  .exp-bar button{min-height:44px;border-radius:10px;padding:0 16px;}
+  .exp-progress{padding:0 22px 16px;font-size:13.5px;color:#33405C;display:flex;flex-direction:column;gap:8px;}
+  .exp-progress:empty{display:none;}
+  .exp-done{color:#15803D;font-weight:700;}
+  /* email composer */
+  .mail-box{max-width:960px;width:calc(100% - 32px);border-radius:20px;padding:0;overflow:hidden;font-family:'IBM Plex Sans Thai',Sarabun,sans-serif;max-height:92vh;display:flex;flex-direction:column;}
+  .mail-body-wrap{padding:16px 22px;overflow-y:auto;}
+  .mail-info{font-size:13px;color:#33405C;margin-bottom:12px;}
+  .mail-warn{margin-top:6px;color:#8A4B06;background:#FFF7E8;border-radius:8px;padding:6px 10px;}
+  .mail-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;}
+  .mail-edit{display:flex;flex-direction:column;gap:6px;}
+  .mail-edit label{font-size:13px;font-weight:600;color:#33405C;margin-top:6px;}
+  .mail-edit input[type=text],.mail-edit textarea{width:100%;box-sizing:border-box;border:1.5px solid #DDE3EE;border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;}
+  .mail-edit input[type=text]{min-height:44px;}
+  .mail-help{font-size:12px;color:#4A5772;}
+  .mail-help code{background:#EEF3FB;color:#1E3A8A;border-radius:4px;padding:0 4px;}
+  .mail-pv{background:#F7F9FC;border:1px solid #E6EAF2;border-radius:12px;padding:14px;}
+  .mail-pv-title{font-size:12px;font-weight:700;color:#4A5772;margin-bottom:8px;}
+  .mail-pv-row{display:flex;gap:10px;font-size:13px;padding:4px 0;border-bottom:1px solid #EEF1F6;word-break:break-word;}
+  .mail-pv-row span{color:#4A5772;width:40px;flex:none;}
+  .mail-pv-body{font-size:13.5px;line-height:1.7;margin-top:10px;color:#0F1B33;}
+  .mail-progress{margin-top:12px;font-size:13.5px;display:flex;flex-direction:column;gap:8px;}
+  .mail-progress:empty{display:none;}
+  .mail-skip{background:#F7F9FC;border-radius:8px;padding:8px 10px;font-size:12.5px;color:#33405C;}
+  .mail-foot{display:flex;gap:10px;align-items:center;padding:14px 22px;border-top:1px solid #EEF1F6;background:#FAFBFD;flex-wrap:wrap;}
+  .mail-foot-gap{flex:1;}
+  .mail-foot button{min-height:44px;border-radius:10px;padding:0 16px;}
+  @media (max-width:760px){ .mail-grid{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -2063,6 +2118,10 @@ setTimeout(function () {
       </div>
     </div>
     <div class="dash-actions">
+      <button type="button" class="dash-import-btn no-print" onclick="openExportPanel()" title="ดาวน์โหลดไฟล์สัญญาศิษย์การบิน เลือกทั้งหมดหรือบางคน">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"></path><path d="M14 3v5h5"></path><path d="M12 11v6"></path><path d="M9 14l3 3 3-3"></path></svg>
+        ส่งออกสัญญา ศบ.
+      </button>
       <button type="button" class="dash-import-btn no-print" onclick="openImportDrawer()">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 19h16"></path></svg>
         นำเข้าข้อมูล <span class="dash-badge" id="dash-import-badge" style="display:none">0</span>
@@ -2107,6 +2166,7 @@ setTimeout(function () {
               <button class="link-btn" onclick="closeDetMenu(); officerChangeEmail()">เปลี่ยนบัญชี Google ของผู้ทำสัญญา</button>
               <button class="link-btn" onclick="closeDetMenu(); officerChangeOfficialId()">แก้ไขเลขประจำตัว</button>
               <button class="link-btn" onclick="closeDetMenu(); officerChangeName()">แก้ไขยศ ชื่อ-นามสกุล</button>
+              <button class="link-btn det-danger admin-only" id="det-del-btn" style="display:none" onclick="closeDetMenu(); officerTrashContract()">ลบสัญญา…</button>
             </div>
           </div>
           <button type="button" class="det-btn" onclick="openReport(currentSubId)">รายงาน</button>
@@ -2130,6 +2190,7 @@ setTimeout(function () {
     <div class="imp-tabs" role="tablist">
       <button type="button" role="tab" class="imp-tab active" id="imp-tab-form" onclick="impTab('form')">Google Form <span class="dash-badge" id="imp-tab-badge" style="display:none">0</span></button>
       <button type="button" role="tab" class="imp-tab" id="imp-tab-hris" onclick="impTab('hris')">ข้อมูล HRIS</button>
+      <button type="button" role="tab" class="imp-tab admin-only" id="imp-tab-trash" style="display:none" onclick="impTab('trash')">ถังขยะ</button>
     </div>
     <div class="imp-body" id="imp-body-form">
       <div class="fi-card">
@@ -2147,6 +2208,10 @@ setTimeout(function () {
       </div>
       <div class="imp-fresh" id="imp-fresh"></div>
       <p class="imp-note">ข้อมูล HRIS เก็บในเครื่องนี้เท่านั้น ไม่ส่งขึ้นเซิร์ฟเวอร์ ใช้ตรวจชื่อ เลขประจำตัว สถานภาพสมรส และประวัติการศึกษา</p>
+    </div>
+    <div class="imp-body" id="imp-body-trash" style="display:none">
+      <p class="trash-note">สัญญาที่ถูกลบ (เฉพาะผู้ดูแลระบบ) — กู้คืนได้จนกว่าจะกด "ลบถาวร"</p>
+      <div id="trash-list"></div>
     </div>
   </aside>
 </div>
@@ -2305,6 +2370,77 @@ setTimeout(function () {
           <ol class="det-activity" id="det-activity"></ol>
         </div>
       </aside>
+    </div>
+  </div>
+
+  <!-- EXPORT PILOT CONTRACTS -->
+  <div class="panel" id="panel-export">
+    <button type="button" class="exp-back" onclick="showList()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>กลับหน้าหลัก</button>
+    <div class="dash-card exp-card">
+      <div class="exp-head">
+        <div>
+          <div class="exp-title">ส่งออกไฟล์สัญญาศิษย์การบิน</div>
+          <div class="dash-card-hint">ดาวน์โหลดเฉพาะไฟล์ "สัญญาเข้าเป็นศิษย์การบิน และสัญญาค้ำประกัน" ฉบับล่าสุด — เลือกทั้งหมดหรือเฉพาะบางคน</div>
+        </div>
+      </div>
+      <div class="exp-filters">
+        <select id="exp-year" aria-label="ปีที่ทำสัญญา" onchange="renderExport()"></select>
+        <label class="exp-check"><input type="checkbox" id="exp-only-pass" checked onchange="renderExport()"> เฉพาะสัญญาที่ตรวจผ่านแล้ว</label>
+        <label class="exp-check"><input type="checkbox" id="exp-only-new" onchange="renderExport()"> ยังไม่เคยดาวน์โหลด</label>
+        <label class="exp-check"><input type="checkbox" id="exp-only-unmailed" onchange="renderExport()"> ยังไม่เคยส่งอีเมล</label>
+        <input type="text" id="exp-search" placeholder="ค้นหาชื่อ เลขที่สัญญา" aria-label="ค้นหา" oninput="renderExport()">
+      </div>
+      <div class="dash-table-scroll">
+        <table class="applicants exp-table">
+          <thead><tr>
+            <th><input type="checkbox" id="exp-all" aria-label="เลือกทั้งหมด" onchange="expToggleAll(this.checked)"></th>
+            <th>เลขที่สัญญา</th><th>ชื่อ-สกุล</th><th>ไฟล์สัญญา</th><th>ดาวน์โหลดล่าสุด</th><th>ส่งอีเมลล่าสุด</th>
+          </tr></thead>
+          <tbody id="exp-rows"></tbody>
+        </table>
+      </div>
+      <div class="exp-bar">
+        <span class="exp-count" id="exp-count"></span>
+        <button class="secondary" id="exp-mail" onclick="openEmailComposer()" disabled>ส่งอีเมลถึงเจ้าของ</button>
+        <button class="secondary" id="exp-pdf" onclick="expRun('pdf')" disabled>รวมเป็น PDF ไฟล์เดียว (สำหรับพิมพ์)</button>
+        <button class="primary" id="exp-zip" onclick="expRun('zip')" disabled>ดาวน์โหลด ZIP (แยกไฟล์ต่อคน)</button>
+      </div>
+      <div class="exp-progress" id="exp-progress"></div>
+    </div>
+  </div>
+
+  <!-- EMAIL COMPOSER -->
+  <div class="modal-overlay" id="mail-modal">
+    <div class="modal-box mail-box" role="dialog" aria-label="ส่งไฟล์สัญญาทางอีเมล">
+      <div class="u-picker-head">
+        <div><h3>ส่งไฟล์สัญญาทางอีเมล</h3><p id="mail-sub"></p></div>
+        <button type="button" class="u-picker-close" onclick="closeEmailComposer()" aria-label="ปิด"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      <div class="mail-body-wrap">
+        <div class="mail-info" id="mail-info"></div>
+        <div class="mail-grid">
+          <div class="mail-edit">
+            <label for="mail-subject">หัวเรื่อง</label>
+            <input type="text" id="mail-subject" oninput="mailRefresh()">
+            <label for="mail-body">ข้อความ</label>
+            <textarea id="mail-body" rows="9" oninput="mailRefresh()"></textarea>
+            <div class="mail-help">ใช้ <code>{ชื่อ}</code> และ <code>{เลขที่สัญญา}</code> แทนข้อมูลของแต่ละคน · ระบบจำข้อความล่าสุดไว้ใช้ครั้งต่อไป</div>
+            <label class="exp-check" id="mail-resend-row" style="display:none"><input type="checkbox" id="mail-resend" onchange="mailRefresh()"> <span id="mail-resend-label"></span></label>
+          </div>
+          <div class="mail-pv">
+            <div class="mail-pv-title">ตัวอย่างอีเมล (คนแรก)</div>
+            <div id="mail-preview"></div>
+          </div>
+        </div>
+        <div class="mail-progress" id="mail-progress"></div>
+      </div>
+      <div class="mail-foot">
+        <button class="secondary" onclick="closeEmailComposer()">ปิด</button>
+        <span class="mail-foot-gap"></span>
+        <button class="secondary" id="mail-test" onclick="mailSendTest()">ส่งทดสอบถึงอีเมลของฉัน</button>
+        <button class="primary" id="mail-send" onclick="mailSendAll()">ส่งอีเมล</button>
+      </div>
     </div>
   </div>
 
@@ -3039,6 +3175,8 @@ function hydrateSubmission(result) {
     consentedAt: s.consentedAt,
     submittedAt: s.submittedAt,
     importSource: s.importSource || '',
+    contractExportedAt: s.contractExportedAt || '',
+    contractEmailedAt: s.contractEmailedAt || '',
     contractSeries: s.contractSeries || '',
     formData: parseJsonSafe(s.formData, null),
     formExtraFiles: parseJsonSafe(s.formExtraFiles, [])
@@ -3935,6 +4073,8 @@ function adaptFlatSubmission(row) {
     createdAt: row.createdAt,
     consentedAt: row.consentedAt,
     importSource: row.importSource || '',
+    contractExportedAt: row.contractExportedAt || '',
+    contractEmailedAt: row.contractEmailedAt || '',
     contractSeries: row.contractSeries || '',
     formData: parseJsonSafe(row.formData, null),
     formExtraFiles: parseJsonSafe(row.formExtraFiles, [])
@@ -4128,6 +4268,7 @@ function showList() {
   document.getElementById('panel-list').classList.add('active');
   document.getElementById('panel-detail').classList.remove('active');
   document.getElementById('panel-report').classList.remove('active');
+  document.getElementById('panel-export').classList.remove('active');
   compareSelection = [];
   updateCompareBar();
   renderList();
@@ -4164,6 +4305,7 @@ function renderDetail(sub) {
   renderMaritalWarnings(sub);
   renderStampArea(sub);
   loadActivity(sub);
+  document.getElementById('panel-export').classList.remove('active');
   document.getElementById('panel-list').classList.remove('active');
   document.getElementById('panel-detail').classList.add('active');
   if (pendingAutoMatchSubId === sub.subId && HRIS) {
@@ -6014,6 +6156,7 @@ function initAdminView() {
   refreshList();
   loadHris();
   dashAutoCheckForm();
+  applyAdminVisibility();
 }
 function renderGuarantorClaimWarnings(sub) {
   var box = document.getElementById('rtaf-warnings');
@@ -6867,6 +7010,8 @@ document.addEventListener('click', function (e) {
   if (w && !w.contains(e.target)) { var m = document.getElementById('det-menu'); if (m) m.classList.remove('open'); }
 });
 function renderDetailHeader(sub) {
+  var delBtn = document.getElementById('det-del-btn');
+  if (delBtn) delBtn.style.display = currentUser && currentUser.isAdmin && !sub.stamped ? '' : 'none';
   var p = sub.personal;
   document.getElementById('d-name').textContent = p.title + ' ' + p.first + ' ' + p.last;
   document.getElementById('det-avatar').textContent = thaiInitial(p.first) + thaiInitial(p.last);
@@ -7248,6 +7393,313 @@ function rvRenderPoints() {
 function rvTick(key, i, on) {
   (rvTicks[key] = rvTicks[key] || {})[i] = on;
   rvRenderPoints();
+}
+
+// ======================================================================
+// Administrator tools: delete (trash → permanent) and export pilot contract files
+// ======================================================================
+function applyAdminVisibility() {
+  var on = !!(currentUser && currentUser.isAdmin);
+  document.querySelectorAll('.admin-only').forEach(function (el) { el.style.display = on ? '' : 'none'; });
+}
+function officerTrashContract() {
+  var sub = SUBMISSIONS.find(function (s) { return s.subId === currentSubId; });
+  if (!sub) return;
+  var no = formatContractNumber(sub);
+  var fields = [
+    {id: 'reason', label: 'เหตุผลในการลบ', type: 'textarea', required: true, placeholder: 'เช่น ยื่นซ้ำ, นำเข้าผิดพลาด, สละสิทธิ์'},
+    {id: 'confirm', label: 'พิมพ์เลขที่สัญญาเพื่อยืนยัน: ' + no, required: true, placeholder: no,
+     validate: function (v) { return v.replace(/\s+/g, '') === no.replace(/\s+/g, '') ? '' : 'เลขที่สัญญาไม่ตรง — พิมพ์ ' + no; }}
+  ];
+  if (sub.importSource === 'google-form') {
+    fields.push({id: 'reimport', label: 'สัญญานี้มาจาก Google Form', type: 'select', value: 'no',
+      optionsHtml: '<option value="no">ลบ และไม่ต้องนำเข้าอีก (เช่น สละสิทธิ์)</option><option value="yes">ลบ และให้นำเข้าใหม่ได้ (เช่น นำเข้าผิดพลาด)</option>',
+      note: 'มีผลเมื่อลบถาวรจากถังขยะ'});
+  }
+  showFormDialog('ลบสัญญา ' + no,
+    subName(sub) + ' — สัญญาจะย้ายไปถังขยะ และหายจากหน้ารายชื่อของเจ้าหน้าที่และผู้ทำสัญญา กู้คืนได้จนกว่าจะลบถาวร',
+    fields, 'ย้ายไปถังขยะ', function (vals) {
+      showLoading('กำลังลบ...');
+      callApi('trashSubmission', [SESSION, sub.subId, vals.reason, vals.reimport === 'yes']).then(function () {
+        hideLoading();
+        SUBMISSIONS = SUBMISSIONS.filter(function (s) { return s.subId !== sub.subId; });
+        showToast('ย้าย ' + no + ' ไปถังขยะแล้ว — กู้คืนได้ที่ "นำเข้าข้อมูล" แท็บถังขยะ', 'success', 6000);
+        showList();
+        refreshList();
+      }).catch(function (err) {
+        hideLoading();
+        showToast('ลบไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error');
+      });
+    });
+}
+// ---------- trash tab (in the right-hand drawer) ----------
+function loadTrash() {
+  var box = document.getElementById('trash-list');
+  box.innerHTML = '<div class="fi-progress">กำลังโหลด...</div>';
+  callApi('listTrash', [SESSION]).then(function (rows) {
+    if (!rows.length) { box.innerHTML = '<div class="trash-empty">ถังขยะว่าง</div>'; return; }
+    box.innerHTML = rows.map(function (r) {
+      var no = formatContractNumber({contractNumber: r.contractNumber, contractYear: r.contractYear, contractSeries: r.contractSeries});
+      return '<div class="trash-row"><div class="trash-main"><div class="trash-top"><span class="det-chip det-chip-no u-pick-no">' + escapeHtml(no) + '</span>' +
+        '<strong>' + escapeHtml([r.title, r.firstName, r.lastName].join(' ')) + '</strong></div>' +
+        '<div class="trash-sub">ลบเมื่อ ' + escapeHtml(formatThaiDateTime(r.deletedAt)) + ' โดย ' + escapeHtml(r.deletedBy) + '</div>' +
+        '<div class="trash-sub">เหตุผล: ' + escapeHtml(r.deleteReason || '-') + '</div>' +
+        (r.importSource === 'google-form' ? '<div class="trash-sub">' + (r.deleteReimport ? 'ลบถาวรแล้ว นำเข้าจาก Google Form ใหม่ได้' : 'ลบถาวรแล้ว จะไม่นำเข้าจาก Google Form อีก') + '</div>' : '') +
+        '</div><div class="trash-actions"><button class="secondary" onclick="trashRestore(\'' + r.subId + '\')">กู้คืน</button>' +
+        '<button class="danger" onclick="trashPurge(\'' + r.subId + '\',\'' + escapeHtml(no) + '\')">ลบถาวร</button></div></div>';
+    }).join('');
+  }).catch(function (err) {
+    box.innerHTML = '<div class="fi-errors">โหลดถังขยะไม่สำเร็จ: ' + escapeHtml(err && err.message ? err.message : String(err)) + '</div>';
+  });
+}
+function trashRestore(subId) {
+  callApi('restoreSubmission', [SESSION, subId]).then(function () {
+    showToast('กู้คืนสัญญาแล้ว', 'success');
+    loadTrash(); refreshList();
+  }).catch(function (err) { showToast('กู้คืนไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error'); });
+}
+function trashPurge(subId, no) {
+  showConfirm('ลบ ' + no + ' ถาวร?', 'ข้อมูลสัญญาและรายการเอกสารจะถูกลบออกจากระบบ และโฟลเดอร์ไฟล์ใน Google Drive ย้ายไปถังขยะของ Drive (กู้จาก Drive ได้ภายใน 30 วัน) ประวัติการทำงานยังเก็บไว้', 'ลบถาวร', function () {
+    showLoading('กำลังลบถาวร...');
+    callApi('purgeSubmission', [SESSION, subId]).then(function () {
+      hideLoading(); showToast('ลบถาวรแล้ว', 'success'); loadTrash();
+    }).catch(function (err) { hideLoading(); showToast('ลบไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error'); });
+  }, true);
+}
+var _admImpTab = impTab;
+impTab = function (t) {
+  var tt = document.getElementById('imp-tab-trash'), tb = document.getElementById('imp-body-trash');
+  if (tt) { tt.classList.toggle('active', t === 'trash'); tb.style.display = t === 'trash' ? '' : 'none'; }
+  if (t === 'trash') {
+    ['form', 'hris'].forEach(function (k) { document.getElementById('imp-tab-' + k).classList.remove('active'); document.getElementById('imp-body-' + k).style.display = 'none'; });
+    loadTrash();
+    return;
+  }
+  _admImpTab(t);
+};
+// ---------- export pilot contract files ----------
+var JSZIP_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+var EXP = {sel: {}, busy: false};
+function openExportPanel() {
+  var a = document.getElementById('app-admin');
+  a.classList.remove('dash-mode'); a.classList.remove('det-mode');
+  document.querySelectorAll('#app-admin .panel').forEach(function (p) { p.classList.remove('active'); });
+  document.getElementById('panel-export').classList.add('active');
+  compareSelection = []; updateCompareBar();
+  var years = {};
+  expPilots().forEach(function (s) { years[s.contractYear] = 1; });
+  var ys = Object.keys(years).sort().reverse(), sel = document.getElementById('exp-year'), cur = sel.value;
+  sel.innerHTML = '<option value="">ทุกปี</option>' + ys.map(function (y) { return '<option value="' + y + '">ปี ' + y + '</option>'; }).join('');
+  sel.value = cur && ys.indexOf(cur) > -1 ? cur : (ys[0] || '');
+  renderExport();
+  window.scrollTo(0, 0);
+}
+function expPilots() { return SUBMISSIONS.filter(function (s) { return s.personal.eduType === 'pilot'; }); }
+function expContract(s) { return docEntry(s, 'c1'); }
+function expVisible() {
+  var y = document.getElementById('exp-year').value, onlyPass = document.getElementById('exp-only-pass').checked,
+    onlyNew = document.getElementById('exp-only-new').checked, q = document.getElementById('exp-search').value.trim().toLowerCase();
+  return expPilots().filter(function (s) {
+    var c = expContract(s);
+    if (y && String(s.contractYear) !== y) return false;
+    if (onlyPass && c.reviewStatus !== 'pass') return false;
+    if (onlyNew && s.contractExportedAt) return false;
+    if (document.getElementById('exp-only-unmailed').checked && s.contractEmailedAt) return false;
+    if (q && (subName(s) + ' ' + formatContractNumber(s)).toLowerCase().indexOf(q) === -1) return false;
+    return true;
+  }).sort(function (a, b) { return (a.contractYear - b.contractYear) || (a.contractNumber - b.contractNumber); });
+}
+function expEligible(s) { return expContract(s).status === 'uploaded'; }
+function renderExport() {
+  var rows = expVisible();
+  var ST = {'pass': ['ตรวจผ่าน', 'res-pass'], 'pending': ['รอตรวจ', 'res-pending'], 'needs-revision': ['ต้องแก้ไข', 'res-revision'], 'fail': ['ไม่ผ่าน', 'res-fail']};
+  document.getElementById('exp-rows').innerHTML = rows.length ? rows.map(function (s) {
+    var c = expContract(s), ok = expEligible(s), st = ok ? (ST[c.reviewStatus] || ST.pending) : ['ยังไม่มีไฟล์', 'res-none'];
+    return '<tr class="' + (ok ? '' : 'exp-off') + '"><td><input type="checkbox" class="exp-pick" aria-label="เลือก ' + escapeHtml(subName(s)) + '" data-id="' + s.subId + '"' +
+      (ok ? '' : ' disabled') + (ok && EXP.sel[s.subId] ? ' checked' : '') + ' onchange="EXP.sel[this.dataset.id]=this.checked;expCount()"></td>' +
+      '<td class="row-no">' + escapeHtml(formatContractNumber(s)) + '</td><td>' + escapeHtml(subName(s)) + '</td>' +
+      '<td><span class="dl-result ' + st[1] + '">' + st[0] + '</span></td>' +
+      '<td class="row-date">' + (s.contractExportedAt ? escapeHtml(formatThaiDateTime(s.contractExportedAt)) : '—') + '</td>' +
+      '<td class="row-date">' + (s.contractEmailedAt ? escapeHtml(formatThaiDateTime(s.contractEmailedAt)) : '—') + '</td></tr>';
+  }).join('') : '<tr><td colspan="6" class="no-results">ไม่มีสัญญาศิษย์การบินตามเงื่อนไขที่เลือก</td></tr>';
+  expCount();
+}
+function expSelected() { return expVisible().filter(function (s) { return expEligible(s) && EXP.sel[s.subId]; }); }
+function expCount() {
+  var vis = expVisible().filter(expEligible), n = expSelected().length;
+  var all = document.getElementById('exp-all');
+  all.checked = vis.length > 0 && n === vis.length;
+  all.indeterminate = n > 0 && n < vis.length;
+  document.getElementById('exp-count').textContent = 'เลือก ' + n + ' จาก ' + vis.length + ' ฉบับ';
+  ['exp-zip', 'exp-pdf', 'exp-mail'].forEach(function (id) { document.getElementById(id).disabled = !n || EXP.busy; });
+}
+function expToggleAll(on) {
+  expVisible().filter(expEligible).forEach(function (s) { EXP.sel[s.subId] = on; });
+  renderExport();
+}
+function expFileName(s) {
+  return (formatContractNumber(s) + '_' + s.personal.title + s.personal.first + '_' + s.personal.last)
+    .replace(/\s+/g, '').replace(/\//g, '-').replace(/[\\:*?"<>|]/g, '') + '.pdf';
+}
+function expDownload(blob, name) {
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+}
+function expRun(kind) {
+  var list = expSelected();
+  if (!list.length || EXP.busy) return;
+  EXP.busy = true; expCount();
+  var prog = document.getElementById('exp-progress'), got = [], failed = [], next = 0, done = 0;
+  var show = function (t) { prog.innerHTML = '<span class="inline-spinner dark"></span> ' + t; };
+  show('กำลังดึงไฟล์สัญญา 0 / ' + list.length);
+  var lib = kind === 'zip' ? loadScriptOnce(JSZIP_URL, 'JSZip') : loadScriptOnce(PDFLIB_URL, 'PDFLib');
+  var worker = function () {
+    if (next >= list.length) return Promise.resolve();
+    var s = list[next++];
+    return callApi('getDocumentFile', [SESSION, s.subId, 'c1']).then(function (f) {
+      got.push({sub: s, bytes: base64ToBytes(f.base64)});
+    }, function (err) {
+      failed.push({sub: s, error: err && err.message ? err.message : String(err)});
+    }).then(function () { done++; show('กำลังดึงไฟล์สัญญา ' + done + ' / ' + list.length); return worker(); });
+  };
+  Promise.all([worker(), worker(), worker(), lib]).then(function () {
+    got.sort(function (a, b) { return (a.sub.contractYear - b.sub.contractYear) || (a.sub.contractNumber - b.sub.contractNumber); });
+    var stamp = new Date().toISOString().slice(0, 10);
+    if (kind === 'zip') {
+      show('กำลังรวมเป็นไฟล์ ZIP...');
+      var zip = new JSZip();
+      got.forEach(function (g) { zip.file(expFileName(g.sub), g.bytes); });
+      return zip.generateAsync({type: 'blob'}).then(function (blob) {
+        expDownload(blob, 'สัญญาศิษย์การบิน_' + got.length + 'ฉบับ_' + stamp + '.zip');
+      });
+    }
+    show('กำลังรวมเป็น PDF ไฟล์เดียว...');
+    return PDFLib.PDFDocument.create().then(function (out) {
+      return got.reduce(function (p, g) {
+        return p.then(function () {
+          return PDFLib.PDFDocument.load(g.bytes, {ignoreEncryption: true}).then(function (src) {
+            return out.copyPages(src, src.getPageIndices()).then(function (pages) { pages.forEach(function (pg) { out.addPage(pg); }); });
+          }).catch(function (err) { failed.push({sub: g.sub, error: 'เปิดไฟล์ PDF ไม่ได้'}); g.bad = true; });
+        });
+      }, Promise.resolve()).then(function () { return out.save(); }).then(function (bytes) {
+        expDownload(new Blob([bytes], {type: 'application/pdf'}), 'สัญญาศิษย์การบิน_รวม_' + got.filter(function (g) { return !g.bad; }).length + 'ฉบับ_' + stamp + '.pdf');
+      });
+    });
+  }).then(function () {
+    var okIds = got.filter(function (g) { return !g.bad; }).map(function (g) { return g.sub.subId; });
+    return okIds.length ? callApi('markContractsExported', [SESSION, okIds, kind]).then(function (r) {
+      SUBMISSIONS.forEach(function (s) { if (okIds.indexOf(s.subId) > -1) s.contractExportedAt = r.exportedAt; });
+    }).catch(function () {}) : null;
+  }).then(function () {
+    EXP.busy = false;
+    var okN = got.filter(function (g) { return !g.bad; }).length;
+    prog.innerHTML = '<span class="exp-done">✓ ส่งออก ' + okN + ' ฉบับแล้ว</span>' + (failed.length ? '<div class="fi-errors"><strong>ไม่สำเร็จ ' + failed.length + ' ฉบับ:</strong>' +
+      failed.map(function (f) { return '<div>' + escapeHtml(formatContractNumber(f.sub) + ' ' + subName(f.sub) + ' — ' + f.error) + '</div>'; }).join('') + '</div>' : '');
+    renderExport();
+  }).catch(function (err) {
+    EXP.busy = false; expCount();
+    prog.innerHTML = '<div class="fi-errors">ส่งออกไม่สำเร็จ: ' + escapeHtml(err && err.message ? err.message : String(err)) + '</div>';
+  });
+}
+
+// ---------- email the contract file to each owner ----------
+var MAIL = {busy: false, settings: null};
+function fillMailTpl(t, s) {
+  return String(t || '').replace(/\{ชื่อ\}/g, subName(s)).replace(/\{เลขที่สัญญา\}/g, formatContractNumber(s));
+}
+function openEmailComposer() {
+  var list = expSelected();
+  if (!list.length) return;
+  document.getElementById('mail-modal').classList.add('active');
+  document.getElementById('mail-progress').innerHTML = '';
+  document.getElementById('mail-info').textContent = 'กำลังโหลดการตั้งค่า...';
+  mailRefresh();
+  callApi('getEmailSettings', [SESSION]).then(function (st) {
+    MAIL.settings = st;
+    var sj = document.getElementById('mail-subject'), bd = document.getElementById('mail-body');
+    if (!sj.value) sj.value = st.subject;
+    if (!bd.value) bd.value = st.body;
+    mailRefresh();
+  }).catch(function (err) {
+    document.getElementById('mail-info').textContent = 'โหลดการตั้งค่าไม่สำเร็จ: ' + (err && err.message ? err.message : err);
+  });
+}
+function closeEmailComposer() { if (!MAIL.busy) document.getElementById('mail-modal').classList.remove('active'); }
+function mailTargets() {
+  var resend = document.getElementById('mail-resend').checked;
+  return expSelected().filter(function (s) { return resend || !s.contractEmailedAt; });
+}
+function mailRefresh() {
+  var list = expSelected(), sentBefore = list.filter(function (s) { return s.contractEmailedAt; }).length, targets = mailTargets();
+  var st = MAIL.settings;
+  document.getElementById('mail-sub').textContent = 'ถึงเจ้าของสัญญา ' + list.length + ' คน · แนบเฉพาะไฟล์สัญญาของแต่ละคน';
+  if (st) {
+    var warn = targets.length > st.quota;
+    document.getElementById('mail-info').innerHTML = 'ผู้ส่ง: <strong>' + escapeHtml(st.senderName + ' <' + st.sender + '>') + '</strong> · โควตาอีเมลวันนี้เหลือ <strong>' + st.quota + '</strong> ฉบับ' +
+      (warn ? '<div class="mail-warn">จะส่ง ' + targets.length + ' ฉบับ เกินโควตาวันนี้ ระบบจะส่งได้ ' + st.quota + ' ฉบับ ที่เหลือส่งต่อได้พรุ่งนี้ (กรอง "ยังไม่เคยส่งอีเมล")</div>' : '');
+  }
+  var rs = document.getElementById('mail-resend-row');
+  rs.style.display = sentBefore ? '' : 'none';
+  document.getElementById('mail-resend-label').textContent = 'ส่งซ้ำให้ ' + sentBefore + ' คนที่เคยส่งแล้ว (ถ้าไม่ติ๊ก จะข้ามคนกลุ่มนี้)';
+  var first = targets[0] || list[0];
+  var sj = document.getElementById('mail-subject').value, bd = document.getElementById('mail-body').value;
+  document.getElementById('mail-preview').innerHTML = first ?
+    '<div class="mail-pv-row"><span>ถึง</span>' + escapeHtml(first.personal.email || '-') + '</div>' +
+    '<div class="mail-pv-row"><span>เรื่อง</span><strong>' + escapeHtml(fillMailTpl(sj, first)) + '</strong></div>' +
+    '<div class="mail-pv-row"><span>แนบ</span>📎 ' + escapeHtml(expFileName(first)) + '</div>' +
+    '<div class="mail-pv-body">' + escapeHtml(fillMailTpl(bd, first)).replace(/\n/g, '<br>') + '</div>' : '';
+  var btn = document.getElementById('mail-send');
+  btn.textContent = targets.length ? 'ส่งอีเมล ' + targets.length + ' ฉบับ' : 'ไม่มีผู้รับที่ต้องส่ง';
+  btn.disabled = !targets.length || MAIL.busy || !st;
+  document.getElementById('mail-test').disabled = MAIL.busy || !st || !list.length;
+}
+function mailSendTest() {
+  var list = expSelected();
+  if (!list.length) return;
+  MAIL.busy = true; mailRefresh();
+  document.getElementById('mail-progress').innerHTML = '<span class="inline-spinner dark"></span> กำลังส่งอีเมลทดสอบ...';
+  callApi('sendContractEmails', [SESSION, [(mailTargets()[0] || list[0]).subId], document.getElementById('mail-subject').value, document.getElementById('mail-body').value, {test: true}]).then(function (r) {
+    MAIL.busy = false; mailRefresh();
+    document.getElementById('mail-progress').innerHTML = r.sent.length
+      ? '<span class="exp-done">✓ ส่งอีเมลทดสอบถึง ' + escapeHtml(r.sent[0].to) + ' แล้ว — ตรวจกล่องจดหมายของท่าน</span>'
+      : '<div class="fi-errors">ส่งทดสอบไม่สำเร็จ: ' + escapeHtml((r.failed[0] || r.skipped[0] || {}).error || (r.skipped[0] || {}).reason || '') + '</div>';
+  }).catch(function (err) {
+    MAIL.busy = false; mailRefresh();
+    document.getElementById('mail-progress').innerHTML = '<div class="fi-errors">ส่งทดสอบไม่สำเร็จ: ' + escapeHtml(err && err.message ? err.message : String(err)) + '</div>';
+  });
+}
+function mailSendAll() {
+  var targets = mailTargets();
+  if (!targets.length) return;
+  var subject = document.getElementById('mail-subject').value, body = document.getElementById('mail-body').value;
+  var resend = document.getElementById('mail-resend').checked;
+  showConfirm('ส่งอีเมล ' + targets.length + ' ฉบับ?', 'ส่งไฟล์สัญญาถึงเจ้าของแต่ละคน เมื่อส่งแล้วเรียกคืนไม่ได้', 'ส่งอีเมล', function () {
+    MAIL.busy = true; mailRefresh();
+    var sent = [], skipped = [], failed = [], total = targets.length;
+    var prog = document.getElementById('mail-progress');
+    var step = function (ids) {
+      prog.innerHTML = '<span class="inline-spinner dark"></span> กำลังส่ง... ' + (sent.length + skipped.length + failed.length) + ' / ' + total;
+      callApi('sendContractEmails', [SESSION, ids, subject, body, {resend: resend}]).then(function (r) {
+        sent = sent.concat(r.sent); skipped = skipped.concat(r.skipped); failed = failed.concat(r.failed);
+        r.sent.forEach(function (x) { var s = SUBMISSIONS.find(function (y) { return y.subId === x.subId; }); if (s) s.contractEmailedAt = r.sentAt; });
+        if (MAIL.settings) MAIL.settings.quota = r.quota;
+        if (r.remaining && r.remaining.length) { step(r.remaining); return; }
+        finish();
+      }).catch(function (err) { failed.push({name: '', error: err && err.message ? err.message : String(err)}); finish(); });
+    };
+    var finish = function () {
+      MAIL.busy = false;
+      var list = function (arr, f) { return arr.map(function (x) { return '<div>' + escapeHtml((x.name ? x.name + ' — ' : '') + f(x)) + '</div>'; }).join(''); };
+      prog.innerHTML = '<span class="exp-done">✓ ส่งอีเมลแล้ว ' + sent.length + ' ฉบับ</span>' +
+        (skipped.length ? '<div class="mail-skip"><strong>ข้าม ' + skipped.length + ' ราย:</strong>' + list(skipped, function (x) { return x.reason; }) + '</div>' : '') +
+        (failed.length ? '<div class="fi-errors"><strong>ไม่สำเร็จ ' + failed.length + ' ราย:</strong>' + list(failed, function (x) { return x.error; }) + '</div>' : '');
+      showToast('ส่งอีเมลแล้ว ' + sent.length + ' ฉบับ' + (failed.length ? ' · ไม่สำเร็จ ' + failed.length : ''), failed.length ? 'warn' : 'success', 6000);
+      renderExport(); mailRefresh();
+    };
+    step(targets.map(function (s) { return s.subId; }));
+  });
 }
 
 boot();
