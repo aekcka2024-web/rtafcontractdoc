@@ -7621,9 +7621,19 @@ function openEmailComposer() {
     var sj = document.getElementById('mail-subject'), bd = document.getElementById('mail-body');
     if (!sj.value) sj.value = st.subject;
     if (!bd.value) bd.value = st.body;
+    if (st.needsAuth) {
+      document.getElementById('mail-info').innerHTML =
+        '<div class="mail-warn" style="background:#FEF2F2;border-color:#FECACA;color:#991B1B">' +
+        '⚠️ ระบบยังไม่มีสิทธิ์ส่งอีเมล — ใน Apps Script ให้เลือกฟังก์ชัน <code>authorizeMail</code> แล้วกด Run หนึ่งครั้ง (กด Allow) จากนั้น Deploy เวอร์ชันใหม่' +
+        '</div>';
+      document.getElementById('mail-test').disabled = true;
+      document.getElementById('mail-send').disabled = true;
+    }
     mailRefresh();
   }).catch(function (err) {
-    document.getElementById('mail-info').textContent = 'โหลดการตั้งค่าไม่สำเร็จ: ' + (err && err.message ? err.message : err);
+    document.getElementById('mail-info').innerHTML =
+      '<div class="mail-warn" style="background:#FEF2F2;border-color:#FECACA;color:#991B1B">โหลดการตั้งค่าไม่สำเร็จ: ' +
+      escapeHtml(err && err.message ? err.message : String(err)) + '</div>';
   });
 }
 function closeEmailComposer() { if (!MAIL.busy) document.getElementById('mail-modal').classList.remove('active'); }
@@ -7635,8 +7645,8 @@ function mailRefresh() {
   var list = expSelected(), sentBefore = list.filter(function (s) { return s.contractEmailedAt; }).length, targets = mailTargets();
   var st = MAIL.settings;
   document.getElementById('mail-sub').textContent = 'ถึงเจ้าของสัญญา ' + list.length + ' คน · แนบเฉพาะไฟล์สัญญาของแต่ละคน';
-  if (st) {
-    var warn = targets.length > st.quota;
+  if (st && !st.needsAuth) {
+    var warn = st.quota !== null && targets.length > st.quota;
     document.getElementById('mail-info').innerHTML = 'ผู้ส่ง: <strong>' + escapeHtml(st.senderName + ' <' + st.sender + '>') + '</strong> · โควตาอีเมลวันนี้เหลือ <strong>' + st.quota + '</strong> ฉบับ' +
       (warn ? '<div class="mail-warn">จะส่ง ' + targets.length + ' ฉบับ เกินโควตาวันนี้ ระบบจะส่งได้ ' + st.quota + ' ฉบับ ที่เหลือส่งต่อได้พรุ่งนี้ (กรอง "ยังไม่เคยส่งอีเมล")</div>' : '');
   }
