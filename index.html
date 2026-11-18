@@ -1143,6 +1143,7 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .imp-tab{flex:1;min-height:40px;border-radius:8px;border:none;background:transparent;color:var(--ink2);font-size:14px;cursor:pointer;}
   .imp-tab.active{background:#fff;color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(15,27,51,.15);}
   .imp-body{flex:1;overflow-y:auto;padding:18px 22px;}
+.fi-table{width:100%;border-collapse:collapse;font-size:13px}.fi-table th,.fi-table td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border,#e5e7eb)}.fi-table th{color:#667085;font-weight:600}
   .imp-body .fi-card,.imp-body .hris-card{border:none;padding:0;margin:0;box-shadow:none;background:transparent;}
   .imp-body .fi-list{max-height:none;}
   .imp-fresh{margin-top:16px;}
@@ -1620,6 +1621,66 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .det-aw-text strong{display:block;font-size:14px;color:#8A4B06;}
   .det-aw-text span{display:block;font-size:12.5px;color:#6B4A12;margin-top:2px;}
   .det-aw-btn{min-height:40px;border-radius:10px;padding:0 14px;flex:none;}
+  .fi-opt{display:flex;gap:10px;align-items:flex-start;margin:12px 0 0;padding:10px 12px;border-radius:10px;background:#F7F9FC;border:1px solid #E6EAF2;font-size:13.5px;cursor:pointer;}
+  #fi-bulk-card{margin-top:22px;padding-top:18px;border-top:1px solid #E6EAF2;}
+  #fi-bulk-result{margin-top:10px;}
+  #fi-result .fi-opt + .hris-actions{margin-top:12px;}
+  .fi-opt input{margin-top:3px;width:17px;height:17px;flex:none;}
+  .fi-opt small{display:block;font-size:12px;color:#4A5772;margin-top:2px;}
+  /* admin: test banner, select mode, delete dialog, trash bar, settings */
+  .test-banner{background:#FFC93C;color:#3B2A00;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;padding:8px 16px;font-size:13.5px;font-weight:500;position:relative;z-index:30;}
+  .test-banner-btn{min-height:32px;padding:0 12px;border-radius:8px;border:1.5px solid #3B2A00;background:transparent;color:#3B2A00;font-size:13px;font-weight:700;cursor:pointer;}
+  .test-banner-btn:hover{background:rgba(59,42,0,.1);}
+  .list-sel{min-height:40px;border-radius:10px;border:1px solid #DDE3EE;background:#fff;padding:0 10px;font-size:13.5px;color:#0F1B33;max-width:150px;}
+  #sel-toggle.on{background:#FFF7E8;border-color:#E4B979;color:#8A4B06;}
+  .applicants:not(.sel-mode) .sel-col{display:none;}
+  .applicants .sel-col{width:44px;padding-left:18px;padding-right:0;}
+  .applicants .sel-col input{width:17px;height:17px;cursor:pointer;}
+  .applicants.sel-mode tr.data-row{cursor:pointer;}
+  tr.data-row.row-selected td{background:#EEF3FB;}
+  .sel-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:#0F1B33;color:#fff;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 24px;box-shadow:0 -8px 24px rgba(15,27,51,.25);}
+  .sel-bar-text{flex:1 1 220px;font-size:14px;font-weight:600;}
+  .sel-bar button{min-height:42px;border-radius:10px;padding:0 16px;font-size:14px;font-weight:600;cursor:pointer;}
+  .sel-bar .sel-bar-clear{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35);}
+  .sel-bar .sel-bar-del{background:#DC2626;color:#fff;border:none;}
+  .sel-bar button:disabled{opacity:.45;cursor:not-allowed;}
+  .del-box{max-width:620px;width:calc(100% - 32px);border-radius:20px;padding:0;overflow:hidden;font-family:'IBM Plex Sans Thai',Sarabun,sans-serif;max-height:92vh;display:flex;flex-direction:column;}
+  .del-body{padding:16px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+  .del-list{list-style:none;margin:0;padding:0;max-height:170px;overflow-y:auto;border:1px solid #E6EAF2;border-radius:10px;}
+  .del-list li{display:flex;gap:10px;align-items:center;padding:7px 12px;font-size:13px;border-bottom:1px solid #F0F3F8;}
+  .del-list li:last-child{border-bottom:none;}
+  .del-list li.del-out{color:#8392AD;text-decoration:line-through;}
+  .del-tag{margin-left:auto;font-size:11.5px;font-weight:700;color:#8A4B06;background:#FFF7E8;border-radius:999px;padding:1px 8px;white-space:nowrap;text-decoration:none;}
+  .del-box label{font-size:13px;font-weight:600;color:#33405C;}
+  .del-box textarea,.del-box input[type=text],.del-box select{width:100%;box-sizing:border-box;border:1.5px solid #DDE3EE;border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;}
+  .del-box input[type=text],.del-box select{min-height:44px;}
+  .del-warn{background:#FFF7E8;border:1px solid #F0C27A;border-radius:10px;padding:10px 12px;font-size:13px;color:#6B4A12;}
+  .del-phrase{font-family:'IBM Plex Mono',monospace;background:#FEF2F2;color:#B91C1C;border-radius:6px;padding:0 6px;}
+  .del-foot{display:flex;gap:10px;padding:14px 22px;border-top:1px solid #EEF1F6;background:#FAFBFD;justify-content:flex-end;flex-wrap:wrap;}
+  .del-foot button{min-height:44px;border-radius:10px;padding:0 16px;}
+  .del-foot .del-go{background:#DC2626;color:#fff;border:none;font-weight:700;}
+  .del-foot .del-go:disabled{opacity:.4;cursor:not-allowed;}
+  #adlg-body{white-space:pre-line;}
+  .trash-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0 12px;border-bottom:1px solid #EEF1F6;position:sticky;top:0;background:#fff;z-index:2;}
+  .trash-count{font-size:12.5px;color:#4A5772;}
+  .trash-gap{flex:1;}
+  .trash-bar button{min-height:36px;border-radius:8px;padding:0 12px;font-size:13px;}
+  .trash-bar .trash-clear{background:#fff;color:#B91C1C;border:1px solid #F3A3A3;}
+  .trash-row .trash-pick{margin-top:4px;width:17px;height:17px;flex:none;}
+  .set-on{color:#B45309;}
+  #imp-body-settings .fi-card + .fi-card{margin-top:22px;padding-top:18px;border-top:1px solid #E6EAF2;}
+  .trash-actions .danger,.trash-bar .danger{background:#fff;color:#B91C1C;border:1px solid #F3A3A3;}
+  .trash-actions .danger:hover,.trash-bar .danger:hover:not(:disabled){background:#FEF2F2;}
+  .trash-bar .danger:disabled{opacity:.45;cursor:not-allowed;}
+  #app-admin.has-selbar{padding-bottom:90px;}
+  .cnt-row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #EEF1F6;}
+  .cnt-main{flex:1;min-width:0;}
+  .cnt-sub{font-size:12.5px;color:#4A5772;margin-top:3px;}
+  .cnt-note{color:#8A4B06;}
+  .cnt-act{flex:none;}
+  .cnt-act button{min-height:36px;border-radius:8px;padding:0 14px;}
+  .cnt-ok{font-size:12.5px;color:#15803D;font-weight:600;}
+  @media (max-width:700px){ .sel-bar{padding:10px 14px;} .list-sel{max-width:none;flex:1;} }
 </style>
 </head>
 <body>
@@ -2127,6 +2188,10 @@ setTimeout(function () {
 </div>
 <div class="app-view dash-mode" id="app-admin">
 
+<div class="test-banner no-print" id="test-banner" style="display:none" role="status">
+  <span><strong>โหมดทดสอบเปิดอยู่</strong> — แอดมินลบสัญญาที่ประทับตราแล้วได้ · ปิดก่อนเริ่มใช้งานจริง</span>
+  <button type="button" class="test-banner-btn admin-only" style="display:none" onclick="toggleTestMode()">ปิดโหมดทดสอบ</button>
+</div>
 <header class="top dash-top">
   <div class="dash-top-inner">
     <div class="dash-brand">
@@ -2210,6 +2275,7 @@ setTimeout(function () {
       <button type="button" role="tab" class="imp-tab active" id="imp-tab-form" onclick="impTab('form')">Google Form <span class="dash-badge" id="imp-tab-badge" style="display:none">0</span></button>
       <button type="button" role="tab" class="imp-tab" id="imp-tab-hris" onclick="impTab('hris')">ข้อมูล HRIS</button>
       <button type="button" role="tab" class="imp-tab admin-only" id="imp-tab-trash" style="display:none" onclick="impTab('trash')">ถังขยะ</button>
+      <button type="button" role="tab" class="imp-tab admin-only" id="imp-tab-settings" style="display:none" onclick="impTab('settings')">ตั้งค่า</button>
     </div>
     <div class="imp-body" id="imp-body-form">
       <div class="fi-card">
@@ -2217,6 +2283,21 @@ setTimeout(function () {
         <div class="fi-desc">อ่านคำตอบจากระบบจัดทำสัญญาเดิม (อ่านอย่างเดียว) แล้วสร้างสัญญาพร้อมคัดลอกเอกสารให้อัตโนมัติ — กดซ้ำได้ ไม่สร้างซ้ำ</div>
         <div class="hris-actions"><button class="secondary" onclick="formImportPreview()">ตรวจหาคำตอบใหม่</button></div>
         <div id="fi-result"></div>
+      </div>
+      <div class="fi-card" id="fi-bulk-card">
+        <div class="hris-title">ศิษย์การบินที่นำเข้าแล้ว: เอกสาร (ถ้ามี) ที่รอผู้ทำสัญญายืนยัน</div>
+        <div class="fi-desc" id="fi-bulk-desc"></div>
+        <div class="hris-actions"><button class="secondary" id="fi-bulk-btn" onclick="bulkDeclareOptionalNone()" disabled>แจ้งแทน: ไม่มีเอกสาร (ถ้ามี) ทุกสัญญา</button></div>
+        <div id="fi-bulk-result"></div>
+      </div>
+      <div class="fi-card" id="fi-conv-card">
+        <div class="hris-title">ไฟล์ที่ไม่ใช่ PDF ในสัญญาที่นำเข้าแล้ว (รูปภาพ / Word ฯลฯ)</div>
+        <div class="fi-desc">ตรวจหาเอกสารที่ศิษย์การบินอัปโหลดมาเป็นไฟล์อื่น แล้วแปลงเป็น PDF ให้เปิดตรวจและทำสัญลักษณ์ได้ — ไฟล์ต้นฉบับยังเก็บไว้ในโฟลเดอร์สัญญา และไม่กระทบสถานะการตรวจที่ทำไปแล้ว</div>
+        <div class="hris-actions">
+          <button class="secondary" id="fi-conv-scan" onclick="convScan()">ตรวจหาไฟล์ที่ไม่ใช่ PDF</button>
+          <button class="primary" id="fi-conv-run" onclick="convRun()" style="display:none">แปลงเป็น PDF</button>
+        </div>
+        <div id="fi-conv-result"></div>
       </div>
     </div>
     <div class="imp-body" id="imp-body-hris" style="display:none">
@@ -2231,6 +2312,18 @@ setTimeout(function () {
     <div class="imp-body" id="imp-body-trash" style="display:none">
       <p class="trash-note">สัญญาที่ถูกลบ (เฉพาะผู้ดูแลระบบ) — กู้คืนได้จนกว่าจะกด "ลบถาวร"</p>
       <div id="trash-list"></div>
+    </div>
+    <div class="imp-body" id="imp-body-settings" style="display:none">
+      <div class="fi-card">
+        <div class="hris-title">โหมดทดสอบ</div>
+        <div class="fi-desc" id="set-test-desc"></div>
+        <div class="hris-actions"><button class="secondary" id="set-test-btn" onclick="toggleTestMode()">เปิดโหมดทดสอบ</button></div>
+      </div>
+      <div class="fi-card" id="set-counters">
+        <div class="hris-title">ตัวนับเลขที่สัญญา</div>
+        <div class="fi-desc">ลบสัญญาทดสอบแล้ว ตัวนับยังเดินต่อ (เช่น สัญญาจริงฉบับแรกได้ ศบ.045) รีเซ็ตให้ตรงกับ <strong>เลขสูงสุดที่ยังเหลืออยู่</strong> (นับรวมสัญญาในถังขยะ) จึงไม่ออกเลขซ้ำ — ควรทำเป็นขั้นสุดท้ายก่อนเริ่มใช้งานจริง</div>
+        <div id="counter-list"></div>
+      </div>
     </div>
   </aside>
 </div>
@@ -2301,20 +2394,24 @@ setTimeout(function () {
         <div class="dash-table-title">รายชื่อสัญญา <span class="list-count" id="list-count"></span></div>
         <div class="search-wrap">
           <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A5772" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
-          <input type="text" id="list-search" aria-label="ค้นหา" placeholder="ค้นหาชื่อ เลขประจำตัว เลขที่สัญญา" oninput="renderList()">
+          <input type="text" id="list-search" aria-label="ค้นหา" placeholder="ค้นหาชื่อ เลขประจำตัว เลขที่สัญญา อีเมล" oninput="renderList()">
         </div>
+        <select id="list-year" class="list-sel" aria-label="กรองตามปี" onchange="listYearFilter=this.value;renderList()"><option value="">ทุกปี</option></select>
+        <select id="list-source" class="list-sel" aria-label="กรองตามที่มา" onchange="listSourceFilter=this.value;renderList()"><option value="">ทุกที่มา</option><option value="form">จาก Google Form</option><option value="system">สร้างในระบบ</option></select>
         <div class="filter-chips seg" role="group" aria-label="กรองตามสถานะ">
           <button type="button" class="chip chip-all active" id="chip-all" onclick="setFilter('all')">ทั้งหมด</button>
           <button type="button" class="chip chip-waiting" id="chip-waiting" onclick="setFilter('waiting')">รอตรวจ</button>
           <button type="button" class="chip chip-revision" id="chip-revision" onclick="setFilter('revision')">แก้ไข</button>
           <button type="button" class="chip chip-stamped" id="chip-stamped" onclick="setFilter('stamped')">เสร็จแล้ว</button>
         </div>
+        <button type="button" class="secondary admin-only" id="sel-toggle" style="display:none" onclick="toggleSelectMode()" title="เลือกสัญญาหลายฉบับเพื่อย้ายไปถังขยะ">เลือกลบหลายฉบับ</button>
         <button type="button" class="secondary dash-refresh" onclick="refreshList()" title="โหลดรายชื่อใหม่">รีเฟรช</button>
       </div>
       <div class="dash-table-scroll">
-        <table class="applicants">
+        <table class="applicants" id="list-table">
           <thead>
             <tr>
+              <th class="sel-col"><input type="checkbox" id="sel-all" aria-label="เลือกทั้งหมดที่แสดงอยู่" onchange="selAll(this.checked)"></th>
               <th onclick="sortList('name')">ผู้ทำสัญญา</th>
               <th onclick="sortList('contractNumber')">เลขที่สัญญา</th>
               <th>ประเภท</th>
@@ -2427,6 +2524,46 @@ setTimeout(function () {
         <button class="primary" id="exp-zip" onclick="expRun('zip')" disabled>ดาวน์โหลด ZIP (แยกไฟล์ต่อคน)</button>
       </div>
       <div class="exp-progress" id="exp-progress"></div>
+    </div>
+  </div>
+
+  <!-- SELECTION BAR -->
+  <div class="sel-bar no-print" id="sel-bar" style="display:none">
+    <span class="sel-bar-text" id="sel-bar-text"></span>
+    <button type="button" class="sel-bar-clear" id="sel-bar-clear" onclick="SEL.ids={};renderList()">ล้างที่เลือก</button>
+    <button type="button" class="sel-bar-del" id="sel-bar-del" onclick="openDeleteModal()" disabled>ย้ายไปถังขยะ…</button>
+  </div>
+
+  <!-- DELETE MANY -->
+  <div class="modal-overlay" id="del-modal">
+    <div class="modal-box del-box" role="dialog" aria-label="ย้ายสัญญาไปถังขยะ">
+      <div class="u-picker-head">
+        <div><h3 id="del-title">ย้ายไปถังขยะ</h3><p>กู้คืนได้ที่ "นำเข้าข้อมูล" แท็บถังขยะ จนกว่าจะลบถาวร</p></div>
+        <button type="button" class="u-picker-close" onclick="closeDeleteModal()" aria-label="ปิด"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      <div class="del-body">
+        <ul class="del-list" id="del-list"></ul>
+        <div class="del-warn" id="del-stamped-row" style="display:none">
+          <label class="exp-check"><input type="checkbox" id="del-incl-stamped" onchange="delRefresh()"> <span id="del-stamped-label"></span></label>
+        </div>
+        <div id="del-reimport-row" style="display:none">
+          <label for="del-reimport">สัญญาจาก Google Form</label>
+          <select id="del-reimport"><option value="yes">ลบ และให้นำเข้าใหม่ได้ (เช่น ทดสอบแล้วอยากนำเข้าซ้ำ)</option><option value="no">ลบ และไม่ต้องนำเข้าอีก (เช่น สละสิทธิ์)</option></select>
+        </div>
+        <div>
+          <label for="del-reason">เหตุผลในการลบ (ใช้กับทุกฉบับที่เลือก)</label>
+          <textarea id="del-reason" rows="2" placeholder="เช่น สัญญาทดสอบระบบ" oninput="delRefresh()"></textarea>
+        </div>
+        <div>
+          <label for="del-confirm">พิมพ์ <span class="del-phrase" id="del-phrase"></span> เพื่อยืนยัน</label>
+          <input type="text" id="del-confirm" autocomplete="off" oninput="delRefresh()">
+        </div>
+        <div class="mail-progress" id="del-progress"></div>
+      </div>
+      <div class="del-foot">
+        <button class="secondary" onclick="closeDeleteModal()">ยกเลิก</button>
+        <button class="del-go" id="del-go" onclick="delGo()" disabled>ย้ายไปถังขยะ</button>
+      </div>
     </div>
   </div>
 
@@ -3195,6 +3332,7 @@ function hydrateSubmission(result) {
     consentedAt: s.consentedAt,
     submittedAt: s.submittedAt,
     importSource: s.importSource || '',
+    googleEmail: s.googleEmail || '',
     contractExportedAt: s.contractExportedAt || '',
     contractEmailedAt: s.contractEmailedAt || '',
     contractSeries: s.contractSeries || '',
@@ -4093,6 +4231,7 @@ function adaptFlatSubmission(row) {
     createdAt: row.createdAt,
     consentedAt: row.consentedAt,
     importSource: row.importSource || '',
+    googleEmail: row.googleEmail || '',
     contractExportedAt: row.contractExportedAt || '',
     contractEmailedAt: row.contractEmailedAt || '',
     contractSeries: row.contractSeries || '',
@@ -4207,10 +4346,14 @@ function subMatchesSearch(sub,q){
   if(!q) return true;
   var ql=q.toLowerCase();
   var name=(sub.personal.title+' '+sub.personal.first+' '+sub.personal.last).toLowerCase();
-  return name.includes(ql)||(sub.personal.officialId||'').includes(ql)||(sub.subId||'').toLowerCase().includes(ql)||formatContractNumber(sub).toLowerCase().includes(ql);
+  return name.includes(ql)||(sub.personal.officialId||'').includes(ql)||(sub.subId||'').toLowerCase().includes(ql)||formatContractNumber(sub).toLowerCase().includes(ql)||
+    (sub.personal.email||'').toLowerCase().includes(ql)||(sub.googleEmail||'').toLowerCase().includes(ql);
 }
 function subMatchesFilter(sub,f){
   if(listEduFilter && sub.personal.eduType !== listEduFilter) return false;
+  if(listYearFilter && String(sub.contractYear) !== listYearFilter) return false;
+  if(listSourceFilter === 'form' && sub.importSource !== 'google-form') return false;
+  if(listSourceFilter === 'system' && sub.importSource === 'google-form') return false;
   if(f==='all') return true;
   if(f==='stamped') return !!sub.stamped;
   var hasFlagged=Object.values(sub.documents||{}).some(function(d){return d.reviewStatus==='needs-revision'||d.reviewStatus==='fail';});
@@ -4236,6 +4379,7 @@ function renderList() {
   updateStats();
   var q = (document.getElementById('list-search')||{}).value||'';
   var rows = SUBMISSIONS.filter(function(sub){ return subMatchesSearch(sub,q) && subMatchesFilter(sub,listFilter); });
+  LIST_VISIBLE = rows; selPrune(rows); fillYearFilter(); renderSelBar();
   rows.sort(function(a,b){
     var d=listSort.dir;
     if(listSort.key==='name'){ var na=(a.personal.last||'')+(a.personal.first||''); var nb=(b.personal.last||'')+(b.personal.first||''); return d*(na<nb?-1:na>nb?1:0); }
@@ -4267,9 +4411,10 @@ function renderList() {
     if (ready) { overallLabel = 'พร้อมประทับตรา'; badgeCls = 'pass'; }
     var tk = dashTypeKey(sub.personal.eduType);
     var tr = document.createElement('tr');
-    tr.className = 'data-row' + (hasFlagged && !sub.stamped ? ' row-flagged' : '');
-    tr.onclick = function(){ showDetail(sub.subId); };
+    tr.className = 'data-row' + (hasFlagged && !sub.stamped ? ' row-flagged' : '') + (SEL.ids[sub.subId] ? ' row-selected' : '');
+    tr.onclick = function(){ if (SEL.on) { if (selEligible(sub)) selToggle(sub.subId); } else showDetail(sub.subId); };
     tr.innerHTML =
+      '<td class="sel-col">' + selBoxHtml(sub) + '</td>' +
       '<td><div class="row-person"><span class="row-avatar t-'+tk+'">'+escapeHtml(thaiInitial(sub.personal.first)+thaiInitial(sub.personal.last))+'</span>'+
         '<span class="row-name"><strong>'+escapeHtml(sub.personal.title+' '+sub.personal.first+' '+sub.personal.last)+'</strong>'+
         '<span class="sub-cell">'+[escapeHtml(sub.personal.email||''), 'ฉบับที่ '+(sub.personalSeq||1)].filter(Boolean).join(' · ')+(sub.importSource==='google-form'?' · <span class="fi-tag">จาก Google Form</span>':'')+'</span></span></div></td>'+
@@ -6244,6 +6389,7 @@ function initAdminView() {
   loadHris();
   dashAutoCheckForm();
   applyAdminVisibility();
+  loadSystemFlags();
 }
 function renderGuarantorClaimWarnings(sub) {
   var box = document.getElementById('rtaf-warnings');
@@ -6799,7 +6945,8 @@ function renderFormImportPreview() {
     }).join('') + '</div>';
   }
   html += actionable
-    ? '<div class="hris-actions"><button class="primary" id="fi-run-btn" onclick="formImportRun()" disabled>เลือกรายการที่จะนำเข้า</button></div>'
+    ? '<label class="fi-opt"><input type="checkbox" id="fi-declare-none" checked> <span>ถือว่าเอกสาร (ถ้ามี) ที่ฟอร์มไม่ได้แนบ = ไม่มี<small>เจ้าหน้าที่แจ้งแทนผู้ทำสัญญา (ระบบเดิมไม่มีช่องให้ติ๊ก) · ไม่รวมหนังสือรับรองของผู้ค้ำ · แก้ภายหลังเป็นรายสัญญาได้</small></span></label>' +
+      '<div class="hris-actions"><button class="primary" id="fi-run-btn" onclick="formImportRun()" disabled>เลือกรายการที่จะนำเข้า</button></div>'
     : '<div class="fi-progress">ไม่มีรายการที่ต้องนำเข้า</div>';
   box.innerHTML = html;
   fiPickChanged();
@@ -6825,13 +6972,15 @@ function formImportRun() {
   var selected = FI_SELECTED.slice();
   var total = selected.length;
   if (!total) return;
-  showConfirm('นำเข้าจาก Google Form?', 'สร้างสัญญาศิษย์การบินและคัดลอกเอกสาร ' + total + ' รายการ ไฟล์ในระบบเดิมไม่ถูกแก้ไข อาจใช้เวลาหลายนาที — อย่าปิดหน้านี้ระหว่างนำเข้า',
+  var optBox = document.getElementById('fi-declare-none'), declareNone = !!(optBox && optBox.checked);
+  showConfirm('นำเข้าจาก Google Form?', 'สร้างสัญญาศิษย์การบินและคัดลอกเอกสาร ' + total + ' รายการ ไฟล์ในระบบเดิมไม่ถูกแก้ไข' +
+    (declareNone ? '\nเอกสาร (ถ้ามี) ที่ฟอร์มไม่ได้แนบ จะถือว่า "ไม่มี" (เจ้าหน้าที่แจ้งแทน)' : '') + '\nอาจใช้เวลาหลายนาที — อย่าปิดหน้านี้ระหว่างนำเข้า',
     'เริ่มนำเข้า', function () {
       var done = [], errors = [];
       var box = document.getElementById('fi-result');
       var step = function () {
         box.innerHTML = '<div class="fi-progress"><span class="inline-spinner dark"></span> กำลังนำเข้า... เสร็จแล้ว ' + done.length + ' / ' + total + ' รายการ</div>';
-        callApi('runFormImport', [SESSION, selected]).then(function (r) {
+        callApi('runFormImport', [SESSION, selected, {declareOptionalNone: declareNone}]).then(function (r) {
           done = done.concat(r.processed || []);
           errors = errors.concat(r.errors || []);
           if (r.remaining > 0 && (r.processed || []).length) { step(); return; }
@@ -7098,7 +7247,7 @@ document.addEventListener('click', function (e) {
 });
 function renderDetailHeader(sub) {
   var delBtn = document.getElementById('det-del-btn');
-  if (delBtn) delBtn.style.display = currentUser && currentUser.isAdmin && !sub.stamped ? '' : 'none';
+  if (delBtn) delBtn.style.display = currentUser && currentUser.isAdmin && (!sub.stamped || SYSTEM_FLAGS.testMode) ? '' : 'none';
   var p = sub.personal;
   document.getElementById('d-name').textContent = p.title + ' ' + p.first + ' ' + p.last;
   document.getElementById('det-avatar').textContent = thaiInitial(p.first) + thaiInitial(p.last);
@@ -7200,6 +7349,11 @@ function renderActivity() {
       label = a.newValue === 'skipped' ? 'แจ้งไม่มีเอกสาร' : 'ยกเลิกการแจ้งไม่มีเอกสาร';
       tone = 'act-grey';
     } else if (a.action === 'stamp_approved') { tone = 'act-green'; }
+    else if (a.action === 'documents_skipped_by_officer_bulk') {
+      label = 'เจ้าหน้าที่แจ้งแทน: ไม่มีเอกสาร (ถ้ามี)' + (a.notes ? ' · ' + a.notes : '');
+      detail = String(a.newValue || '').split(',').filter(Boolean).map(function (id) { return findDocMeta(id).name.replace(/\s+พร้อม.*$/, ''); }).join(' · ');
+      tone = 'act-gold';
+    }
     else if (/skipped_by_officer|skip_cancelled_by_officer/.test(a.action)) {
       label = a.action === 'document_skipped_by_officer' ? (isRtafExemptId(a.docId) ? 'เจ้าหน้าที่แจ้งแทน: ผู้ค้ำเป็นข้าราชการ ทอ.' : 'เจ้าหน้าที่แจ้งแทน: ไม่มีเอกสารนี้') : 'เจ้าหน้าที่ยกเลิกการแจ้งแทน';
       tone = 'act-gold';
@@ -7522,12 +7676,12 @@ function officerTrashContract() {
      validate: function (v) { return v.replace(/\s+/g, '') === no.replace(/\s+/g, '') ? '' : 'เลขที่สัญญาไม่ตรง — พิมพ์ ' + no; }}
   ];
   if (sub.importSource === 'google-form') {
-    fields.push({id: 'reimport', label: 'สัญญานี้มาจาก Google Form', type: 'select', value: 'no',
-      optionsHtml: '<option value="no">ลบ และไม่ต้องนำเข้าอีก (เช่น สละสิทธิ์)</option><option value="yes">ลบ และให้นำเข้าใหม่ได้ (เช่น นำเข้าผิดพลาด)</option>',
+    fields.push({id: 'reimport', label: 'สัญญานี้มาจาก Google Form', type: 'select', value: 'yes',
+      optionsHtml: '<option value="yes">ลบ และให้นำเข้าใหม่ได้ (เช่น ทดสอบแล้วอยากนำเข้าซ้ำ)</option><option value="no">ลบ และไม่ต้องนำเข้าอีก (เช่น สละสิทธิ์)</option>',
       note: 'มีผลเมื่อลบถาวรจากถังขยะ'});
   }
   showFormDialog('ลบสัญญา ' + no,
-    subName(sub) + ' — สัญญาจะย้ายไปถังขยะ และหายจากหน้ารายชื่อของเจ้าหน้าที่และผู้ทำสัญญา กู้คืนได้จนกว่าจะลบถาวร',
+    subName(sub) + (sub.stamped ? '\n⚠ สัญญานี้ประทับตราแล้ว (ลบได้เพราะเปิดโหมดทดสอบอยู่)' : '') + '\nสัญญาจะย้ายไปถังขยะ และหายจากหน้ารายชื่อของเจ้าหน้าที่และผู้ทำสัญญา กู้คืนได้จนกว่าจะลบถาวร',
     fields, 'ย้ายไปถังขยะ', function (vals) {
       showLoading('กำลังลบ...');
       callApi('trashSubmission', [SESSION, sub.subId, vals.reason, vals.reimport === 'yes']).then(function () {
@@ -7542,51 +7696,13 @@ function officerTrashContract() {
       });
     });
 }
-// ---------- trash tab (in the right-hand drawer) ----------
-function loadTrash() {
-  var box = document.getElementById('trash-list');
-  box.innerHTML = '<div class="fi-progress">กำลังโหลด...</div>';
-  callApi('listTrash', [SESSION]).then(function (rows) {
-    if (!rows.length) { box.innerHTML = '<div class="trash-empty">ถังขยะว่าง</div>'; return; }
-    box.innerHTML = rows.map(function (r) {
-      var no = formatContractNumber({contractNumber: r.contractNumber, contractYear: r.contractYear, contractSeries: r.contractSeries});
-      return '<div class="trash-row"><div class="trash-main"><div class="trash-top"><span class="det-chip det-chip-no u-pick-no">' + escapeHtml(no) + '</span>' +
-        '<strong>' + escapeHtml([r.title, r.firstName, r.lastName].join(' ')) + '</strong></div>' +
-        '<div class="trash-sub">ลบเมื่อ ' + escapeHtml(formatThaiDateTime(r.deletedAt)) + ' โดย ' + escapeHtml(r.deletedBy) + '</div>' +
-        '<div class="trash-sub">เหตุผล: ' + escapeHtml(r.deleteReason || '-') + '</div>' +
-        (r.importSource === 'google-form' ? '<div class="trash-sub">' + (r.deleteReimport ? 'ลบถาวรแล้ว นำเข้าจาก Google Form ใหม่ได้' : 'ลบถาวรแล้ว จะไม่นำเข้าจาก Google Form อีก') + '</div>' : '') +
-        '</div><div class="trash-actions"><button class="secondary" onclick="trashRestore(\'' + r.subId + '\')">กู้คืน</button>' +
-        '<button class="danger" onclick="trashPurge(\'' + r.subId + '\',\'' + escapeHtml(no) + '\')">ลบถาวร</button></div></div>';
-    }).join('');
-  }).catch(function (err) {
-    box.innerHTML = '<div class="fi-errors">โหลดถังขยะไม่สำเร็จ: ' + escapeHtml(err && err.message ? err.message : String(err)) + '</div>';
-  });
-}
+// ---------- trash tab: see the multi-select block further down ----------
 function trashRestore(subId) {
   callApi('restoreSubmission', [SESSION, subId]).then(function () {
     showToast('กู้คืนสัญญาแล้ว', 'success');
     loadTrash(); refreshList();
   }).catch(function (err) { showToast('กู้คืนไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error'); });
 }
-function trashPurge(subId, no) {
-  showConfirm('ลบ ' + no + ' ถาวร?', 'ข้อมูลสัญญาและรายการเอกสารจะถูกลบออกจากระบบ และโฟลเดอร์ไฟล์ใน Google Drive ย้ายไปถังขยะของ Drive (กู้จาก Drive ได้ภายใน 30 วัน) ประวัติการทำงานยังเก็บไว้', 'ลบถาวร', function () {
-    showLoading('กำลังลบถาวร...');
-    callApi('purgeSubmission', [SESSION, subId]).then(function () {
-      hideLoading(); showToast('ลบถาวรแล้ว', 'success'); loadTrash();
-    }).catch(function (err) { hideLoading(); showToast('ลบไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error'); });
-  }, true);
-}
-var _admImpTab = impTab;
-impTab = function (t) {
-  var tt = document.getElementById('imp-tab-trash'), tb = document.getElementById('imp-body-trash');
-  if (tt) { tt.classList.toggle('active', t === 'trash'); tb.style.display = t === 'trash' ? '' : 'none'; }
-  if (t === 'trash') {
-    ['form', 'hris'].forEach(function (k) { document.getElementById('imp-tab-' + k).classList.remove('active'); document.getElementById('imp-body-' + k).style.display = 'none'; });
-    loadTrash();
-    return;
-  }
-  _admImpTab(t);
-};
 // ---------- export pilot contract files ----------
 var JSZIP_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
 var EXP = {sel: {}, busy: false};
@@ -7821,6 +7937,416 @@ function mailSendAll() {
     step(targets.map(function (s) { return s.subId; }));
   });
 }
+
+// ---------- declare "no such document" for every imported pilot contract at once ----------
+function bulkTargets() {
+  var t = {subs: 0, docs: 0};
+  SUBMISSIONS.forEach(function (sub) {
+    if (sub.personal.eduType !== 'pilot' || sub.importSource !== 'google-form' || sub.stamped) return;
+    var noSpouse = sub.documents.gs1_1 && sub.documents.gs1_1.status === 'skipped';
+    var n = ['c5', 'c8', 'g1_2', 'gs1_4'].filter(function (id) { return !(id === 'gs1_4' && noSpouse) && !sub.documents[id]; }).length;
+    if (n) { t.subs++; t.docs += n; }
+  });
+  return t;
+}
+function renderBulkCard() {
+  var d = document.getElementById('fi-bulk-desc'), b = document.getElementById('fi-bulk-btn');
+  if (!d || !b) return;
+  var t = bulkTargets();
+  d.innerHTML = t.subs
+    ? 'มี <strong>' + t.subs + ' สัญญา</strong> ที่ยังมีเอกสาร (ถ้ามี) รอผู้ทำสัญญายืนยัน รวม <strong>' + t.docs + ' รายการ</strong> — ระบบเดิมไม่มีช่องให้ติ๊ก เจ้าหน้าที่แจ้งแทนว่า "ไม่มี" ได้ในครั้งเดียว ' +
+      '(ไม่รวมหนังสือรับรองของผู้ค้ำ ที่ต้องเลือกเป็นรายสัญญา · ไม่แตะรายการที่ผู้ทำสัญญาตอบเองแล้ว หรือสัญญาที่ประทับตราแล้ว)'
+    : 'ไม่มีเอกสาร (ถ้ามี) ที่รอผู้ทำสัญญายืนยันในศิษย์การบินที่นำเข้าแล้ว';
+  b.disabled = !t.subs;
+}
+function bulkDeclareOptionalNone() {
+  var t = bulkTargets();
+  if (!t.subs) return;
+  showConfirm('แจ้งแทนผู้ทำสัญญา ' + t.subs + ' สัญญา?',
+    'แจ้งว่า "ไม่มี" สำหรับเอกสาร (ถ้ามี) ' + t.docs + ' รายการ (การเปลี่ยนชื่อ-นามสกุล, หลักฐานวิทยฐานะ ฯลฯ) ของศิษย์การบินที่นำเข้าแล้ว\nไม่รวมหนังสือรับรองของผู้ค้ำ · ยกเลิกเป็นรายสัญญาได้ภายหลัง · ทุกรายการบันทึกว่าเจ้าหน้าที่เป็นผู้แจ้ง',
+    'แจ้งแทนทั้งหมด', function () {
+      var box = document.getElementById('fi-bulk-result'), contracts = 0, documents = 0, btn = document.getElementById('fi-bulk-btn');
+      btn.disabled = true;
+      var step = function () {
+        box.innerHTML = '<div class="fi-progress"><span class="inline-spinner dark"></span> กำลังบันทึก... ' + contracts + ' สัญญา</div>';
+        callApi('bulkDeclareOptionalNone', [SESSION]).then(function (r) {
+          contracts += r.contracts; documents += r.documents;
+          if (r.remaining > 0 && r.contracts > 0) { step(); return; }
+          done(null);
+        }).catch(function (err) { done(err); });
+      };
+      var done = function (err) {
+        box.innerHTML = err ? '<div class="fi-errors">ไม่สำเร็จ: ' + escapeHtml(err.message || String(err)) + (contracts ? ' (บันทึกไปแล้ว ' + contracts + ' สัญญา — กดซ้ำเพื่อทำต่อ)' : '') + '</div>'
+          : '<div class="exp-done">✓ แจ้งแทนแล้ว ' + contracts + ' สัญญา · ' + documents + ' รายการ</div>';
+        if (!err) showToast('แจ้งแทนผู้ทำสัญญาแล้ว ' + contracts + ' สัญญา (' + documents + ' รายการ)', 'success', 6000);
+        refreshList();
+      };
+      step();
+    });
+}
+// ---------- find / convert non-PDF documents of imported contracts ----------
+var CONV = {pending: 0, failed: 0};
+function mimeLabel(m) {
+  m = String(m || '');
+  if (/jpeg/.test(m)) return 'รูป JPEG'; if (/png/.test(m)) return 'รูป PNG'; if (/heic|heif/.test(m)) return 'รูป HEIC';
+  if (/webp/.test(m)) return 'รูป WebP'; if (/^image\//.test(m)) return 'รูปภาพ (' + m.replace('image/', '') + ')';
+  if (/wordprocessing|msword/.test(m)) return 'Word'; if (/spreadsheet|excel/.test(m)) return 'Excel';
+  if (/presentation|powerpoint/.test(m)) return 'PowerPoint'; if (/^text\//.test(m)) return 'ข้อความ';
+  return m || 'ไม่ทราบชนิด';
+}
+function convScan() {
+  var box = document.getElementById('fi-conv-result'), btn = document.getElementById('fi-conv-scan'), run = document.getElementById('fi-conv-run');
+  btn.disabled = true; run.style.display = 'none';
+  box.innerHTML = '<div class="fi-progress"><span class="inline-spinner dark"></span> กำลังตรวจชนิดไฟล์... (อาจใช้เวลาครู่หนึ่ง)</div>';
+  callApi('scanNonPdfDocuments', [SESSION]).then(function (r) {
+    btn.disabled = false; CONV.pending = r.pending; CONV.failed = r.failed;
+    if (!r.total) { box.innerHTML = '<div class="exp-done">✓ ไม่พบเอกสารที่ไม่ใช่ PDF' + (r.partial ? ' (ตรวจยังไม่ครบ กดตรวจซ้ำ)' : '') + '</div>'; return; }
+    var types = Object.keys(r.byType).map(function (m) { return mimeLabel(m) + ' ' + r.byType[m]; }).join(' · ');
+    var rows = r.items.map(function (x) {
+      return '<tr><td>' + escapeHtml(x.name) + '</td><td>' + escapeHtml(x.docId) + '</td><td>' + escapeHtml(mimeLabel(x.mime)) + '</td><td>' +
+        (x.failed ? '<span style="color:#b42318">แปลงไม่ได้</span>' : 'รอแปลง') + '</td></tr>';
+    }).join('');
+    box.innerHTML = '<div class="fi-progress">พบ <strong>' + r.total + '</strong> เอกสารใน <strong>' + r.contracts + '</strong> สัญญา — ' + escapeHtml(types) +
+      (r.failed ? ' · เคยแปลงไม่สำเร็จ ' + r.failed : '') + (r.partial ? ' · (ตรวจยังไม่ครบ กดตรวจซ้ำเพื่อดูส่วนที่เหลือ)' : '') + '</div>' +
+      '<div style="max-height:220px;overflow:auto;margin-top:8px"><table class="fi-table"><thead><tr><th>ผู้ทำสัญญา</th><th>เอกสาร</th><th>ชนิด</th><th>สถานะ</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+    if (r.pending || r.failed) { run.style.display = ''; run.textContent = r.pending ? 'แปลงเป็น PDF (' + r.pending + ' รายการ)' : 'ลองแปลงรายการที่ไม่สำเร็จอีกครั้ง'; }
+  }).catch(function (err) {
+    btn.disabled = false;
+    box.innerHTML = '<div class="fi-errors">ตรวจไม่สำเร็จ: ' + escapeHtml(err.message || String(err)) + '</div>';
+  });
+}
+function convRun() {
+  var retry = !CONV.pending && CONV.failed > 0;
+  showConfirm('แปลงเอกสารเป็น PDF?',
+    'ระบบจะแปลงเอกสารที่ไม่ใช่ PDF ทีละรอบจนครบ ใช้เวลาตามจำนวนไฟล์ — ไฟล์ต้นฉบับยังเก็บไว้ ไม่กระทบสถานะการตรวจ กรุณาอย่าปิดหน้านี้ระหว่างแปลง',
+    'เริ่มแปลง', function () {
+      var box = document.getElementById('fi-conv-result'), run = document.getElementById('fi-conv-run'), scan = document.getElementById('fi-conv-scan');
+      var ok = 0, bad = 0, fails = [];
+      run.disabled = true; scan.disabled = true;
+      var step = function () {
+        box.innerHTML = '<div class="fi-progress"><span class="inline-spinner dark"></span> กำลังแปลง... สำเร็จ ' + ok + ' · ไม่สำเร็จ ' + bad + '</div>';
+        callApi('convertNonPdfDocuments', [SESSION, {retryFailed: retry}]).then(function (r) {
+          ok += r.converted; bad += r.failed; fails = fails.concat(r.failures || []);
+          if (r.remaining > 0 && (r.converted + r.failed) > 0) { step(); return; }
+          done(null);
+        }).catch(function (err) { done(err); });
+      };
+      var done = function (err) {
+        run.disabled = false; scan.disabled = false; run.style.display = 'none';
+        var html = err ? '<div class="fi-errors">ไม่สำเร็จ: ' + escapeHtml(err.message || String(err)) + (ok ? ' (แปลงไปแล้ว ' + ok + ' รายการ — กดตรวจและแปลงซ้ำเพื่อทำต่อ)' : '') + '</div>'
+          : '<div class="exp-done">✓ แปลงสำเร็จ ' + ok + ' รายการ' + (bad ? ' · แปลงไม่ได้ ' + bad + ' รายการ' : '') + '</div>';
+        if (fails.length) {
+          html += '<div class="fi-errors" style="margin-top:8px">แปลงไม่ได้ (ต้องให้ผู้ทำสัญญาอัปโหลดเป็น PDF ใหม่ หรือแปลงเอง):<br>' +
+            fails.slice(0, 30).map(function (f) { return escapeHtml(f.subId + ' · ' + f.docId + ' · ' + mimeLabel(f.mime)); }).join('<br>') + '</div>';
+        }
+        box.innerHTML = html;
+        if (!err) showToast('แปลงเป็น PDF แล้ว ' + ok + ' รายการ', 'success', 6000);
+        refreshList();
+      };
+      step();
+    });
+}
+
+var _bulkRenderList = renderList;
+renderList = function () { _bulkRenderList.apply(this, arguments); renderBulkCard(); };
+
+// ======================================================================
+// Admin: delete many contracts, bulk trash actions, test mode, counter reset
+// ======================================================================
+var SYSTEM_FLAGS = {testMode: false, testModeBy: '', testModeAt: ''};
+var SEL = {on: false, ids: {}}, LIST_VISIBLE = [], listYearFilter = '', listSourceFilter = '';
+var MULTI = {busy: false};
+function setFlags(f) {
+  SYSTEM_FLAGS = {testMode: !!(f && f.testMode), testModeBy: (f && f.testModeBy) || '', testModeAt: (f && f.testModeAt) || ''};
+  renderTestBanner(); renderSettings(); renderList();
+}
+function loadSystemFlags() {
+  callApi('getSystemFlags', [SESSION]).then(setFlags).catch(function () {});
+}
+function renderTestBanner() {
+  var b = document.getElementById('test-banner');
+  if (!b) return;
+  b.style.display = SYSTEM_FLAGS.testMode ? '' : 'none';
+  applyAdminVisibility();
+}
+function toggleTestMode() {
+  var turnOn = !SYSTEM_FLAGS.testMode;
+  var go = function () {
+    callApi('setTestMode', [SESSION, turnOn]).then(function (f) {
+      setFlags(f);
+      showToast(turnOn ? 'เปิดโหมดทดสอบแล้ว' : 'ปิดโหมดทดสอบแล้ว', turnOn ? 'warn' : 'success', 4000);
+    }).catch(function (err) { showToast('เปลี่ยนโหมดไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error'); });
+  };
+  if (turnOn) showConfirm('เปิดโหมดทดสอบ?', 'แอดมินจะลบสัญญาที่ประทับตราแล้วได้ (ยังต้องระบุเหตุผลและยืนยันเพิ่ม) ใช้ช่วงทดสอบระบบเท่านั้น — ปิดก่อนเริ่มใช้งานจริง', 'เปิดโหมดทดสอบ', go);
+  else go();
+}
+// ---------- select mode on the contract list ----------
+function selEligible(sub) { return !sub.stamped || SYSTEM_FLAGS.testMode; }
+function selectedSubs() { return LIST_VISIBLE.filter(function (s) { return SEL.ids[s.subId] && selEligible(s); }); }
+function selBoxHtml(sub) {
+  var ok = selEligible(sub);
+  return '<input type="checkbox" class="sel-pick" aria-label="เลือก ' + escapeHtml(subName(sub)) + '"' + (ok ? '' : ' disabled title="ประทับตราแล้ว — เปิดโหมดทดสอบเพื่อลบ"') +
+    (ok && SEL.ids[sub.subId] ? ' checked' : '') + ' onclick="event.stopPropagation()" onchange="selToggle(\'' + sub.subId + '\', this.checked)">';
+}
+function selPrune(rows) {
+  var visible = {};
+  rows.forEach(function (r) { visible[r.subId] = r; });
+  Object.keys(SEL.ids).forEach(function (id) { if (!visible[id] || !selEligible(visible[id])) delete SEL.ids[id]; });   // hidden rows are never deleted by accident
+}
+function fillYearFilter() {
+  var sel = document.getElementById('list-year');
+  if (!sel) return;
+  var years = {};
+  SUBMISSIONS.forEach(function (s) { if (s.contractYear) years[s.contractYear] = 1; });
+  var ys = Object.keys(years).sort().reverse(), html = '<option value="">ทุกปี</option>' + ys.map(function (y) { return '<option value="' + y + '">ปี ' + y + '</option>'; }).join('');
+  if (sel.dataset.years !== ys.join(',')) { sel.innerHTML = html; sel.dataset.years = ys.join(','); sel.value = listYearFilter; }
+}
+function toggleSelectMode() {
+  SEL.on = !SEL.on;
+  if (!SEL.on) SEL.ids = {};
+  document.getElementById('list-table').classList.toggle('sel-mode', SEL.on);
+  document.getElementById('app-admin').classList.toggle('has-selbar', SEL.on);
+  var b = document.getElementById('sel-toggle');
+  b.textContent = SEL.on ? 'ยกเลิกการเลือก' : 'เลือกลบหลายฉบับ';
+  b.classList.toggle('on', SEL.on);
+  renderList();
+}
+function selToggle(id, on) {
+  var sub = SUBMISSIONS.find(function (s) { return s.subId === id; });
+  if (!sub || !selEligible(sub)) return;
+  SEL.ids[id] = on === undefined ? !SEL.ids[id] : !!on;
+  renderList();
+}
+function selAll(on) {
+  LIST_VISIBLE.filter(selEligible).forEach(function (s) { SEL.ids[s.subId] = !!on; });
+  renderList();
+}
+function renderSelBar() {
+  var bar = document.getElementById('sel-bar');
+  if (!bar) return;
+  if (!SEL.on) { bar.style.display = 'none'; return; }
+  var elig = LIST_VISIBLE.filter(selEligible).length, chosen = selectedSubs(), stamped = chosen.filter(function (s) { return s.stamped; }).length;
+  bar.style.display = '';
+  document.getElementById('sel-bar-text').textContent = 'เลือก ' + chosen.length + ' จาก ' + elig + ' ฉบับที่แสดงอยู่' + (stamped ? ' (ประทับตราแล้ว ' + stamped + ')' : '');
+  document.getElementById('sel-bar-del').disabled = !chosen.length;
+  document.getElementById('sel-bar-clear').disabled = !chosen.length;
+  var all = document.getElementById('sel-all');
+  if (all) { all.checked = elig > 0 && chosen.length === elig; all.indeterminate = chosen.length > 0 && chosen.length < elig; }
+}
+// ---------- delete dialog for many ----------
+function openDeleteModal() {
+  var chosen = selectedSubs();
+  if (!chosen.length) return;
+  var stamped = chosen.filter(function (s) { return s.stamped; }).length;
+  document.getElementById('del-reason').value = '';
+  document.getElementById('del-confirm').value = '';
+  document.getElementById('del-incl-stamped').checked = false;
+  document.getElementById('del-stamped-row').style.display = stamped ? '' : 'none';
+  document.getElementById('del-stamped-label').textContent = 'ลบสัญญาที่ประทับตราแล้ว ' + stamped + ' ฉบับด้วย (โหมดทดสอบ) — ถ้าไม่ติ๊ก จะลบเฉพาะที่ยังไม่ประทับตรา';
+  document.getElementById('del-reimport').value = 'yes';
+  document.getElementById('del-progress').innerHTML = '';
+  document.getElementById('del-modal').classList.add('active');
+  delRefresh();
+  setTimeout(function () { document.getElementById('del-reason').focus(); }, 120);
+}
+function closeDeleteModal() { if (!MULTI.busy) document.getElementById('del-modal').classList.remove('active'); }
+function delEffective() {
+  var incl = SYSTEM_FLAGS.testMode && document.getElementById('del-incl-stamped').checked;
+  return selectedSubs().filter(function (s) { return !s.stamped || incl; });
+}
+function delRefresh() {
+  var all = selectedSubs(), eff = delEffective(), n = eff.length, effIds = {};
+  eff.forEach(function (s) { effIds[s.subId] = 1; });
+  document.getElementById('del-title').textContent = 'ย้ายไปถังขยะ ' + n + ' ฉบับ';
+  document.getElementById('del-list').innerHTML = all.map(function (s) {
+    var out = !effIds[s.subId];
+    return '<li' + (out ? ' class="del-out"' : '') + '><span class="row-no">' + escapeHtml(formatContractNumber(s)) + '</span><span>' + escapeHtml(subName(s)) + '</span>' +
+      (s.stamped ? '<span class="del-tag">ประทับตราแล้ว' + (out ? ' — ไม่รวม' : '') + '</span>' : '') + '</li>';
+  }).join('');
+  document.getElementById('del-reimport-row').style.display = eff.some(function (s) { return s.importSource === 'google-form'; }) ? '' : 'none';
+  var phrase = 'ลบ ' + n + ' ฉบับ';
+  document.getElementById('del-phrase').textContent = phrase;
+  var typed = document.getElementById('del-confirm').value.replace(/\s+/g, ''), ok = n > 0 && typed === phrase.replace(/\s+/g, '') && !!document.getElementById('del-reason').value.trim();
+  var btn = document.getElementById('del-go');
+  btn.disabled = !ok || MULTI.busy;
+  btn.textContent = 'ย้ายไปถังขยะ ' + n + ' ฉบับ';
+}
+function delGo() {
+  var eff = delEffective();
+  if (!eff.length || MULTI.busy) return;
+  var reason = document.getElementById('del-reason').value.trim(), incl = SYSTEM_FLAGS.testMode && document.getElementById('del-incl-stamped').checked;
+  var reimport = document.getElementById('del-reimport').value === 'yes';
+  var total = eff.length, trashed = [], skipped = [], prog = document.getElementById('del-progress');
+  MULTI.busy = true; delRefresh();
+  var finish = function (err) {
+    MULTI.busy = false;
+    SUBMISSIONS = SUBMISSIONS.filter(function (s) { return trashed.indexOf(s.subId) === -1; });
+    trashed.forEach(function (id) { delete SEL.ids[id]; });
+    if (!err && !skipped.length) {
+      document.getElementById('del-modal').classList.remove('active');
+      if (SEL.on) toggleSelectMode();
+      showToast('ย้าย ' + trashed.length + ' ฉบับไปถังขยะแล้ว — กู้คืนได้ที่ "นำเข้าข้อมูล" แท็บถังขยะ', 'success', 6000);
+    } else {
+      prog.innerHTML = '<div class="' + (trashed.length ? 'exp-done' : 'fi-errors') + '">ย้ายไปถังขยะแล้ว ' + trashed.length + ' ฉบับ</div>' +
+        (skipped.length ? '<div class="fi-errors"><strong>ข้าม ' + skipped.length + ' ฉบับ:</strong>' + skipped.map(function (x) { return '<div>' + escapeHtml(x.subId + ' — ' + x.reason) + '</div>'; }).join('') + '</div>' : '') +
+        (err ? '<div class="fi-errors">ไม่สำเร็จ: ' + escapeHtml(err.message || String(err)) + '</div>' : '');
+    }
+    delRefresh(); renderList(); refreshList();
+  };
+  var step = function (ids) {
+    prog.innerHTML = '<span class="inline-spinner dark"></span> กำลังย้ายไปถังขยะ... ' + (trashed.length + skipped.length) + ' / ' + total;
+    callApi('trashSubmissions', [SESSION, ids, reason, reimport, incl]).then(function (r) {
+      trashed = trashed.concat(r.trashed || []); skipped = skipped.concat(r.skipped || []);
+      if (r.remaining && r.remaining.length && ((r.trashed || []).length + (r.skipped || []).length)) { step(r.remaining); return; }
+      finish(null);
+    }).catch(function (err) { finish(err); });
+  };
+  step(eff.map(function (s) { return s.subId; }));
+}
+// ---------- trash tab: select many ----------
+var TRASH = {rows: [], sel: {}};
+function loadTrash() {
+  var box = document.getElementById('trash-list');
+  box.innerHTML = '<div class="fi-progress">กำลังโหลด...</div>';
+  callApi('listTrash', [SESSION]).then(function (rows) {
+    TRASH.rows = rows || [];
+    var have = {}; TRASH.rows.forEach(function (r) { have[r.subId] = 1; });
+    Object.keys(TRASH.sel).forEach(function (id) { if (!have[id]) delete TRASH.sel[id]; });
+    renderTrash();
+  }).catch(function (err) {
+    box.innerHTML = '<div class="fi-errors">โหลดถังขยะไม่สำเร็จ: ' + escapeHtml(err && err.message ? err.message : String(err)) + '</div>';
+  });
+}
+function trashNo(r) { return formatContractNumber({contractNumber: r.contractNumber, contractYear: r.contractYear, contractSeries: r.contractSeries}); }
+function renderTrash() {
+  var box = document.getElementById('trash-list'), rows = TRASH.rows;
+  if (!rows.length) { box.innerHTML = '<div class="trash-empty">ถังขยะว่าง</div>'; return; }
+  box.innerHTML = '<div class="trash-bar"><label class="exp-check"><input type="checkbox" id="trash-all" onchange="trashSelAll(this.checked)"> เลือกทั้งหมด</label>' +
+    '<span class="trash-count" id="trash-count"></span><span class="trash-gap"></span>' +
+    '<button type="button" class="secondary" id="trash-restore-sel" onclick="trashRestoreSel()" disabled>กู้คืนที่เลือก</button>' +
+    '<button type="button" class="danger" id="trash-purge-sel" onclick="trashPurge(trashSelectedIds())" disabled>ลบถาวรที่เลือก</button>' +
+    '<button type="button" class="danger trash-clear" onclick="trashPurge(TRASH.rows.map(function (r) { return r.subId; }))">ล้างถังขยะทั้งหมด</button></div>' +
+    rows.map(function (r) {
+      var no = trashNo(r);
+      return '<div class="trash-row"><input type="checkbox" class="trash-pick" aria-label="เลือก ' + escapeHtml(no) + '" data-id="' + r.subId + '"' + (TRASH.sel[r.subId] ? ' checked' : '') + ' onchange="trashSelToggle(this.dataset.id, this.checked)">' +
+        '<div class="trash-main"><div class="trash-top"><span class="det-chip det-chip-no u-pick-no">' + escapeHtml(no) + '</span>' +
+        '<strong>' + escapeHtml([r.title, r.firstName, r.lastName].join(' ')) + '</strong></div>' +
+        '<div class="trash-sub">ลบเมื่อ ' + escapeHtml(formatThaiDateTime(r.deletedAt)) + ' โดย ' + escapeHtml(r.deletedBy) + '</div>' +
+        '<div class="trash-sub">เหตุผล: ' + escapeHtml(r.deleteReason || '-') + '</div>' +
+        (r.importSource === 'google-form' ? '<div class="trash-sub">' + (r.deleteReimport ? 'ลบถาวรแล้ว นำเข้าจาก Google Form ใหม่ได้' : 'ลบถาวรแล้ว จะไม่นำเข้าจาก Google Form อีก') + '</div>' : '') +
+        '</div><div class="trash-actions"><button class="secondary" onclick="trashRestore(\'' + r.subId + '\')">กู้คืน</button>' +
+        '<button class="danger" onclick="trashPurge([\'' + r.subId + '\'])">ลบถาวร</button></div></div>';
+    }).join('');
+  trashCount();
+}
+function trashSelectedIds() { return TRASH.rows.filter(function (r) { return TRASH.sel[r.subId]; }).map(function (r) { return r.subId; }); }
+function trashCount() {
+  var n = trashSelectedIds().length, all = document.getElementById('trash-all');
+  var c = document.getElementById('trash-count'); if (c) c.textContent = 'เลือก ' + n + ' จาก ' + TRASH.rows.length;
+  if (all) { all.checked = n > 0 && n === TRASH.rows.length; all.indeterminate = n > 0 && n < TRASH.rows.length; }
+  ['trash-restore-sel', 'trash-purge-sel'].forEach(function (id) { var b = document.getElementById(id); if (b) b.disabled = !n; });
+}
+function trashSelToggle(id, on) { TRASH.sel[id] = !!on; trashCount(); }
+function trashSelAll(on) {
+  TRASH.rows.forEach(function (r) { TRASH.sel[r.subId] = !!on; });
+  document.querySelectorAll('#trash-list .trash-pick').forEach(function (b) { b.checked = !!on; });
+  trashCount();
+}
+function trashRestoreSel() {
+  var ids = trashSelectedIds();
+  if (!ids.length) return;
+  callApi('restoreSubmissions', [SESSION, ids]).then(function (r) {
+    showToast('กู้คืน ' + r.restored.length + ' ฉบับแล้ว' + (r.skipped.length ? ' · ข้าม ' + r.skipped.length : ''), r.skipped.length ? 'warn' : 'success');
+    loadTrash(); refreshList();
+  }).catch(function (err) { showToast('กู้คืนไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error'); });
+}
+function trashPurge(ids) {
+  var rows = TRASH.rows.filter(function (r) { return ids.indexOf(r.subId) > -1; }), n = rows.length;
+  if (!n) return;
+  var phrase = 'ลบถาวร ' + n + ' ฉบับ';
+  var names = rows.slice(0, 6).map(function (r) { return trashNo(r) + ' ' + [r.title, r.firstName, r.lastName].join(' '); });
+  showFormDialog('ลบถาวร ' + n + ' ฉบับ?',
+    'ข้อมูลสัญญาและรายการเอกสารจะถูกลบออกจากระบบ และโฟลเดอร์ไฟล์ใน Google Drive ย้ายไปถังขยะของ Drive (กู้จาก Drive ได้ภายใน 30 วัน) ประวัติการทำงานยังเก็บไว้\n• ' +
+    names.join('\n• ') + (n > 6 ? '\n• …และอีก ' + (n - 6) + ' ฉบับ' : ''),
+    [{id: 'confirm', label: 'พิมพ์ "' + phrase + '" เพื่อยืนยัน', required: true, placeholder: phrase,
+      validate: function (v) { return v.replace(/\s+/g, '') === phrase.replace(/\s+/g, '') ? '' : 'พิมพ์ ' + phrase + ' ให้ตรง'; }}],
+    'ลบถาวร', function () {
+      var purged = 0, skipped = [];
+      var step = function (list) {
+        showLoading('กำลังลบถาวร... ' + purged + ' / ' + n);
+        callApi('purgeSubmissions', [SESSION, list]).then(function (r) {
+          purged += r.purged.length; skipped = skipped.concat(r.skipped || []);
+          if (r.remaining && r.remaining.length && r.purged.length) { step(r.remaining); return; }
+          done(null);
+        }).catch(function (err) { done(err); });
+      };
+      var done = function (err) {
+        hideLoading();
+        TRASH.sel = {};
+        showToast(err ? 'ลบถาวรไม่สำเร็จ: ' + (err.message || err) + (purged ? ' (ลบไปแล้ว ' + purged + ' ฉบับ)' : '') : 'ลบถาวรแล้ว ' + purged + ' ฉบับ' + (skipped.length ? ' · ข้าม ' + skipped.length : ''), err ? 'error' : 'success', 6000);
+        loadTrash();
+        if (document.getElementById('imp-body-settings').style.display !== 'none') loadCounters();
+      };
+      step(rows.map(function (r) { return r.subId; }));
+    }, true);
+}
+// ---------- settings tab: test mode + contract-number counters ----------
+var COUNTERS = [];
+function renderSettings() {
+  var d = document.getElementById('set-test-desc'), b = document.getElementById('set-test-btn');
+  if (!d || !b) return;
+  d.innerHTML = SYSTEM_FLAGS.testMode
+    ? '<strong class="set-on">เปิดอยู่</strong>' + (SYSTEM_FLAGS.testModeBy ? ' — เปิดโดย ' + escapeHtml(SYSTEM_FLAGS.testModeBy) + ' เมื่อ ' + escapeHtml(formatThaiDateTime(SYSTEM_FLAGS.testModeAt)) : '') + '<br>แอดมินลบสัญญาที่ประทับตราแล้วได้ และมีแถบเตือนสีเหลืองแสดงที่ด้านบนทุกหน้า'
+    : '<strong>ปิดอยู่</strong> — สัญญาที่ประทับตราแล้วลบไม่ได้ (ค่าปกติสำหรับใช้งานจริง) เปิดในช่วงทดสอบระบบ เมื่อต้องการลบสัญญาทดสอบที่ประทับตราไปแล้ว';
+  b.textContent = SYSTEM_FLAGS.testMode ? 'ปิดโหมดทดสอบ' : 'เปิดโหมดทดสอบ';
+  b.className = SYSTEM_FLAGS.testMode ? 'primary' : 'secondary';
+}
+function loadSettings() { renderSettings(); loadCounters(); }
+function counterLabel(c) { return c.series === '' ? 'สัญญาทั่วไป ปี ' + c.year : c.series === 'SB' ? 'ศิษย์การบิน (ศบ.) ปี ' + c.year : 'ชุด ' + c.series + ' ปี ' + c.year; }
+function counterNo(c, n) { return formatContractNumber({contractNumber: n, contractYear: c.year, contractSeries: c.series}); }
+function loadCounters() {
+  var box = document.getElementById('counter-list');
+  box.innerHTML = '<div class="fi-progress">กำลังโหลด...</div>';
+  callApi('listCounters', [SESSION]).then(function (rows) {
+    COUNTERS = rows || [];
+    if (!COUNTERS.length) { box.innerHTML = '<div class="trash-empty">ยังไม่มีตัวนับ</div>'; return; }
+    box.innerHTML = COUNTERS.map(function (c, i) {
+      return '<div class="cnt-row"><div class="cnt-main"><strong>' + escapeHtml(counterLabel(c)) + '</strong>' +
+        '<div class="cnt-sub">ตัวนับ ' + c.lastNumber + ' · เลขสูงสุดที่ยังเหลือ ' + c.maxNumber + ' · สัญญา ' + c.count + ' ฉบับ' + (c.trashed ? ' (อยู่ในถังขยะ ' + c.trashed + ')' : '') + '</div>' +
+        '<div class="cnt-sub">ฉบับถัดไปจะได้เลข <strong>' + escapeHtml(counterNo(c, c.lastNumber + 1)) + '</strong>' +
+        (c.canReset ? ' → หลังรีเซ็ต <strong>' + escapeHtml(counterNo(c, c.maxNumber + 1)) + '</strong>' : '') + '</div>' +
+        (c.canReset && c.trashed ? '<div class="cnt-sub cnt-note">สัญญาในถังขยะยังนับอยู่ — ลบถาวรก่อน เพื่อคืนเลขของสัญญาเหล่านั้น</div>' : '') +
+        '</div><div class="cnt-act">' + (c.canReset ? '<button type="button" class="secondary" onclick="counterReset(' + i + ')">รีเซ็ต</button>' : '<span class="cnt-ok">ตรงกับสัญญาที่เหลือแล้ว</span>') + '</div></div>';
+    }).join('');
+  }).catch(function (err) {
+    box.innerHTML = '<div class="fi-errors">โหลดตัวนับไม่สำเร็จ: ' + escapeHtml(err && err.message ? err.message : String(err)) + '</div>';
+  });
+}
+function counterReset(i) {
+  var c = COUNTERS[i];
+  if (!c) return;
+  showConfirm('รีเซ็ตตัวนับ ' + counterLabel(c) + '?',
+    'ตัวนับจะเปลี่ยนจาก ' + c.lastNumber + ' เป็น ' + c.maxNumber + ' ฉบับถัดไปจะได้เลข ' + counterNo(c, c.maxNumber + 1) + ' (เดิม ' + counterNo(c, c.lastNumber + 1) + ')\nไม่กระทบสัญญาที่มีอยู่ และจะไม่ออกเลขซ้ำกับสัญญาที่เหลืออยู่ (รวมในถังขยะ)',
+    'รีเซ็ตตัวนับ', function () {
+      callApi('resetCounter', [SESSION, c.key]).then(function () {
+        showToast('รีเซ็ตตัวนับแล้ว', 'success'); loadCounters();
+      }).catch(function (err) { showToast('รีเซ็ตไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error'); });
+    });
+}
+var _admImpTab = impTab;
+impTab = function (t) {
+  ['trash', 'settings'].forEach(function (k) {
+    var tab = document.getElementById('imp-tab-' + k), body = document.getElementById('imp-body-' + k);
+    if (tab) tab.classList.toggle('active', t === k);
+    if (body) body.style.display = t === k ? '' : 'none';
+  });
+  if (t === 'trash' || t === 'settings') {
+    ['form', 'hris'].forEach(function (k) { document.getElementById('imp-tab-' + k).classList.remove('active'); document.getElementById('imp-body-' + k).style.display = 'none'; });
+    if (t === 'trash') loadTrash(); else loadSettings();
+    return;
+  }
+  _admImpTab(t);
+};
 
 boot();
 </script>
