@@ -6915,6 +6915,18 @@ var FI_LABEL = {
   'invalid': {t: 'ข้อมูลไม่ครบ', c: 'fi-muted'}
 };
 var FI_PREVIEW = null;
+// เตือนเมื่อหัวคอลัมน์ในชีตคำตอบไม่ตรงกับที่ระบบจับคู่ไว้ (เช่น มีการเปลี่ยนชื่อคำถามในฟอร์ม)
+function fiHeaderWarnHtml(res) {
+  var w = res.headerWarnings || {}, miss = w.missing || [], dup = w.duplicate || [];
+  if (!miss.length && !dup.length) return '';
+  var h = '<div class="fi-errors fi-hdrwarn"><strong>⚠ หัวคอลัมน์ในชีตคำตอบไม่ตรงกับที่ระบบคาดไว้ — เอกสารช่องเหล่านี้จะถูกมองว่า "ยังไม่ได้อัปโหลด"</strong>';
+  miss.forEach(function (m) {
+    h += '<div>• ไม่พบ "' + escapeHtml(m.header) + '"' + (m.docId ? ' (ช่อง ' + escapeHtml(m.docId) + ')' : ' (ไฟล์เพิ่มเติม)') +
+      (m.suggest ? '<br>&nbsp;&nbsp;ชื่อใกล้เคียงในชีต: "' + escapeHtml(m.suggest) + '"' : '') + '</div>';
+  });
+  dup.forEach(function (d) { h += '<div>• พบหัวคอลัมน์ซ้ำ "' + escapeHtml(d) + '" — ระบบอ่านเฉพาะคอลัมน์แรก</div>'; });
+  return h + '<div style="margin-top:6px">วิธีแก้: ตรวจชื่อคำถามในฟอร์ม/หัวคอลัมน์ในชีตให้ตรงกับที่ระบบใช้ หรือแจ้งผู้พัฒนาให้ปรับชื่อที่จับคู่ ก่อนนำเข้า</div></div>';
+}
 // ---------- แนบเอกสารเพิ่มภายหลัง / ไฟล์ใหม่ในช่องที่มีไฟล์แล้ว ----------
 function fiDocName(id) { var m = findDocMeta(id); return m && m.name ? m.name : id; }
 function fiDeltaText(it) {
@@ -6984,7 +6996,7 @@ function renderFormImportPreview() {
   var res = FI_PREVIEW, c = res.counts, box = document.getElementById('fi-result');
   var actionable = c['new'] + c.pdf + (c.added || 0);
   var chip = function (k, n) { return n ? '<span class="fi-chip ' + FI_LABEL[k].c + '">' + FI_LABEL[k].t + ' ' + n + '</span>' : ''; };
-  var html = '<div class="fi-summary">' + chip('new', c['new']) + chip('pdf', c.pdf) + chip('added', c.added) + chip('conflict', c.conflict) + chip('changed', c.changed) + chip('partial', c.partial) +
+  var html = fiHeaderWarnHtml(res) + '<div class="fi-summary">' + chip('new', c['new']) + chip('pdf', c.pdf) + chip('added', c.added) + chip('conflict', c.conflict) + chip('changed', c.changed) + chip('partial', c.partial) +
     chip('exists', c.exists) + chip('invalid', c.invalid) + '<span class="fi-chip fi-muted">นำเข้าแล้ว ' + c.done + '</span></div>';
   if (actionable) {
     html += '<label class="fi-all"><input type="checkbox" id="fi-all" onchange="fiToggleAll(this.checked)"> เลือกทั้งหมดที่นำเข้าได้ (' + actionable + ')</label>';
@@ -7031,7 +7043,9 @@ function formImportRun() {
   var total = selected.length;
   if (!total) return;
   var optBox = document.getElementById('fi-declare-none'), declareNone = !!(optBox && optBox.checked);
-  showConfirm('นำเข้าจาก Google Form?', 'สร้างสัญญาศิษย์การบินและคัดลอกเอกสาร ' + total + ' รายการ ไฟล์ในระบบเดิมไม่ถูกแก้ไข' +
+  var hw = FI_PREVIEW && FI_PREVIEW.headerWarnings, hwMiss = hw && (hw.missing || []).filter(function (m) { return m.docId; });
+  showConfirm(hwMiss && hwMiss.length ? '⚠ พบหัวคอลัมน์ที่ไม่ตรง — นำเข้าต่อหรือไม่?' : 'นำเข้าจาก Google Form?',
+    (hwMiss && hwMiss.length ? 'ช่องเอกสาร ' + hwMiss.map(function (m) { return m.docId; }).join(', ') + ' จะนำเข้าไม่ได้ (หาคอลัมน์ไม่พบ) แนะนำให้แก้ก่อน\n\n' : '') + 'สร้างสัญญาศิษย์การบินและคัดลอกเอกสาร ' + total + ' รายการ ไฟล์ในระบบเดิมไม่ถูกแก้ไข' +
     (declareNone ? '\nเอกสาร (ถ้ามี) ที่ฟอร์มไม่ได้แนบ จะถือว่า "ไม่มี" (เจ้าหน้าที่แจ้งแทน)' : '') + '\nอาจใช้เวลาหลายนาที — อย่าปิดหน้านี้ระหว่างนำเข้า',
     'เริ่มนำเข้า', function () {
       var done = [], errors = [];
