@@ -1143,6 +1143,7 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
   .imp-tab{flex:1;min-height:40px;border-radius:8px;border:none;background:transparent;color:var(--ink2);font-size:14px;cursor:pointer;}
   .imp-tab.active{background:#fff;color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(15,27,51,.15);}
   .imp-body{flex:1;overflow-y:auto;padding:18px 22px;}
+.fi-conflicts{margin-top:6px;display:flex;flex-direction:column;gap:6px}.fi-conf-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}.fi-conf-name{font-weight:600;flex:1 1 100%}
 .fi-table{width:100%;border-collapse:collapse;font-size:13px}.fi-table th,.fi-table td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border,#e5e7eb)}.fi-table th{color:#667085;font-weight:600}
   .imp-body .fi-card,.imp-body .hris-card{border:none;padding:0;margin:0;box-shadow:none;background:transparent;}
   .imp-body .fi-list{max-height:none;}
@@ -6906,12 +6907,68 @@ function onManualAnnotFile(input) {
 var FI_LABEL = {
   'new': {t: 'คำตอบใหม่', c: 'fi-new'},
   'pdf': {t: 'มีไฟล์สัญญาเพิ่ม', c: 'fi-pdf'},
+  'added': {t: 'แนบเอกสารเพิ่ม', c: 'fi-new'},
+  'conflict': {t: 'ไฟล์ใหม่ในช่องเดิม', c: 'fi-warn'},
   'changed': {t: 'ผู้ใช้แก้คำตอบ', c: 'fi-warn'},
   'partial': {t: 'นำเข้าไม่สมบูรณ์', c: 'fi-warn'},
   'exists': {t: 'มีสัญญาในระบบแล้ว', c: 'fi-muted'},
   'invalid': {t: 'ข้อมูลไม่ครบ', c: 'fi-muted'}
 };
 var FI_PREVIEW = null;
+// ---------- แนบเอกสารเพิ่มภายหลัง / ไฟล์ใหม่ในช่องที่มีไฟล์แล้ว ----------
+function fiDocName(id) { var m = findDocMeta(id); return m && m.name ? m.name : id; }
+function fiDeltaText(it) {
+  var t = [];
+  if ((it.added || []).length) t.push('ผู้ทำสัญญาแนบเพิ่ม (' + it.subId + '): ' + it.added.map(fiDocName).join(', ') + ' — เลือกแล้วกด "นำเข้า" เพื่อเพิ่มเฉพาะช่องที่ยังว่าง');
+  if ((it.conflicts || []).length) t.push('ช่องที่มีไฟล์แล้วแต่ฟอร์มเป็นไฟล์ใหม่ — ให้เจ้าหน้าที่ตัดสินใจ (ด้านล่าง)');
+  return t.join(' · ');
+}
+function fiConflictHtml(it) {
+  if (!(it.conflicts || []).length) return '';
+  var em = escapeHtml(it.email);
+  return '<div class="fi-conflicts">' + it.conflicts.map(function (d) {
+    return '<div class="fi-conf-row"><span class="fi-conf-name">' + escapeHtml(fiDocName(d)) + '</span>' +
+      '<button class="doc-view-btn" onclick="fiViewSource(\'' + em + '\',\'' + d + '\')">👁 ดูไฟล์ใหม่</button>' +
+      '<button class="secondary" onclick="fiResolve(\'' + em + '\',\'' + d + '\',\'replace\')">ใช้ไฟล์ใหม่</button>' +
+      '<button class="secondary" onclick="fiResolve(\'' + em + '\',\'' + d + '\',\'keep\')">คงของเดิม</button></div>';
+  }).join('') + '</div>';
+}
+function fiViewSource(email, docId) {
+  ANNOT = {mode: 'view', subId: '', docId: '', pages: [], items: [], tool: 'hand'};
+  annotShell(fiDocName(docId), 'ไฟล์ใหม่จาก Google Form (ยังไม่ได้นำเข้า)');
+  document.getElementById('annot-modal').classList.add('annot-noside');
+  callApi('getFormSourceFile', [SESSION, email, docId]).then(function (f) {
+    var bytes = base64ToBytes(f.base64);
+    var dl = document.getElementById('annot-download');
+    dl.href = URL.createObjectURL(new Blob([bytes], {type: f.mime || 'application/octet-stream'}));
+    dl.setAttribute('download', f.name || 'ไฟล์');
+    dl.style.display = '';
+    if (f.mime !== 'application/pdf') {
+      document.getElementById('annot-pages').innerHTML = '<div class="annot-msg">ไฟล์นี้ไม่ใช่ PDF (' + escapeHtml(f.mime || '') + ') — กด "ดาวน์โหลดไฟล์" เพื่อเปิดดู</div>';
+      return;
+    }
+    return annotRenderPages(bytes);
+  }).catch(function (err) {
+    document.getElementById('annot-pages').innerHTML = '<div class="annot-msg">เปิดไฟล์ไม่สำเร็จ: ' + escapeHtml(err.message || String(err)) + '</div>';
+  });
+}
+function fiResolve(email, docId, action) {
+  var replace = action === 'replace';
+  showConfirm(replace ? 'ใช้ไฟล์ใหม่แทนไฟล์เดิม?' : 'คงไฟล์เดิมไว้?',
+    replace ? 'ไฟล์ใหม่จากฟอร์มจะเข้าช่อง "' + fiDocName(docId) + '" และสถานะตรวจกลับเป็น "รอตรวจ" ส่วนไฟล์เดิม (พร้อมผลตรวจและความเห็น) เก็บไว้เป็น "ฉบับก่อน" ให้เทียบได้'
+            : 'ระบบจะไม่นำไฟล์ใหม่เข้า และไม่ถามเรื่องไฟล์นี้อีก (ไฟล์เดิมและผลตรวจไม่เปลี่ยน)',
+    replace ? 'ใช้ไฟล์ใหม่' : 'คงของเดิม', function () {
+      showLoading && showLoading('กำลังบันทึก...');
+      callApi('resolveFormConflict', [SESSION, email, docId, action]).then(function () {
+        hideLoading();
+        showToast(replace ? 'นำไฟล์ใหม่เข้าแล้ว' : 'คงไฟล์เดิมไว้แล้ว', 'success');
+        refreshList();
+        return callApi('previewFormImport', [SESSION]).then(function (res) { FI_PREVIEW = res; renderFormImportPreview(); });
+      }).catch(function (err) { hideLoading(); showToast('ไม่สำเร็จ: ' + (err && err.message ? err.message : err), 'error'); });
+    });
+}
+
+
 function formImportPreview() {
   var box = document.getElementById('fi-result');
   box.innerHTML = '<div class="fi-progress">กำลังอ่านคำตอบจาก Google Form...</div>';
@@ -6925,9 +6982,9 @@ function formImportPreview() {
 }
 function renderFormImportPreview() {
   var res = FI_PREVIEW, c = res.counts, box = document.getElementById('fi-result');
-  var actionable = c['new'] + c.pdf;
+  var actionable = c['new'] + c.pdf + (c.added || 0);
   var chip = function (k, n) { return n ? '<span class="fi-chip ' + FI_LABEL[k].c + '">' + FI_LABEL[k].t + ' ' + n + '</span>' : ''; };
-  var html = '<div class="fi-summary">' + chip('new', c['new']) + chip('pdf', c.pdf) + chip('changed', c.changed) + chip('partial', c.partial) +
+  var html = '<div class="fi-summary">' + chip('new', c['new']) + chip('pdf', c.pdf) + chip('added', c.added) + chip('conflict', c.conflict) + chip('changed', c.changed) + chip('partial', c.partial) +
     chip('exists', c.exists) + chip('invalid', c.invalid) + '<span class="fi-chip fi-muted">นำเข้าแล้ว ' + c.done + '</span></div>';
   if (actionable) {
     html += '<label class="fi-all"><input type="checkbox" id="fi-all" onchange="fiToggleAll(this.checked)"> เลือกทั้งหมดที่นำเข้าได้ (' + actionable + ')</label>';
@@ -6936,12 +6993,13 @@ function renderFormImportPreview() {
     html += '<div class="fi-list">' + res.items.map(function (it) {
       var lab = FI_LABEL[it.status] || {t: it.status, c: 'fi-muted'};
       var extra = it.status === 'new' && !it.hasContract ? 'ยังไม่มี PDF สัญญา (แนบให้เองเมื่อแอดมินสร้าง)' : it.note;
-      var can = it.status === 'new' || it.status === 'pdf';
+      var can = it.status === 'new' || it.status === 'pdf' || it.status === 'added';
+      if (it.status === 'added' || it.status === 'conflict') extra = fiDeltaText(it);
       var picked = FI_SELECTED.indexOf(it.email) > -1;
       return '<div class="fi-row' + (can ? ' fi-pickable' : '') + '">' +
         (can ? '<input type="checkbox" class="fi-pick" value="' + escapeHtml(it.email) + '"' + (picked ? ' checked' : '') + ' onchange="fiPickChanged()">' : '<span class="fi-pick-gap"></span>') +
         '<span class="fi-chip ' + lab.c + '">' + lab.t + '</span><span class="fi-name">' + escapeHtml(it.name) +
-        '</span><span class="fi-email">' + escapeHtml(it.email) + '</span>' + (extra ? '<div class="fi-note">' + escapeHtml(extra) + '</div>' : '') + '</div>';
+        '</span><span class="fi-email">' + escapeHtml(it.email) + '</span>' + (extra ? '<div class="fi-note">' + escapeHtml(extra) + '</div>' : '') + fiConflictHtml(it) + '</div>';
     }).join('') + '</div>';
   }
   html += actionable
