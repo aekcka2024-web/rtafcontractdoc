@@ -568,6 +568,7 @@ header.top h1{font-size:18px;font-weight:600;margin:0;}
     .boot-right{width:auto;padding:32px 24px;box-shadow:none;flex:1;}
     .boot-footer{padding:10px 20px;}
   }
+  .ocr-idcheck{font-size:11px;margin-top:3px;min-height:14px}.ocr-idcheck.ok{color:#067647}.ocr-idcheck.bad{color:#b42318;font-weight:600}
   .ocr-status{font-size:12px;color:var(--steel);}
   .ocr-raw-wrap{margin:0 0 10px;font-size:12px;color:var(--steel);}
   .ocr-raw-wrap pre{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:4px;padding:8px;max-height:140px;overflow:auto;font-family:inherit;margin:6px 0 0;}
@@ -2683,14 +2684,15 @@ setTimeout(function () {
           <label><input type="radio" name="ocr-card-type" value="civil" checked onchange="updateOcrIdLabel()"> บัตรข้าราชการ</label>
           <label><input type="radio" name="ocr-card-type" value="citizen" onchange="updateOcrIdLabel()"> บัตรประชาชน</label>
           <label>หน้าที่ <input type="number" id="ocr-page" value="1" min="1" style="width:56px;padding:4px 6px;border:1px solid var(--line);border-radius:4px;font-family:inherit"></label>
-          <button class="secondary" id="ocr-scan-btn" onclick="runDocOcr()">สแกน OCR</button>
+          <button class="primary" id="ocr-google-btn" onclick="runDocOcr('google')" title="ใช้ OCR ของ Google Drive (ภาษาไทยแม่นกว่า)">อ่านบัตรด้วย Google</button>
+          <button class="secondary" id="ocr-scan-btn" onclick="runDocOcr('local')" title="อ่านในเครื่อง (Tesseract) — ใช้เมื่ออ่านด้วย Google ไม่ได้">สแกนในเครื่อง</button>
           <span class="ocr-status" id="ocr-status"></span>
         </div>
         <div class="ocr-fields-row">
           <div class="field"><label>คำนำหน้า/ยศ</label><input id="ocr-title"></div>
           <div class="field"><label>ชื่อ</label><input id="ocr-first"></div>
           <div class="field"><label>นามสกุล</label><input id="ocr-last"></div>
-          <div class="field"><label id="ocr-idnum-label">เลขประจำตัวข้าราชการ</label><input id="ocr-idnum"></div>
+          <div class="field"><label id="ocr-idnum-label">เลขประจำตัวข้าราชการ</label><input id="ocr-idnum" oninput="updateOcrIdCheck()"><div class="ocr-idcheck" id="ocr-idcheck"></div></div>
         </div>
         <details id="ocr-raw-wrap" class="ocr-raw-wrap" style="display:none"><summary>ข้อความทั้งหมดที่อ่านได้</summary><pre id="ocr-raw"></pre></details>
         <button class="primary" onclick="runDocOcrMatch()">ตรวจสอบรายชื่อกับระบบ</button>
@@ -5198,7 +5200,7 @@ function openDocModal(subId, docId) {
       document.getElementById('ocr-title').value = '';
       document.getElementById('ocr-first').value = '';
       document.getElementById('ocr-last').value = '';
-      document.getElementById('ocr-idnum').value = '';
+      document.getElementById('ocr-idnum').value = ''; updateOcrIdCheck();
       if (gNum) {
         document.getElementById('ocr-save-btn').disabled = true;
         document.getElementById('ocr-save-btn').textContent = 'บันทึกข้อมูลผู้ค้ำประกัน';
@@ -5292,6 +5294,24 @@ function closeDocModal() {
 function updateOcrIdLabel() {
   var cardType = document.querySelector('input[name="ocr-card-type"]:checked').value;
   document.getElementById('ocr-idnum-label').textContent = cardType === 'civil' ? 'เลขประจำตัวข้าราชการ' : 'เลขบัตรประชาชน (13 หลัก)';
+  updateOcrIdCheck();
+}
+// เลขประจำตัวประชาชน 13 หลัก: หลักสุดท้ายคือหลักตรวจสอบ — อ่านผิดแม้หลักเดียวจะรู้ทันที
+function isValidThaiCitizenId(id) {
+  var d = String(id || '').replace(/\D/g, '');
+  if (d.length !== 13) return false;
+  var sum = 0;
+  for (var i = 0; i < 12; i++) sum += Number(d.charAt(i)) * (13 - i);
+  return (11 - sum % 11) % 10 === Number(d.charAt(12));
+}
+function updateOcrIdCheck() {
+  var el = document.getElementById('ocr-idcheck');
+  if (!el) return;
+  var v = document.getElementById('ocr-idnum').value.replace(/\D/g, '');
+  if (v.length !== 13) { el.textContent = ''; el.className = 'ocr-idcheck'; return; }
+  var ok = isValidThaiCitizenId(v);
+  el.textContent = ok ? '✓ เลขประจำตัวประชาชนถูกต้องตามหลักตรวจสอบ' : '⚠ เลขไม่ผ่านหลักตรวจสอบ — OCR น่าจะอ่านผิด กรุณาเทียบกับบัตร';
+  el.className = 'ocr-idcheck ' + (ok ? 'ok' : 'bad');
 }
 var PDFJS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
 var PDFJS_WORKER_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -5434,6 +5454,8 @@ function parseIdCardText(raw) {
   var citizen = runs.filter(function (d) {
     return d.length === 13;
   });
+  // ถ้ามีหลายชุด ให้ชุดที่ผ่านหลักตรวจสอบขึ้นก่อน
+  citizen.sort(function (a, b) { return (isValidThaiCitizenId(b) ? 1 : 0) - (isValidThaiCitizenId(a) ? 1 : 0); });
   var idNum = '',
     idType = null;
   var kwCivil = text.search(/ประจำตัวข้าราชการ/);
@@ -5458,24 +5480,43 @@ function parseIdCardText(raw) {
     found: !!(name || idNum)
   };
 }
-function runDocOcr() {
+function canvasToJpegBase64(canvas) {
+  var src = canvas, maxW = 2000;
+  if (canvas.width > maxW) {
+    src = document.createElement('canvas');
+    src.width = maxW; src.height = Math.round(canvas.height * maxW / canvas.width);
+    src.getContext('2d').drawImage(canvas, 0, 0, src.width, src.height);
+  }
+  var q = 0.88, url = src.toDataURL('image/jpeg', q);
+  while (url.length > 3.5 * 1024 * 1024 && q > 0.5) { q -= 0.12; url = src.toDataURL('image/jpeg', q); }
+  return url.slice(url.indexOf(',') + 1);
+}
+function runDocOcr(engine) {
   if (!docModalCurrent) return;
+  engine = engine === 'local' ? 'local' : 'google';
   var sub = SUBMISSIONS.find(function (s) {
     return s.subId === docModalCurrent.subId;
   });
   var docId = docModalCurrent.docId;
   var pageNum = Math.max(1, parseInt(document.getElementById('ocr-page').value, 10) || 1);
-  var btn = document.getElementById('ocr-scan-btn');
-  btn.disabled = true;
+  var btns = [document.getElementById('ocr-scan-btn'), document.getElementById('ocr-google-btn')];
+  btns.forEach(function (b) { if (b) b.disabled = true; });
+  var btn = {set disabled(v) { btns.forEach(function (b) { if (b) b.disabled = v; }); }};
   setOcrStatus('กำลังเตรียมเอกสาร...');
   getPdfBytes(sub, docId).then(function (bytes) {
     return renderPdfPageToCanvas(bytes, pageNum);
   }).then(function (canvas) {
+    if (engine === 'google') {
+      setOcrStatus('กำลังอ่านบัตรด้วย Google... (ประมาณ 5–15 วินาที)');
+      return callApi('ocrIdCardImage', [SESSION, sub.subId, docId, canvasToJpegBase64(canvas), 'image/jpeg']).then(function (r) {
+        return {data: {text: r.text || ''}};
+      });
+    }
     return getOcrWorker().then(function (worker) {
       return worker.recognize(canvas);
     });
   }).then(function (result) {
-    if (!docModalCurrent || docModalCurrent.docId !== docId) return;
+    if (!result || !docModalCurrent || docModalCurrent.docId !== docId) return;
     var text = result && result.data && result.data.text || '';
     var parsed = parseIdCardText(text);
     document.getElementById('ocr-title').value = parsed.title;
@@ -5484,15 +5525,15 @@ function runDocOcr() {
     document.getElementById('ocr-idnum').value = parsed.idNum;
     if (parsed.idType) {
       document.querySelector('input[name="ocr-card-type"][value="' + parsed.idType + '"]').checked = true;
-      updateOcrIdLabel();
     }
+    updateOcrIdLabel();
     document.getElementById('ocr-raw').textContent = text;
     document.getElementById('ocr-raw-wrap').style.display = '';
     ocrMatchResult = null;
     document.getElementById('doc-modal-match-result').innerHTML = '';
     setOcrStatus(parsed.found ? 'อ่านเสร็จแล้ว — กรุณาตรวจทานก่อนกด "ตรวจสอบรายชื่อกับระบบ" (OCR ภาษาไทยอาจอ่านผิดบางตัวอักษร)' : 'อ่านข้อความได้ แต่ไม่พบชื่อหรือเลขประจำตัวที่ชัดเจน กรุณากรอกเอง (ดูข้อความที่อ่านได้ด้านล่าง)');
   }).then(null, function (err) {
-    setOcrStatus('สแกนไม่สำเร็จ: ' + (err && err.message ? err.message : err));
+    setOcrStatus('สแกนไม่สำเร็จ: ' + (err && err.message ? err.message : err) + (engine === 'google' ? ' — ลองกด "สแกนในเครื่อง" แทนได้' : ''));
   }).then(function () {
     btn.disabled = false;
   });
