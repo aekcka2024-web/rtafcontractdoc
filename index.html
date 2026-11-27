@@ -3184,6 +3184,8 @@ function activeGuarantors(eduType) {
 // "ผู้ค้ำไม่มีคู่สมรส" ตามกติกาเดิม (ติ๊กจากหัวกลุ่มแทน); เพิ่ม c8 หลักฐานวิทยฐานะต่างประเทศ (ถ้ามี)
 // ต้องตรงกับ requiredDocIds_ ฝั่งเซิร์ฟเวอร์
 var DOC_FOREIGN_DEGREE = {id: 'c8', name: 'หลักฐานแสดงวิทยฐานะ (ใบรับรองคุณวุฒิ) พร้อมคำแปลภาษาไทย สำหรับผู้สำเร็จการศึกษาจากต่างประเทศ', optional: true};
+// ศิษย์การบิน: เอกสารอื่น ๆ ที่เกี่ยวข้อง (คอลัมน์ "หลักฐาน อื่น ๆ" ในฟอร์ม) — ไม่บังคับ ไม่ต้องติ๊ก "ไม่มี" แต่ถ้ามีไฟล์ต้องตรวจผ่านก่อนประทับตรา
+var DOC_PILOT_OTHER = {id: 'c9', name: 'เอกสารอื่น ๆ ที่เกี่ยวข้อง (ถ้ามี)', optional: true, noDeclare: true, reviewIfUploaded: true};
 var PILOT_HIDDEN_CONTRACTOR = ['c2', 'c3', 'c7'];
 // ศิษย์การบิน: สัญญาเข้าเป็นศิษย์การบินและสัญญาค้ำประกันเป็นไฟล์ PDF เดียว จึงรวมเป็นช่องเดียว
 var PILOT_C1 = {id: 'c1', name: 'สัญญาเข้าเป็นศิษย์การบิน และสัญญาค้ำประกัน (ผนวก ฎ, ฏ)', optional: false};
@@ -3191,7 +3193,7 @@ function isPilotEdu(eduType) { return eduType === 'pilot'; }
 function contractorDocsFor(eduType) {
   if (!isPilotEdu(eduType)) return DOCS_CONTRACTOR;
   return DOCS_CONTRACTOR.filter(function (d) { return PILOT_HIDDEN_CONTRACTOR.indexOf(d.id) === -1; })
-    .map(function (d) { return d.id === 'c1' ? PILOT_C1 : d; }).concat([DOC_FOREIGN_DEGREE]);
+    .map(function (d) { return d.id === 'c1' ? PILOT_C1 : d; }).concat([DOC_FOREIGN_DEGREE, DOC_PILOT_OTHER]);
 }
 function contractorSpouseDocsFor(eduType) { return isPilotEdu(eduType) ? [] : DOCS_CONTRACTOR_SPOUSE; }
 function guarantorSpouseDocsFor(g, eduType) {
@@ -3222,6 +3224,7 @@ function isRtafExemptId(docId) {
   return /^g[1-3]_4$/.test(docId);
 }
 function isRequiredDoc(getEntryFn, doc) {
+  if (doc.reviewIfUploaded) return getEntryFn(doc.id).status === 'uploaded';
   return !doc.optional && !isWaivedDoc(getEntryFn, doc.id) && !(isRtafExemptId(doc.id) && getEntryFn(doc.id).status === 'skipped');
 }
 function isDocSatisfied(getEntryFn, doc) {
@@ -3445,7 +3448,7 @@ function renderDocList(containerId, docs) {
     }
     var spouseConsent = isSpouseConsentId(doc.id);
     var rtafExempt = isRtafExemptId(doc.id);
-    if ((doc.optional || spouseConsent || rtafExempt) && !locked) {
+    if ((doc.optional || spouseConsent || rtafExempt) && !doc.noDeclare && !locked) {
       var skipWrap = document.createElement('label');
       skipWrap.className = 'doc-skip';
       var cb = document.createElement('input');
@@ -4684,6 +4687,7 @@ function awaitingDocs(sub) {
     if (isWaivedDoc(g, d.id)) return;
     var e = g(d.id);
     if (e.status === 'uploaded' || e.status === 'skipped') return;
+    if (d.noDeclare) return;
     if (d.optional) out.optional.push(d); else if (isRtafExemptId(d.id)) out.rtaf.push(d);
   });
   return out;
@@ -4752,7 +4756,7 @@ function renderDocTable(containerId, docs, sub) {
     var cmp = uploaded
       ? '<input type="checkbox" class="dl-cmp" aria-label="เลือกเอกสารนี้เพื่อเปิดเทียบ"' + (compareSelection.includes(doc.id) ? ' checked' : '') + ' onclick="event.stopPropagation()" onchange="toggleCompare(\'' + doc.id + '\', this)">'
       : '<span class="dl-cmp-gap"></span>';
-    var awaiting = !uploaded && !waived && !declaredNoSpouse && entry.status !== 'skipped' && (doc.optional || isRtafExemptId(doc.id));
+    var awaiting = !uploaded && !waived && !declaredNoSpouse && entry.status !== 'skipped' && !doc.noDeclare && (doc.optional || isRtafExemptId(doc.id));
     var icon = canReview ? '<span class="dl-icon ' + ui.cls + '" aria-hidden="true">' + ui.icon + '</span>'
       : awaiting ? '<span class="dl-icon res-wait" aria-hidden="true"></span>'
       : '<span class="dl-icon res-none" aria-hidden="true">–</span>';
@@ -4762,6 +4766,7 @@ function renderDocTable(containerId, docs, sub) {
       : declaredNoSpouse ? '<span class="dl-reason dl-reason-warn">ผู้ยื่นแจ้ง: ไม่มีคู่สมรส — ยืนยันผลด้านขวา</span>'
       : rtafSkip ? '<span class="dl-reason">' + (entry.skippedBy === 'officer' ? 'เจ้าหน้าที่แจ้งแทนผู้ยื่น' : 'ผู้ยื่นแจ้ง') + ': ผู้ค้ำเป็นข้าราชการ ทอ.</span>'
       : entry.status === 'skipped' ? '<span class="dl-reason">' + (entry.skippedBy === 'officer' ? 'เจ้าหน้าที่แจ้งแทนผู้ยื่นว่าไม่มีเอกสารนี้' : 'ผู้ยื่นแจ้งว่าไม่มีเอกสารนี้') + '</span>'
+      : doc.noDeclare ? '<span class="dl-reason">ไม่มีไฟล์ (ไม่บังคับ)</span>'
       : doc.optional ? '<span class="dl-reason dl-wait">รอผู้ทำสัญญายืนยัน — อัปโหลด หรือติ๊ก "ไม่มีเอกสารนี้"</span>'
       : isRtafExemptId(doc.id) ? '<span class="dl-reason dl-missing">ยังไม่อัปโหลด</span> <span class="dl-reason dl-wait">· รอผู้ทำสัญญา (อัปโหลด หรือแจ้งว่าผู้ค้ำเป็นข้าราชการ ทอ.)</span>'
       : '<span class="dl-reason dl-missing">ยังไม่อัปโหลด</span>';
@@ -4772,7 +4777,7 @@ function renderDocTable(containerId, docs, sub) {
       ? '<select class="rv-sel rv-' + st + '" aria-label="ผลตรวจ" onclick="event.stopPropagation()" onchange="this.className=\'rv-sel rv-\'+this.value; setReview(\'' + doc.id + '\',\'' + sub.subId + '\',this.value); renderAllDocTables(SUBMISSIONS.find(function(s){return s.subId===\'' + sub.subId + '\';}))">' +
         ['pending', 'pass', 'needs-revision', 'fail'].map(function (v) { return '<option value="' + v + '"' + (st === v ? ' selected' : '') + '>' + RESULT_UI[v].label + '</option>'; }).join('') + '</select>'
       : '<span class="dl-result res-none">—</span>';
-    var canDeclare = !sub.stamped && !locked && !uploaded && !waived && !declaredNoSpouse && (doc.optional || isRtafExemptId(doc.id));
+    var canDeclare = !sub.stamped && !locked && !uploaded && !waived && !declaredNoSpouse && !doc.noDeclare && (doc.optional || isRtafExemptId(doc.id));
     var declareBtn = '';
     if (canDeclare && entry.status === 'skipped') {
       declareBtn = '<button type="button" class="dl-act dl-act-undo" onclick="event.stopPropagation();officerDeclareDocs([\'' + doc.id + '\'], false)">ยกเลิกการแจ้ง</button>';
@@ -5136,7 +5141,7 @@ function currentEduForNames() {
 function findDocMeta(docId) {
   docId = String(docId).replace(/@prev$/, '');
   if (docId === 'c1' && isPilotEdu(currentEduForNames())) return PILOT_C1;
-  var all = [].concat(DOCS_CONTRACTOR, [DOC_FOREIGN_DEGREE], DOCS_CONTRACTOR_SPOUSE, _toConsumableArray(GUARANTORS.flatMap(function (g) {
+  var all = [].concat(DOCS_CONTRACTOR, [DOC_FOREIGN_DEGREE, DOC_PILOT_OTHER], DOCS_CONTRACTOR_SPOUSE, _toConsumableArray(GUARANTORS.flatMap(function (g) {
     return [].concat(_toConsumableArray(g.docs), _toConsumableArray(g.spouseDocs));
   })));
   return all.find(function (d) {
@@ -7539,7 +7544,7 @@ function renderUserProgress() {
   // contracts imported from the Google Form: the form never asked about these, so the applicant must
   // either upload them or tick "no such document" (optional documents / guarantor's income certificate)
   var undecided = state.importSource === 'google-form' ? docs.filter(function (d) {
-    if (!(d.optional || isRtafExemptId(d.id)) || isWaivedDoc(getEntry, d.id)) return false;
+    if (d.noDeclare || !(d.optional || isRtafExemptId(d.id)) || isWaivedDoc(getEntry, d.id)) return false;
     var e = getEntry(d.id);
     return e.status !== 'uploaded' && e.status !== 'skipped';
   }) : [];
